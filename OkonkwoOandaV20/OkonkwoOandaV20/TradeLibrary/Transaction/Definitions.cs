@@ -5,12 +5,34 @@ using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.TradeLibrary.Transaction
 {
+   /// <summary>
+   /// The reason that an Account is being funded.
+   /// </summary>
    public class FundingReason
    {
+      /// <summary>
+      /// The client has initiated a funds transfer
+      /// </summary>
       public const string ClientFunding = "CLIENT_FUNDING";
+
+      /// <summary>
+      /// Funds are being transfered between two Accounts.
+      /// </summary>
       public const string AccountTransfer = "ACCOUNT_TRANSFER";
+
+      /// <summary>
+      /// Funds are being transfered as part of a Division migration
+      /// </summary>
       public const string DivisionMigration = "DIVISION_MIGRATION";
+
+      /// <summary>
+      /// Funds are being transfered as part of a Site migration
+      /// </summary>
       public const string SiteMigration = "SITE_MIGRATION";
+
+      /// <summary>
+      /// Funds are being transfered as part of an Account adjustment
+      /// </summary>
       public const string Adjustment = "ADJUSTMENT";
    }
 
@@ -685,6 +707,11 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public const string OneCancelsAllOrderTriggered = "ONE_CANCELS_ALL_ORDER_TRIGGERED";
    }
 
+   /// <summary>
+   /// A VWAP Receipt provides a record of how the price for an Order fill is constructed. If the Order is 
+   /// filled with multiple buckets in a depth of market, each bucket will be represented with a VWAP 
+   /// Receipt.
+   /// </summary>
    public class VWAPReceipt
    {
       public long units { get; set; }
