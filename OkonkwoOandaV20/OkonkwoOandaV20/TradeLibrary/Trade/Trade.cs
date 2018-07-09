@@ -1,6 +1,6 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Order;
+﻿using OkonkwoOandaV20.TradeLibrary.Order;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Trade
+namespace OkonkwoOandaV20.TradeLibrary.Trade
 {
    public class Trade : TradeBase
    {

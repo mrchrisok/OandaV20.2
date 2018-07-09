@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Position
+namespace OkonkwoOandaV20.TradeLibrary.Position
 {
    /// <summary>
    /// The representation of a Position for a single direcetion (long or short).

@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Trade
+﻿namespace OkonkwoOandaV20.TradeLibrary.Trade
 {
    /// <summary>
    /// The current state of the trade

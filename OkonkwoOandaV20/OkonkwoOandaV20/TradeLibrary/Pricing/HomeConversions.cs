@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing
+﻿namespace OkonkwoOandaV20.TradeLibrary.Pricing
 {
    /// <summary>
    /// HomeConversions represents the factors to use to convert quantities of a given currency into the 

@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Credentials.cs" />
     <Compile Include="Framework\Attributes.cs" />
     <Compile Include="Framework\Common.cs" />
     <Compile Include="Framework\Factories\ErrorResponseFactory.cs" />
@@ -57,8 +56,8 @@
     <Compile Include="Framework\JsonConverters\PriceObjectConverter.cs" />
     <Compile Include="Framework\JsonConverters\OrderConverter.cs" />
     <Compile Include="Framework\JsonConverters\PricingStreamrResponseConverter.cs" />
-    <Compile Include="Framework\JsonConverters\TransactionStreamResponseConverter.cs" />
     <Compile Include="Framework\JsonConverters\TransactionConverter.cs" />
+    <Compile Include="Framework\JsonConverters\TransactionsStreamResponseConverter.cs" />
     <Compile Include="Framework\MarketHaltedException.cs" />
     <Compile Include="Framework\PriceInformation.cs" />
     <Compile Include="Framework\Utilities.cs" />
@@ -137,7 +136,6 @@
     <Compile Include="TradeLibrary\Pricing\REST\GetPricingStream.cs" />
     <Compile Include="TradeLibrary\Pricing\UnitsAvailable.cs" />
     <Compile Include="TradeLibrary\Pricing\UnitsAvailableDetails.cs" />
-    <Compile Include="TradeLibrary\Primitives.cs" />
     <Compile Include="TradeLibrary\Rest20.cs" />
     <Compile Include="TradeLibrary\REST\Credentials.cs" />
     <Compile Include="TradeLibrary\REST\Primitives.cs" />

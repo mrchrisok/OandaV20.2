@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Instrument;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Order;
+using OkonkwoOandaV20.TradeLibrary.Order;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 
@@ -11,7 +10,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequest
    [JsonConverter(typeof(PriceObjectConverter))]
    public abstract class EntryOrderRequest : Request, IOrderRequest, IHasPrices
    {
-      public EntryOrderRequest(Instrument oandaInstrument)
+      public EntryOrderRequest(Instrument.Instrument oandaInstrument)
       {
          instrument = oandaInstrument.name;
          timeInForce = TimeInForce.FillOrKill;

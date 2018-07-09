@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Trade
+﻿namespace OkonkwoOandaV20.TradeLibrary.Trade
 {
    public class TradeSummary : TradeBase
    {

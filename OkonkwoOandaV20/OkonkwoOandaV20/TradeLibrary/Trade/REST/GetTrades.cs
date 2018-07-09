@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Trade;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,7 +12,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>A list of TradeData objects (or empty list, if no trades)</returns>
-      public static async Task<List<Trade>> GetTradesAsync(string accountID, TradesParameters parameters)
+      public static async Task<List<Trade.Trade>> GetTradesAsync(string accountID, TradesParameters parameters)
       {
          string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/trades";
 
@@ -23,7 +22,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          
          var response = await MakeRequestAsync<TradesResponse>(uri, "GET", requestParams);
 
-         return response.trades ?? new List<Trade>();
+         return response.trades ?? new List<Trade.Trade>();
       }
 
       public class TradesParameters
@@ -61,7 +60,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// <summary>
          /// The list of Trade detail objects
          /// </summary>
-         public List<Trade> trades { get; set; }
+         public List<Trade.Trade> trades { get; set; }
       }
    }
 }

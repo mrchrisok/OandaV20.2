@@ -1,7 +1,7 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Trade
+namespace OkonkwoOandaV20.TradeLibrary.Trade
 {
    public abstract class TradeBase : CalculatedTradeState
    {

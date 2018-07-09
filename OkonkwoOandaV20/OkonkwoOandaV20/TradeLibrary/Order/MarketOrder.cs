@@ -1,6 +1,6 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Order
+namespace OkonkwoOandaV20.TradeLibrary.Order
 {
    public class MarketOrder : EntryOrder
    {

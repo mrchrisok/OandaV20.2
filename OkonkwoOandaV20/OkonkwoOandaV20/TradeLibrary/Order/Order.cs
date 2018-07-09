@@ -1,7 +1,7 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.REST;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Order
+namespace OkonkwoOandaV20.TradeLibrary.Order
 {
    public class Order : Response, IOrder
    {

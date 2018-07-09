@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing
+﻿namespace OkonkwoOandaV20.TradeLibrary.Pricing
 {
    /// <summary>
    /// QuoteHomeConversionFactors represents the factors that can be used used to convert 

@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Account
+﻿namespace OkonkwoOandaV20.TradeLibrary.Account
 {
    /// <summary>
    /// http://developer.oanda.com/rest-live-v20/account-df/#AccountSummary

@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Position
+﻿namespace OkonkwoOandaV20.TradeLibrary.Position
 {
    /// <summary>
    /// The dynamic calculated state of a Position

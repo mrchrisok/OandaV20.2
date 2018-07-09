@@ -1,4 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Transaction;
+﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.Framework.Factories
@@ -30,6 +30,7 @@ namespace OkonkwoOandaV20.Framework.Factories
             case TransactionType.TransferFundsReject: return new TransferFundsRejectTransaction();
             case TransactionType.MarketOrder: return new MarketOrderTransaction();
             case TransactionType.MarketOrderReject: return new MarketOrderRejectTransaction();
+            case TransactionType.FixedPriceOrder: return new FixedPriceOrderTransaction();
             case TransactionType.LimitOrder: return new LimitOrderTransaction();
             case TransactionType.LimitOrderReject: return new LimitOrderRejectTransaction();
             case TransactionType.StopOrder: return new StopOrderTransaction();

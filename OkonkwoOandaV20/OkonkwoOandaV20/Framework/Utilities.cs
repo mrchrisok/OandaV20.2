@@ -1,6 +1,7 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Primitives;
+﻿using OkonkwoOandaV20.TradeLibrary.REST;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20.Framework
 {
@@ -13,8 +14,10 @@ namespace OkonkwoOandaV20.Framework
       /// <returns>True if trading is halted, false if trading is not halted.</returns>
       public static async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD)
       {
-         var accountId = Credentials.GetDefaultCredentials().DefaultAccountId;
-         var prices = await Rest20.GetPriceListAsync(accountId, new List<string>() { instrument });
+         var accountID = Credentials.GetDefaultCredentials().DefaultAccountId;
+         var parameters = new PricingParameters() { instruments = new List<string>() { instrument } };
+
+         var prices = await Rest20.GetPricingAsync(accountID, parameters);
 
          bool isTradeable = false, hasBids = false, hasAsks = false;
 

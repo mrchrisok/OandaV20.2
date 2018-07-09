@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Position
+﻿namespace OkonkwoOandaV20.TradeLibrary.Position
 {
    /// <summary>
    /// The specification of a Positon within an Account

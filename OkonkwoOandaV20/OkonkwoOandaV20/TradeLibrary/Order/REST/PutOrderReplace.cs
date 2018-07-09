@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Order;
+using OkonkwoOandaV20.TradeLibrary.Order;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Threading.Tasks;
 

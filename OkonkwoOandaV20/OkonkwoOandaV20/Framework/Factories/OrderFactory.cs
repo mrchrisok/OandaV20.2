@@ -1,4 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Order;
+﻿using OkonkwoOandaV20.TradeLibrary.Order;
 using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.Framework.Factories

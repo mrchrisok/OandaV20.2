@@ -1,5 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Trade;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -11,13 +10,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">Account identifier</param>
       /// <returns>A list of TradeData objects (or empty list, if no trades)</returns>
-      public static async Task<List<Trade>> GetOpenTradesAsync(string accountID)
+      public static async Task<List<Trade.Trade>> GetOpenTradesAsync(string accountID)
       {
          string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/openTrades";
 
          var response = await MakeRequestAsync<TradesResponse>(uri);
 
-         return response.trades ?? new List<Trade>();
+         return response.trades ?? new List<Trade.Trade>();
       }
    }
 }

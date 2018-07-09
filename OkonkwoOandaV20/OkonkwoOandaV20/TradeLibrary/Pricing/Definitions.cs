@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing
+﻿namespace OkonkwoOandaV20.TradeLibrary.Pricing
 {
    public class PriceStatus
    {

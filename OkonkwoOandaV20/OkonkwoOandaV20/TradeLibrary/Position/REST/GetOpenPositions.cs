@@ -1,5 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Position;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -14,13 +13,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">positions will be retrieved for this account id</param>
       /// <returns>A list of Position objects with the details for each position (or empty list if no positions)</returns>
-      public static async Task<List<Position>> GetOpenPositionsAsync(string accountID)
+      public static async Task<List<Position.Position>> GetOpenPositionsAsync(string accountID)
       {
          string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/openPositions";
 
          var response = await MakeRequestAsync<PositionsResponse>(uri);
 
-         return response.positions ?? new List<Position>();
+         return response.positions ?? new List<Position.Position>();
       }
    }
 }

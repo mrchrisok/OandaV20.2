@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Order
+namespace OkonkwoOandaV20.TradeLibrary.Order
 {
    public abstract class ExitOrder : Order
    {

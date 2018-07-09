@@ -1,4 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Instrument;
+﻿using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.Framework

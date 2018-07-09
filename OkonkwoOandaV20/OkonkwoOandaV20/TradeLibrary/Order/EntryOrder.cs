@@ -1,7 +1,7 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Order
+namespace OkonkwoOandaV20.TradeLibrary.Order
 {
    /// <summary>
    /// Base Order definition inherited by all Orders that  initiate a new Trade or Position

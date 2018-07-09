@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing
+﻿namespace OkonkwoOandaV20.TradeLibrary.Pricing
 {
    /// <summary>
    /// Representation of how many units of an Instrument are available to be traded for both long and short 

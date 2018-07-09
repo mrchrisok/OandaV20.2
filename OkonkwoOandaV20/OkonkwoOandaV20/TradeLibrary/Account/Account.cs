@@ -1,7 +1,7 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Trade;
+﻿using OkonkwoOandaV20.TradeLibrary.Trade;
 using System.Collections.Generic;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Account
+namespace OkonkwoOandaV20.TradeLibrary.Account
 {
    public class Account : AccountSummary
    {

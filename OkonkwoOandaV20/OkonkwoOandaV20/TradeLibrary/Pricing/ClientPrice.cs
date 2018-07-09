@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing
+namespace OkonkwoOandaV20.TradeLibrary.Pricing
 {
    /// <summary>
    /// Client price for an Account.

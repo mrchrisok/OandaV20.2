@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing
+namespace OkonkwoOandaV20.TradeLibrary.Pricing
 {
    /// <summary>
    /// The specification of an Account-specific Price

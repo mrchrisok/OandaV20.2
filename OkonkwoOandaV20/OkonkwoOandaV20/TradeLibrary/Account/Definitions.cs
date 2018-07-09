@@ -1,7 +1,7 @@
 ﻿/// <summary>
 /// http://developer.oanda.com/rest-live-v20/account-df/
 /// </summary>
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Account
+namespace OkonkwoOandaV20.TradeLibrary.Account
 {
    public class GuaranteedStopLossOrderMode
    {

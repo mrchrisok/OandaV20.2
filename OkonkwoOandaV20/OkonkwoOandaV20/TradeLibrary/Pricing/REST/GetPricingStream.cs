@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Instrument;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing;
+using OkonkwoOandaV20.TradeLibrary.Pricing;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using System;
 using System.Collections.Generic;
@@ -88,10 +87,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public class PricingSession : StreamSession<PricingStreamResponse>
       {
-         private readonly List<Instrument> _instruments;
+         private readonly List<Instrument.Instrument> _instruments;
          private bool _snapshot;
 
-         public PricingSession(string accountID, List<Instrument> instruments, bool snapshot = true) 
+         public PricingSession(string accountID, List<Instrument.Instrument> instruments, bool snapshot = true) 
             : base(accountID)
          {
             _instruments = instruments;

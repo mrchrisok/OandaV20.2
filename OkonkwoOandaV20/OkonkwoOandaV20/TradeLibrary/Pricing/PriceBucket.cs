@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing
+﻿namespace OkonkwoOandaV20.TradeLibrary.Pricing
 {
    /// <summary>
    /// A Price Bucket represents a prie available for an amount of liquidity.

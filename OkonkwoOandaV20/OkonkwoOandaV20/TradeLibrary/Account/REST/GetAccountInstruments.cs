@@ -1,5 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Instrument;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,7 +16,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a List of the tradeable instruments specified. If none are specified, all tradeable instruments for 
       /// the account are returned.</returns>
-      public static async Task<List<Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters)
+      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters)
       {
          string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/instruments";
 
@@ -45,6 +44,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// The requested list of instruments.
       /// </summary>
-      public List<Instrument> instruments { get; set; }
+      public List<Instrument.Instrument> instruments { get; set; }
    }
 }

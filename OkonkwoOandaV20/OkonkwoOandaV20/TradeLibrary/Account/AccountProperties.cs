@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Account
+﻿namespace OkonkwoOandaV20.TradeLibrary.Account
 {
    public class AccountProperties
    {

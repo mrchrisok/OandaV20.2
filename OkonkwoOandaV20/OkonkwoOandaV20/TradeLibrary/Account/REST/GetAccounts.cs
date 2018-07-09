@@ -1,4 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Account;
+﻿using OkonkwoOandaV20.TradeLibrary.Account;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

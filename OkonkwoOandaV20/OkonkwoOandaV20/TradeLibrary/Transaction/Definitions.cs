@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Instrument;
 using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.TradeLibrary.Transaction
@@ -192,7 +191,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    public class TakeProfitDetails : IHasPrices
    {
       public TakeProfitDetails() { }
-      public TakeProfitDetails(Instrument instrument)
+      public TakeProfitDetails(Instrument.Instrument instrument)
       {
          priceInformation = new PriceInformation()
          {
@@ -214,7 +213,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    public class StopLossDetails : IHasPrices
    {
       public StopLossDetails() { }
-      public StopLossDetails(Instrument instrument)
+      public StopLossDetails(Instrument.Instrument instrument)
       {
          priceInformation = new PriceInformation()
          {
@@ -238,7 +237,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    public class TrailingStopLossDetails : IHasPrices
    {
       public TrailingStopLossDetails() { }
-      public TrailingStopLossDetails(Instrument instrument)
+      public TrailingStopLossDetails(Instrument.Instrument instrument)
       {
          priceInformation = new PriceInformation()
          {

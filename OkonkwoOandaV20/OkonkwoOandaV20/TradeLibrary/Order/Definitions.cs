@@ -1,7 +1,7 @@
 ﻿/// <summary>
 /// http://developer.oanda.com/rest-live-v20/order-df/
 /// </summary>
-namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Order
+namespace OkonkwoOandaV20.TradeLibrary.Order
 {
    /// <summary>
    /// Specification of how Positions in the Account are modified when the Order is filled

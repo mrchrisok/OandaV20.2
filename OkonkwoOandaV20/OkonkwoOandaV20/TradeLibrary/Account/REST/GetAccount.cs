@@ -1,5 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Account;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -12,7 +11,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">details will be retrieved for this account id</param>
       /// <returns>an Account object containing the account details</returns>
-      public static async Task<Account> GetAccountAsync(string accountID)
+      public static async Task<Account.Account> GetAccountAsync(string accountID)
       {
          string uri = ServerUri(Server.Account) + "accounts/" + accountID;
 
@@ -26,6 +25,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// The full details of the requested Account.
       /// </summary>
-      public Account account { get; set; }
+      public Account.Account account { get; set; }
    }
 }

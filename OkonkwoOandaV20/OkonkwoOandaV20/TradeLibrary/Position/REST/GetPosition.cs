@@ -1,5 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Position;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -12,11 +11,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the account for which to get the position</param>
       /// <param name="instrument">the instrument for which to get the position</param>
       /// <returns>Position object with the details of the position</returns>
-      public static async Task<Position> GetPositionAsync(string accountID, string instrument)
+      public static async Task<Position.Position> GetPositionAsync(string accountID, string instrument)
       {
-         string requestString = ServerUri(Server.Account) + "accounts/" + accountID + "/positions/" + instrument;
+         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/positions/" + instrument;
 
-         var response = await MakeRequestAsync<PositionResponse>(requestString);
+         var response = await MakeRequestAsync<PositionResponse>(uri);
 
          return response.position;
       }
@@ -27,6 +26,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// The requested Position
       /// </summary>
-      public Position position { get; set; }
+      public Position.Position position { get; set; }
    }
 }

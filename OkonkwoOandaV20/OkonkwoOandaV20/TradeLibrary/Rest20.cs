@@ -47,7 +47,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <typeparam name="T">The response type</typeparam>
       /// <param name="uri">the uri of the request</param>
       /// <param name="method">method for the request (defaults to GET)</param>
-      /// <param name="requestParams">optional parameters (if provided, it's assumed the requestString doesn't contain any)</param>
+      /// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
       /// <returns>response via type T</returns>
       private static async Task<T> MakeRequestAsync<T>(string uri, string method = "GET", Dictionary<string, string> requestParams = null)
       {
@@ -61,7 +61,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <typeparam name="E">The error  response type</typeparam>
       /// <param name="uri">the uri of the request</param>
       /// <param name="method">method for the request (defaults to GET)</param>
-      /// <param name="requestParams">optional parameters (if provided, it's assumed the requestString doesn't contain any)</param>
+      /// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
       /// <returns>response via type T</returns>
       private static async Task<T> MakeRequestAsync<T, E>(string uri, string method = "GET", Dictionary<string, string> requestParams = null) 
          where E : IErrorResponse

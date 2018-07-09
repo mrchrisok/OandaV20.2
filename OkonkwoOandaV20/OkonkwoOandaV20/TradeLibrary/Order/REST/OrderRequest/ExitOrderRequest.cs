@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Instrument;
+using OkonkwoOandaV20.TradeLibrary.Instrument;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 
@@ -10,7 +10,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequest
    [JsonConverter(typeof(PriceObjectConverter))]
    public abstract class ExitOrderRequest : Request, IOrderRequest, IHasPrices
    {
-      public ExitOrderRequest(Instrument oandaInstrument)
+      public ExitOrderRequest(Instrument.Instrument oandaInstrument)
       {
          priceInformation = new PriceInformation()
          {

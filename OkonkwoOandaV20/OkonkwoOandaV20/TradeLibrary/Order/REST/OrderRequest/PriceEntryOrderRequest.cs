@@ -1,5 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Instrument;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Order;
+﻿using OkonkwoOandaV20.TradeLibrary.Order;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequest
 {
@@ -8,7 +7,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequest
    /// </summary>
    public abstract class PriceEntryOrderRequest : EntryOrderRequest
    {
-      public PriceEntryOrderRequest(Instrument instrument) : base(instrument)
+      public PriceEntryOrderRequest(Instrument.Instrument instrument) 
+         : base(instrument)
       {
          timeInForce = TimeInForce.GoodUntilCancelled;
          triggerCondition = OrderTriggerCondition.Default;

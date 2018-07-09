@@ -1,4 +1,4 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.DataTypes.Trade
+﻿namespace OkonkwoOandaV20.TradeLibrary.Trade
 {
    /// <summary>
    /// http://developer.oanda.com/rest-live-v20/trade-df/#CalculatedTradeState

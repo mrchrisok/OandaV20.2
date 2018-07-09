@@ -1,4 +1,4 @@
-﻿using OkonkwoOandaV20.TradeLibrary.DataTypes.Pricing;
+﻿using OkonkwoOandaV20.TradeLibrary.Pricing;
 using System;
 using System.Collections.Generic;
 

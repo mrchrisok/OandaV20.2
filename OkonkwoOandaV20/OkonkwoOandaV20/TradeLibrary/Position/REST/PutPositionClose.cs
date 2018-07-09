@@ -15,11 +15,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>DeletePositionResponse object containing details about the actions taken</returns>
       public static async Task<PositionCloseResponse> PutPositionCloseAsync(string accountId, string instrument, PositionCloseParameters parameters)
       {
-         string requestString = ServerUri(Server.Account) + "accounts/" + accountId + "/positions/" + instrument + "/close";
+         string uri = ServerUri(Server.Account) + "accounts/" + accountId + "/positions/" + instrument + "/close";
 
          var requestBody = ConvertToJSON(parameters);
 
-         var response = await MakeRequestWithJSONBody<PositionCloseResponse, PositionCloseErrorResponse>("PUT", requestBody, requestString);
+         var response = await MakeRequestWithJSONBody<PositionCloseResponse, PositionCloseErrorResponse>("PUT", requestBody, uri);
 
          return response;
       }

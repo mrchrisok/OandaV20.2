@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.TradeLibrary.DataTypes.Communications;
+using OkonkwoOandaV20.TradeLibrary.REST;
+using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20.Framework.Factories
 {
@@ -17,20 +18,20 @@ namespace OkonkwoOandaV20.Framework.Factories
                return JsonConvert.DeserializeObject<AccountConfigurationErrorResponse>(message);
             case "OrderCancelErrorResponse":
                return JsonConvert.DeserializeObject<OrderCancelErrorResponse>(message);
-            case "OrderCancelReplaceErrorResponse":
-               return JsonConvert.DeserializeObject<OrderCancelReplaceErrorResponse>(message);
-            case "OrderClientExtensionsModifyErrorResponse":
-               return JsonConvert.DeserializeObject<OrderClientExtensionsModifyErrorResponse>(message);
-            case "OrderPostErrorResponse":
-               return JsonConvert.DeserializeObject<OrderPostErrorResponse>(message);
+            case "OrderReplaceErrorResponse":
+               return JsonConvert.DeserializeObject<OrderReplaceErrorResponse>(message);
+            case "OrderClientExtensionsErrorResponse":
+               return JsonConvert.DeserializeObject<OrderClientExtensionsErrorResponse>(message);
+            case "PostOrderErrorResponse":
+               return JsonConvert.DeserializeObject<PostOrderErrorResponse>(message);
             case "PositionCloseErrorResponse":
                return JsonConvert.DeserializeObject<PositionCloseErrorResponse>(message);
-            case "TradeClientExtensionsModifyErrorResponse":
-               return JsonConvert.DeserializeObject<TradeClientExtensionsModifyErrorResponse>(message);
+            case "TradeClientExtensionsErrorResponse":
+               return JsonConvert.DeserializeObject<TradeClientExtensionsErrorResponse>(message);
             case "TradeCloseErrorResponse":
                return JsonConvert.DeserializeObject<TradeCloseErrorResponse>(message);
-            case "TradePatchExitOrdersErrorResponse":
-               return JsonConvert.DeserializeObject<TradePatchExitOrdersErrorResponse>(message);
+            case "TradeOrdersErrorResponse":
+               return JsonConvert.DeserializeObject<TradeOrdersErrorResponse>(message);
             default:
                return JsonConvert.DeserializeObject<ErrorResponse>(message);
          }
