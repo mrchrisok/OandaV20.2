@@ -14,25 +14,71 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public const string Adjustment = "ADJUSTMENT";
    }
 
+   /// <summary>
+   /// A LiquidityRegenerationSchedule indicates how liquidity that is used when filling an 
+   /// Order for an instrument is regenerated following the fill.  A liquidity regeneration schedule 
+   /// will be in effect until the timestamp of its final step, but may be replaced by a schedule 
+   /// created for an Order of the same instrument that is filled while it is still in effect.
+   /// </summary>
    public class LiquidityRegenerationSchedule
    {
+      /// <summary>
+      /// The steps in the Liquidity Regeneration Schedule
+      /// </summary>
       public List<LiquidityRegenerationScheduleStep> steps { get; set; }
    }
 
+   /// <summary>
+   /// A liquidity regeneration schedule Step indicates the amount of bid and ask 
+   /// liquidity that is used by the Account at a certain time. These amounts will only 
+   /// change at the timestamp of the following step.
+   /// </summary>
    public class LiquidityRegenerationScheduleStep
    {
+      /// <summary>
+      /// The timestamp of the schedule step.
+      /// </summary>
       public string timestamp { get; set; }
+
+      /// <summary>
+      /// The amount of bid liquidity used at this step in the schedule.
+      /// </summary>
       public decimal bidLiquidityUsed { get; set; }
+
+      /// <summary>
+      /// The amount of ask liquidity used at this step in the schedule.
+      /// </summary>
       public decimal askLiquidityUsed { get; set; }
    }
 
+   /// <summary>
+   /// Details for the Market Order extensions specific to a Market Order placed with the 
+   /// intent of fully closing a specific open trade that should have already been closed but 
+   /// wasn’t due to halted market conditions
+   /// </summary>
    public class MarketOrderDelayedTradeClose
    {
+      /// <summary>
+      /// The ID of the Trade being closed
+      /// </summary>
       public long tradeID { get; set; }
+
+      /// <summary>
+      /// The Client ID of the Trade being closed
+      /// </summary>
       public string clientTradeID { get; set; }
+
+      /// <summary>
+      /// The Transaction ID of the DelayedTradeClosure transaction to which this 
+      /// Delayed Trade Close belongs to
+      /// </summary>
       public long sourceTransactionID { get; set; }
    }
 
+   /// <summary>
+   /// A MarketOrderTradeClose specifies the extensions to a Market Order that has been created
+   /// specifically to close a Trade.
+   /// </summary>
    public class MarketOrderTradeClose
    {
       /// <summary>
@@ -52,6 +98,10 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public string units { get; set; }
    }
 
+   /// <summary>
+   /// A MarketOrderPositionCloseout specifies the extensions to a Market Order when it has
+   /// been created specifically to closeout a specific Position.
+   /// </summary>
    public class MarketOrderPositionCloseout
    {
       /// <summary>
@@ -68,23 +118,54 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public string units { get; set; }
    }
 
+   /// <summary>
+   /// Details for the Market Order extensions specific to a Market Order placed that is part of a 
+   /// Market Order Margin Closeout in a client's account
+   /// </summary>
    public class MarketOrderMarginCloseout
    {
+      /// <summary>
+      /// The reason the Market Order was created to perform a margin closeout
+      /// </summary>
       public string reason { get; set; }
    }
 
+   /// <summary>
+   /// The reason that the Market Order was created to perform a margin closeout
+   /// </summary>
    public class MarketOrderMarginCloseoutReason
    {
+      /// <summary>
+      /// Trade closures resulted from violating OANDA’s margin policy
+      /// </summary>
       public const string MarginCheckViolation = "MARGIN_CHECK_VIOLATION";
+
+      /// <summary>
+      /// Trade closures came from a margin closeout event resulting from regulatory conditions placed on the 
+      /// Account’s margin call
+      /// </summary>
       public const string RegulatoryMarginCallViolation = "REGULATORY_MARGIN_CALL_VIOLATION";
    }
 
+   /// <summary>
+   /// OpenTradeFinancing is used to pay/collect daily financing charge for an open Trade within an Account
+   /// </summary>
    public class OpenTradeFinancing
    {
+      /// <summary>
+      /// The ID of the Trade that financing is being paid/collected for.
+      /// </summary>
       public long tradeID { get; set; }
+
+      /// <summary>
+      /// The amount of financing paid/collected for the Trade.
+      /// </summary>
       public decimal financing { get; set; }
    }
 
+   /// <summary>
+   /// The reason that an Order was filled
+   /// </summary>
    public class OrderFillReason
    {
       public const string LimitOrder = "LIMIT_ORDER";
@@ -101,7 +182,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    }
 
    /// <summary>
-   /// For additional details, visit http://developer.oanda.com/rest-live-v20/transaction-df/#OrderCancelReason
+   /// For additional details, visit http://developer.oanda.com/rest-live-v20/transaction-df////OrderCancelReason
    /// </summary>
    public class OrderCancelReason
    {
@@ -148,6 +229,9 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public const string AccountPositionValueLimitExceeded = "ACCOUNT_POSITION_VALUE_LIMIT_EXCEEDED";
    }
 
+   /// <summary>
+   /// OpenTradeFinancing is used to pay/collect daily financing charge for a Position within an Account
+   /// </summary>
    public class PositionFinancing
    {
       /// <summary>
@@ -166,29 +250,77 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public List<OpenTradeFinancing> openTradeFinancings { get; set; }
    }
 
+   /// <summary>
+   /// A TradeReduce object represents a Trade for an instrument that was reduced (either partially or fully) in 
+   /// an Account. It is found embedded in Transactions that affect the position of an instrument in the account, 
+   /// specifically the OrderFill Transaction.
+   /// </summary>
    public class TradeOpen : TradeAction
    {
+      /// <summary>
+      /// The client extensions for the newly opened Trade
+      /// </summary>
       public ClientExtensions clientExtensions { get; set; }
+
+      /// <summary>
+      /// The margin required at the time the Trade was created. Note, this is the
+      /// ‘pure’ margin required, it is not the ‘effective’ margin used that
+      /// factors in the trade risk if a GSLO is attached to the trade.
+      /// </summary>
       public decimal initialMarginRequired { get; set; }
    }
 
+   /// <summary>
+   /// A TradeReduce object represents a Trade for an instrument that was reduced (either partially or fully) in an 
+   /// Account. It is found embedded in Transactions that affect the position of an instrument in the account, specifically 
+   /// the OrderFill Transaction.
+   /// </summary>
    public class TradeReduce : TradeAction
    {
+      /// <summary>
+      /// The PL realized when reducing the Trade
+      /// </summary>
       public decimal realizedPL { get; set; }
+
+      /// <summary>
+      /// The financing paid/collected when reducing the Trade
+      /// </summary>
       public decimal financing { get; set; }
    }
 
    public class TradeAction
    {
+      /// <summary>
+      /// The ID of the Trade that was opened
+      /// </summary>
       public long tradeID { get; set; }
+
+      /// <summary>
+      /// The number of units opened by the Trade
+      /// </summary>
       public long units { get; set; }
+
+      /// <summary>
+      /// The average price that the units were opened at.
+      /// </summary>
       public decimal price { get; set; }
+
+      /// <summary>
+      /// This is the fee charged for opening the trade if it has a guaranteed Stop
+      /// Loss Order attached to it.
+      /// </summary>
       public decimal guaranteedExecutionFee { get; set; }
+
+      /// <summary>
+      /// The half spread cost for the trade open. This can be a positive or
+      /// negative value and is represented in the home currency of the Account.
+      /// </summary>
       public decimal halfSpreadCost { get; set; }
    }
 
+   #region price object
    [JsonConverter(typeof(PriceObjectConverter))]
-   public class TakeProfitDetails : IHasPrices
+   public class TakeProfitDetails : PriceObject
    {
       public TakeProfitDetails() { }
       public TakeProfitDetails(Instrument.Instrument instrument)
@@ -200,17 +332,14 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
          };
       }
 
+      /// <summary>
+      /// The price that the Take Profit Order will be triggered at.
+      /// </summary>
       public decimal price { get; set; }
-      public string timeInForce { get; set; }
-      public string gtdTime { get; set; }
-      public ClientExtensions clientExtensions { get; set; }
-
-      [JsonIgnore]
-      public PriceInformation priceInformation { get; set; }
    }
 
    [JsonConverter(typeof(PriceObjectConverter))]
-   public class StopLossDetails : IHasPrices
+   public class StopLossDetails : PriceObject
    {
       public StopLossDetails() { }
       public StopLossDetails(Instrument.Instrument instrument)
@@ -222,19 +351,30 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
          };
       }
 
+      /// <summary>
+      /// The price that the Stop Loss Order will be triggered at. Only one of the
+      /// price and distance fields may be specified.
+      /// </summary>
       public decimal? price { get; set; }
-      public decimal? distance { get; set; }
-      public string timeInForce { get; set; }
-      public string gtdTime { get; set; }
-      public ClientExtensions clientExtensions { get; set; }
-      public bool guaranteed { get; set; }
 
-      [JsonIgnore]
-      public PriceInformation priceInformation { get; set; }
+      /// <summary>
+      /// Specifies the distance (in price units) from the Trade’s open price to
+      /// use as the Stop Loss Order price. Only one of the distance and price
+      /// fields may be specified.
+      /// </summary>
+      public decimal? distance { get; set; }
+
+      /// <summary>
+      /// Flag indicating that the price for the Stop Loss Order is guaranteed. The
+      /// default value depends on the GuaranteedStopLossOrderMode of the account,
+      /// if it is REQUIRED, the default will be true, for DISABLED or ENABLED the
+      /// default is false.
+      /// </summary>
+      public bool guaranteed { get; set; }
    }
 
    [JsonConverter(typeof(PriceObjectConverter))]
-   public class TrailingStopLossDetails : IHasPrices
+   public class TrailingStopLossDetails : PriceObject
    {
       public TrailingStopLossDetails() { }
       public TrailingStopLossDetails(Instrument.Instrument instrument)
@@ -246,13 +386,40 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
          };
       }
 
+      /// <summary>
+      /// The distance (in price units) from the Trade’s fill price that the
+      /// Trailing Stop Loss Order will be triggered at.
+      /// </summary>
       public decimal distance { get; set; }
+   }
+
+   public abstract class PriceObject : IHasPrices
+   {
+      /// <summary>
+      /// The time in force for the created Order. This may only
+      /// be GTC, GTD or GFD.
+      /// </summary>
       public string timeInForce { get; set; }
+
+      /// <summary>
+      /// The date when the Trailing Stop Loss Order will be cancelled on if
+      /// timeInForce is GTD.
+      /// </summary>
       public string gtdTime { get; set; }
+
+      /// <summary>
+      /// The Client Extensions to add to the Trailing Stop Loss Order when
+      /// created.
+      /// </summary>
       public ClientExtensions clientExtensions { get; set; }
+
+      /// <summary>
+      /// 
+      /// </summary>
       [JsonIgnore]
       public PriceInformation priceInformation { get; set; }
    }
+   #endregion
 
    #region order reasons
    public abstract class OrderReason
@@ -314,6 +481,9 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 
    #endregion
 
+   /// <summary>
+   /// The reason that a Transaction was rejected.
+   /// </summary>
    public class TransactionRejectReason
    {
       public const string InternalServerError = "INTERNAL_SERVER_ERROR";
@@ -461,7 +631,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    }
 
    /// <summary>
-   /// For additional info, go to http://developer.oanda.com/rest-live-v20/transaction-df/
+   /// The possible types of a Transaction
    /// </summary>
    public class TransactionType
    {
@@ -503,7 +673,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    }
 
    /// <summary>
-   /// For additional info, go to http://developer.oanda.com/rest-live-v20/transaction-df/
+   /// A filter that can be used when fetching Transactions
    /// </summary>
    public class TransactionFilter : TransactionType
    {
