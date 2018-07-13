@@ -12,7 +12,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>List of Position objects with the details for each position (or empty list iff no positions)</returns>
       public static async Task<List<Position.Position>> GetPositionsAsync(string accountID)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/positions";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions";
 
          var response = await MakeRequestAsync<PositionsResponse>(uri);
 

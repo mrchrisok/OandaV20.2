@@ -1,5 +1,4 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
@@ -16,11 +15,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>an AccountConfigurationResponse object containing the updated values that were applied to the account</returns>
       public static async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(string accountID, AccountConfigurationParameters parameters)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/configuration";
-         //var bodyParams = ConvertToDictionary(parameters);
-
-         //var response = await MakeRequestWithJSONBody<AccountConfigurationResponse, AccountConfigurationErrorResponse, Dictionary<string, string>>("PATCH", bodyParams, uri);
-
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/configuration";
+ 
          var response = await MakeRequestWithJSONBody<AccountConfigurationResponse, AccountConfigurationErrorResponse, AccountConfigurationParameters>("PATCH", parameters, uri);
 
          return response;
@@ -35,26 +31,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          public string alias { get; set; }
 
          /// <summary>
-         /// The string representation of a decimal number.
+         /// The margin rate the Account should be set to.
          /// </summary>
          [DataMember(EmitDefaultValue = false)]
-         public decimal marginRate { get; set; }
+         public decimal? marginRate { get; set; }
       }
+   }
 
-      public class AccountConfigurationResponse : Response
-      {
-         /// <summary>
-         /// The transaction that configures the Account.
-         /// </summary>
-         public ClientConfigureTransaction clientConfigureTransaction;
-      }
+   public class AccountConfigurationResponse : Response
+   {
+      /// <summary>
+      /// The transaction that configures the Account.
+      /// </summary>
+      public ClientConfigureTransaction clientConfigureTransaction;
+   }
 
-      public class AccountConfigurationErrorResponse : ErrorResponse
-      {
-         /// <summary>
-         /// The transaction that rejects the configuration of the Account.
-         /// </summary>
-         public ClientConfigureRejectTransaction clientConfigureRejectTransaction { get; set; }
-      }
+   public class AccountConfigurationErrorResponse : ErrorResponse
+   {
+      /// <summary>
+      /// The transaction that rejects the configuration of the Account.
+      /// </summary>
+      public ClientConfigureRejectTransaction clientConfigureRejectTransaction { get; set; }
    }
 }

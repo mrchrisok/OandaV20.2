@@ -14,7 +14,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>an AccountChangesResponse object</returns>
       public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/changes";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/changes";
 
          uri += "?sinceTransactionID=" + parameters.sinceTransactionID;
 
@@ -22,14 +22,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          return response;
       }
-   }
 
-   public class AccountChangesParameters
-   {
-      /// <summary>
-      /// ID of the Transaction to get Account changes since.
-      /// </summary>
-      public long sinceTransactionID { get; set; }
+      public class AccountChangesParameters
+      {
+         /// <summary>
+         /// ID of the Transaction to get Account changes since.
+         /// </summary>
+         public long sinceTransactionID { get; set; }
+      }
    }
 
    public class AccountChangesResponse : Response

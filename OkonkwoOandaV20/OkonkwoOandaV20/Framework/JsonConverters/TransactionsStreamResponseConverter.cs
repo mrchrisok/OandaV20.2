@@ -1,23 +1,36 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OkonkwoOandaV20.Framework.Factories;
-using OkonkwoOandaV20.TradeLibrary.Transaction;
+using OkonkwoOandaV20.TradeLibrary.REST;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Linq;
 using System.Reflection;
-using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20.Framework.JsonConverters
 {
    public class TransactionsStreamResponseConverter : JsonConverterBase
    {
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="objectType"></param>
+      /// <returns></returns>
       public override bool CanConvert(Type objectType)
       {
          bool canConvert = objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IStreamResponse));
          return canConvert;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="reader"></param>
+      /// <param name="objectType"></param>
+      /// <param name="existingValue"></param>
+      /// <param name="serializer"></param>
+      /// <returns>A TransactionsStreamResponse object</returns>
       public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
       {
          var response = new TransactionsStreamResponse();
@@ -27,7 +40,7 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
          if (jsonToken.Type == JTokenType.Object)
          {
             bool isHeartbeat = jsonToken["type"].Value<string>() == "HEARTBEAT";
-
+ 
             if (isHeartbeat)
             {
                var heartbeat = new TransactionsHeartbeat();

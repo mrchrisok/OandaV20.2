@@ -2,7 +2,7 @@
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
-   public enum Server
+   public enum EServer
    {
       Account,
       Labs,
@@ -10,7 +10,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       TransactionsStream
    }
 
-   public enum Environment
+   public enum EEnvironment
    {
       Practice,
       Trade
@@ -18,12 +18,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
    public class Credentials
    {
-      public bool HasServer(Server server)
+      public bool HasServer(EServer server)
       {
          return Servers[Environment].ContainsKey(server);
       }
 
-      public string GetServer(Server server)
+      public string GetServer(EServer server)
       {
          if (HasServer(server))
          {
@@ -32,22 +32,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return null;
       }
 
-      private static readonly Dictionary<Environment, Dictionary<Server, string>> Servers = new Dictionary<Environment, Dictionary<Server, string>>
+      private static readonly Dictionary<EEnvironment, Dictionary<EServer, string>> Servers = new Dictionary<EEnvironment, Dictionary<EServer, string>>
       {
-         {  Environment.Practice, new Dictionary<Server, string>
+         {  EEnvironment.Practice, new Dictionary<EServer, string>
             {
-               {Server.Account, "https://api-fxpractice.oanda.com/v3/"},
-               {Server.Labs, "https://api-fxpractice.oanda.com/labs/v3/"},
-               {Server.PricingStream, "https://stream-fxpractice.oanda.com/v3/"},
-               {Server.TransactionsStream, "https://stream-fxpractice.oanda.com/v3/"},
+               {EServer.Account, "https://api-fxpractice.oanda.com/v3/"},
+               {EServer.Labs, "https://api-fxpractice.oanda.com/labs/v3/"},
+               {EServer.PricingStream, "https://stream-fxpractice.oanda.com/v3/"},
+               {EServer.TransactionsStream, "https://stream-fxpractice.oanda.com/v3/"},
             }
          },
-         {  Environment.Trade, new Dictionary<Server, string>
+         {  EEnvironment.Trade, new Dictionary<EServer, string>
             {
-               {Server.Account, "https://api-fxtrade.oanda.com/v3/"},
-               {Server.Labs, "https://api-fxtrade.oanda.com/labs/v3/"},
-               {Server.PricingStream, "https://stream-fxtrade.oanda.com/v3/"},
-               {Server.TransactionsStream, "https://stream-fxtrade.oanda.com/v3/"}
+               {EServer.Account, "https://api-fxtrade.oanda.com/v3/"},
+               {EServer.Labs, "https://api-fxtrade.oanda.com/labs/v3/"},
+               {EServer.PricingStream, "https://stream-fxtrade.oanda.com/v3/"},
+               {EServer.TransactionsStream, "https://stream-fxtrade.oanda.com/v3/"}
             }
          }
       };
@@ -56,14 +56,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public string AccessToken { get; set; }
       public string DefaultAccountId { get; set; }
-      public Environment Environment { get; set; }
+      public EEnvironment Environment { get; set; }
 
       public static Credentials GetDefaultCredentials()
       {
          return m_DefaultCredentials;
       }
 
-      public static void SetCredentials(Environment environment, string accessToken, string defaultAccount = "0")
+      public static void SetCredentials(EEnvironment environment, string accessToken, string defaultAccount = "0")
       {
          m_DefaultCredentials = new Credentials
          {

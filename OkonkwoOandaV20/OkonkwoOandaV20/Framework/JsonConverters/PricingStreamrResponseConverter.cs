@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
+using OkonkwoOandaV20.TradeLibrary.REST;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using System;
 using System.Linq;
 using System.Reflection;
-using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20.Framework.JsonConverters
 {

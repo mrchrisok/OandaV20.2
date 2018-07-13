@@ -13,7 +13,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>a List of AccountProperties that includes basic information about the accounts</returns>
       public static async Task<List<AccountProperties>> GetAccountsAsync()
       {
-         string uri = ServerUri(Server.Account) + "accounts";
+         string uri = ServerUri(EServer.Account) + "accounts";
 
          var response = await MakeRequestAsync<AccountsResponse>(uri);
          return response.accounts;

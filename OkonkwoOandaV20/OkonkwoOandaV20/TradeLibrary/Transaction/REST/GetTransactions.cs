@@ -24,7 +24,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             requestParams.Add("type", type);
          }
 
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/transactions";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions";
 
          var pagesResponse = await MakeRequestAsync<TransactionPagesResponse>(uri, "GET", requestParams);
 
@@ -73,42 +73,42 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// </summary>
          public int pagingDelayMilliSeconds { get; set; }
       }
+   }
+
+   /// <summary>
+   /// http://developer.oanda.com/rest-live-v20/transaction-ep/
+   /// </summary>
+   public class TransactionPagesResponse : Response
+   {
+      /// <summary>
+      /// The starting time provided in the request.
+      /// </summary>
+      public string from { get; set; }
 
       /// <summary>
-      /// http://developer.oanda.com/rest-live-v20/transaction-ep/
+      /// The ending time provided in the request.
       /// </summary>
-      public class TransactionPagesResponse : Response
-      {
-         /// <summary>
-         /// The starting time provided in the request.
-         /// </summary>
-         public string from { get; set; }
+      public string to { get; set; }
 
-         /// <summary>
-         /// The ending time provided in the request.
-         /// </summary>
-         public string to { get; set; }
+      /// <summary>
+      /// The pageSize provided in the requests
+      /// </summary>
+      public int pageSize { get; set; }
 
-         /// <summary>
-         /// The pageSize provided in the requests
-         /// </summary>
-         public int pageSize { get; set; }
+      /// <summary>
+      /// The Transaction-type filter provided in the request
+      /// </summary>
+      public List<string> type { get; set; }
 
-         /// <summary>
-         /// The Transaction-type filter provided in the request
-         /// </summary>
-         public List<string> type { get; set; }
+      /// <summary>
+      /// The number of Transactions that are contained in the pages returned
+      /// </summary>
+      public int count { get; set; }
 
-         /// <summary>
-         /// The number of Transactions that are contained in the pages returned
-         /// </summary>
-         public int count { get; set; }
-
-         /// <summary>
-         /// The list of URLs that represent idrange queries providing the data for
-         /// each page in the query results
-         /// </summary>
-         public List<string> pages { get; set; }
-      }
+      /// <summary>
+      /// The list of URLs that represent idrange queries providing the data for
+      /// each page in the query results
+      /// </summary>
+      public List<string> pages { get; set; }
    }
 }

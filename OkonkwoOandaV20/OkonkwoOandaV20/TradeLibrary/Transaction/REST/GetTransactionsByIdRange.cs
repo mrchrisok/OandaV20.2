@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          }
          else
          {
-            uri = ServerUri(Server.Account) + "accounts/" + accountID + "/transactions/idrange";
+            uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange";
 
             var requestParams = ConvertToDictionary(parameters);
             if (parameters?.type.Count > 0)
@@ -67,18 +67,18 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          [JsonIgnore]
          public List<string> type { get; set; }
       }
+   }
 
+   /// <summary>
+   /// The requested range of Transactions
+   /// http://developer.oanda.com/rest-live-v20/transaction-ep/
+   /// </summary>
+   public class TransactionsResponse : Response
+   {
       /// <summary>
-      /// The requested range of Transactions
-      /// http://developer.oanda.com/rest-live-v20/transaction-ep/
+      /// The list of Transactions that satisfy the request.
       /// </summary>
-      public class TransactionsResponse : Response
-      {
-         /// <summary>
-         /// The list of Transactions that satisfy the request.
-         /// </summary>
-         [JsonConverter(typeof(TransactionConverter))]
-         public List<ITransaction> transactions;
-      }
+      [JsonConverter(typeof(TransactionConverter))]
+      public List<ITransaction> transactions;
    }
 }

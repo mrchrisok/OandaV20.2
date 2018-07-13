@@ -15,7 +15,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>A list of transaction objects</returns>
       public static async Task<List<ITransaction>> GetTransactionsSinceIdAsync(string accountID, long transactionID)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/transactions/sinceid";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/sinceid";
          uri += "?id=" + transactionID;
 
          var response = await MakeRequestAsync<TransactionsResponse>(uri);

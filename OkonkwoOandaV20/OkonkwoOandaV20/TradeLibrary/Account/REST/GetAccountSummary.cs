@@ -13,7 +13,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>an AccountSummary object containing the account details</returns>
       public static async Task<AccountSummary> GetAccountSummaryAsync(string accountID)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/summary";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/summary";
 
          var response = await MakeRequestAsync<AccountSummaryResponse>(uri);
          return response.account;

@@ -12,19 +12,19 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>TradeData object containing the details of the trade</returns>
       public static async Task<Trade.Trade> GetTradeAsync(string accountID, long tradeSpecifier)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier;
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier;
 
          var response = await MakeRequestAsync<TradeResponse>(uri);
 
          return response.trade;
       }
+   }
 
-      public class TradeResponse : Response
-      {
-         /// <summary>
-         /// The details for the Trade requested
-         /// </summary>
-         public Trade.Trade trade { get; set; }
-      }
+   public class TradeResponse : Response
+   {
+      /// <summary>
+      /// The details for the Trade requested
+      /// </summary>
+      public Trade.Trade trade { get; set; }
    }
 }

@@ -84,9 +84,9 @@
     <Compile Include="TradeLibrary\Instrument\OrderBookBucket.cs" />
     <Compile Include="TradeLibrary\Instrument\PositionBook.cs" />
     <Compile Include="TradeLibrary\Instrument\PositionBookBucket.cs" />
-    <Compile Include="TradeLibrary\Instrument\REST\GetCandles.cs" />
-    <Compile Include="TradeLibrary\Instrument\REST\GetOrderBook.cs" />
-    <Compile Include="TradeLibrary\Instrument\REST\GetPositionBook.cs" />
+    <Compile Include="TradeLibrary\Instrument\REST\GetInstrumentCandles.cs" />
+    <Compile Include="TradeLibrary\Instrument\REST\GetInstrumentOrderBook.cs" />
+    <Compile Include="TradeLibrary\Instrument\REST\GetInstrumentPositionBook.cs" />
     <Compile Include="TradeLibrary\Order\Definitions.cs" />
     <Compile Include="TradeLibrary\Order\DynamicOrderState.cs" />
     <Compile Include="TradeLibrary\Order\EntryOrder.cs" />

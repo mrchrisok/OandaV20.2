@@ -15,7 +15,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
       public static async Task<TradeClientExtensionsResponse> PutTradeClientExtensionsAsync(string accountID, long tradeSpecifier, TradeClientExtensionsParameters parameters)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/clientExtensions";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/clientExtensions";
 
          var response = await MakeRequestWithJSONBody<TradeClientExtensionsResponse, TradeClientExtensionsErrorResponse, TradeClientExtensionsParameters>("PUT", parameters, uri);
 
@@ -30,22 +30,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// </summary>
          public ClientExtensions clientExtensions { get; set; }
       }
+   }
 
-      public class TradeClientExtensionsResponse : Response
-      {
-         /// <summary>
-         /// The Transaction that updates the Trade’s Client Extensions.
-         /// </summary>
-         public TradeClientExtensionsModifyTransaction tradeClientExtensionsModifyTransaction { get; set; }
-      }
+   public class TradeClientExtensionsResponse : Response
+   {
+      /// <summary>
+      /// The Transaction that updates the Trade’s Client Extensions.
+      /// </summary>
+      public TradeClientExtensionsModifyTransaction tradeClientExtensionsModifyTransaction { get; set; }
+   }
 
-      public class TradeClientExtensionsErrorResponse : ErrorResponse
-      {
-         /// <summary>
-         /// The Transaction that rejects the modification of the Trade’s Client
-         /// Extensions.
-         /// </summary>
-         public TradeClientExtensionsModifyRejectTransaction tradeClientExtensionsModifyRejectTransaction { get; set; }
-      }
+   public class TradeClientExtensionsErrorResponse : ErrorResponse
+   {
+      /// <summary>
+      /// The Transaction that rejects the modification of the Trade’s Client
+      /// Extensions.
+      /// </summary>
+      public TradeClientExtensionsModifyRejectTransaction tradeClientExtensionsModifyRejectTransaction { get; set; }
    }
 }

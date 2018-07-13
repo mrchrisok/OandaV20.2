@@ -39,7 +39,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="server">The target server</param>
       /// <returns></returns>
-      private static string ServerUri(Server server) { return Credentials.GetDefaultCredentials().GetServer(server); }
+      private static string ServerUri(EServer server) { return Credentials.GetDefaultCredentials().GetServer(server); }
 
       /// <summary>
       /// Primary (internal) request handler
@@ -111,7 +111,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       private static async Task<T> MakeRequestWithJSONBody<T, E, P>(string method, P requestParams, string uri) 
          where E : IErrorResponse
       {
-         var requestBody = CreateJSONBody(requestParams);
+         var requestBody = (typeof(P).GetInterfaces().Contains(typeof(IDictionary)) == false)
+            ? CreateJSONBody(ConvertToDictionary(requestParams))
+            : CreateJSONBody(requestParams);
 
          return await MakeRequestWithJSONBody<T, E>(method, requestBody, uri);
       }
@@ -287,6 +289,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>a Dictionary{string,string] object.</returns>
       public static Dictionary<string, string> ConvertToDictionary(object input)
       {
+         if (input == null)
+            return null;
+
          string json = ConvertToJSON(input, true);
 
          return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);

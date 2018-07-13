@@ -16,12 +16,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a List of the tradeable instruments specified. If none are specified, all tradeable instruments for 
       /// the account are returned.</returns>
-      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters)
+      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/instruments";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/instruments";
 
-         if (parameters.instruments != null && parameters.instruments.Count > 0)
-         {
+         if (parameters?.instruments?.Count > 0)
+         { 
             string commaSeparatedInstruments = GetCommaSeparatedString(parameters.instruments);
             uri += "?instruments=" + Uri.EscapeDataString(commaSeparatedInstruments);
          }
@@ -29,14 +29,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var response = await MakeRequestAsync<AccountInstrumentsResponse>(uri);
          return response.instruments;
       }
-   }
 
-   public class AccountInstrumentsParameters
-   {
-      /// <summary>
-      /// List of instruments to query specifically.
-      /// </summary>
-      public List<string> instruments { get; set; }
+      public class AccountInstrumentsParameters
+      {
+         /// <summary>
+         /// List of instruments to query specifically.
+         /// </summary>
+         public List<string> instruments { get; set; }
+      }
    }
 
    public class AccountInstrumentsResponse : Response

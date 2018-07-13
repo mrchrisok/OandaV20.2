@@ -16,9 +16,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the identifier of the account to retrieve the list for</param>
       /// <param name="orderSpecifier">The Order Specifier (orderId) [required]</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
-      public static async Task<IOrder> GetOrdersAsync(string accountID, long orderSpecifier)
+      public static async Task<IOrder> GetOrderAsync(string accountID, long orderSpecifier)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier;
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier;
 
          var response = await MakeRequestAsync<OrderResponse>(uri);
 

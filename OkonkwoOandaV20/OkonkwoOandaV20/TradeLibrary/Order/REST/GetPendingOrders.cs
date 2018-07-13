@@ -16,7 +16,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
       public static async Task<List<IOrder>> GetPendingOrdersAsync(string accountID)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/pendingOrders";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/pendingOrders";
 
          var response = await MakeRequestAsync<OrdersResponse>(uri);
 

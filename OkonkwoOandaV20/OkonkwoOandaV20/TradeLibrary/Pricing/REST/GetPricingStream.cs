@@ -28,7 +28,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          var instruments = Uri.EscapeDataString(GetCommaSeparatedString(parameters.instruments));
 
-         string uri = ServerUri(Server.PricingStream) + "accounts/" + accountID + "/pricing/stream";
+         string uri = ServerUri(EServer.PricingStream) + "accounts/" + accountID + "/pricing/stream";
          uri += "?instruments=" + instruments + "&snapshot=" + parameters.snapshot.ToString();
 
          HttpWebRequest request = WebRequest.CreateHttp(uri);
@@ -64,52 +64,52 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// </summary>
          public bool snapshot { get; set; }
       }
+   }
 
-      /// <summary>
-      /// Events are authorized transactions posted to the subject account.
-      /// For more information, visit: http://developer.oanda.com/rest-live-v20/transaction-ep/
-      /// </summary>
-      [JsonConverter(typeof(PricingStreamResponseConverter))]
-      public class PricingStreamResponse : IStreamResponse
+   /// <summary>
+   /// Events are authorized transactions posted to the subject account.
+   /// For more information, visit: http://developer.oanda.com/rest-live-v20/transaction-ep/
+   /// </summary>
+   [JsonConverter(typeof(PricingStreamResponseConverter))]
+   public class PricingStreamResponse : IStreamResponse
+   {
+      public PricingHeartbeat heartbeat { get; set; }
+      public Price price { get; set; }
+
+      public bool IsHeartbeat()
       {
-         public PricingHeartbeat heartbeat { get; set; }
-         public Price price { get; set; }
+         return (heartbeat != null);
+      }
+   }
 
-         public bool IsHeartbeat()
-         {
-            return (heartbeat != null);
-         }
+   public class PricingHeartbeat : Heartbeat
+   {
+   }
+
+   public class PricingSession : StreamSession<PricingStreamResponse>
+   {
+      private readonly List<Instrument.Instrument> _instruments;
+      private bool _snapshot;
+
+      public PricingSession(string accountID, List<Instrument.Instrument> instruments, bool snapshot = true)
+         : base(accountID)
+      {
+         _instruments = instruments;
+         _snapshot = snapshot;
       }
 
-      public class PricingHeartbeat : Heartbeat
+      protected override async Task<WebResponse> GetSession()
       {
-      }
+         var instruments = new List<string>();
+         _instruments.ForEach(instrument => instruments.Add(instrument.name));
 
-      public class PricingSession : StreamSession<PricingStreamResponse>
-      {
-         private readonly List<Instrument.Instrument> _instruments;
-         private bool _snapshot;
-
-         public PricingSession(string accountID, List<Instrument.Instrument> instruments, bool snapshot = true) 
-            : base(accountID)
+         var parameters = new Rest20.PricingStreamParameters()
          {
-            _instruments = instruments;
-            _snapshot = snapshot;
-         }
+            instruments = instruments,
+            snapshot = _snapshot
+         };
 
-         protected override async Task<WebResponse> GetSession()
-         {
-            var instruments = new List<string>();
-            _instruments.ForEach(instrument => instruments.Add(instrument.name));
-
-            var parameters = new PricingStreamParameters()
-            {
-               instruments = instruments,
-               snapshot = _snapshot
-            };
-
-            return await GetPricingStream(_accountID, parameters);
-         }
+         return await Rest20.GetPricingStream(_accountID, parameters);
       }
    }
 }

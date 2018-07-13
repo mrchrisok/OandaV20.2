@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.REST;
-using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20.Framework.Factories
 {

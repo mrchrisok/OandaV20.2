@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OkonkwoOandaV20;
+using OkonkwoOandaV20.TradeLibrary.REST;
 using System.Linq;
 using System.Threading.Tasks;
 

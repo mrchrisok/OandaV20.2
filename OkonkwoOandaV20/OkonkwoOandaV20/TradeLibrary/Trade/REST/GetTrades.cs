@@ -12,14 +12,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>A list of TradeData objects (or empty list, if no trades)</returns>
-      public static async Task<List<Trade.Trade>> GetTradesAsync(string accountID, TradesParameters parameters)
+      public static async Task<List<Trade.Trade>> GetTradesAsync(string accountID, TradesParameters parameters = null)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/trades";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades";
 
          var requestParams = ConvertToDictionary(parameters);
          if (parameters?.ids.Count > 0)
             requestParams.Add("ids", GetCommaSeparatedString(parameters.ids));
-         
+
          var response = await MakeRequestAsync<TradesResponse>(uri, "GET", requestParams);
 
          return response.trades ?? new List<Trade.Trade>();
@@ -54,13 +54,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// </summary>
          public long? beforeID { get; set; }
       }
+   }
 
-      public class TradesResponse : Response
-      {
-         /// <summary>
-         /// The list of Trade detail objects
-         /// </summary>
-         public List<Trade.Trade> trades { get; set; }
-      }
+   public class TradesResponse : Response
+   {
+      /// <summary>
+      /// The list of Trade detail objects
+      /// </summary>
+      public List<Trade.Trade> trades { get; set; }
    }
 }

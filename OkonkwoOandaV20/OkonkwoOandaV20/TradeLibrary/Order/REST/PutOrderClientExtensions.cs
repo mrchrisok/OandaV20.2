@@ -1,6 +1,4 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -17,7 +15,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>an OrderClientExtensionsModifyResponse (throws an OrderClientExtensionsModifyErrorResponse if the request fails.)</returns>
       public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(string accountID, long orderSpecifier, OrderClientExtensionsParameters parameters)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier + "/clientExtensions";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier + "/clientExtensions";
 
          //var extensions = new Dictionary<string, ClientExtensions>();
          //extensions.Add("clientExtensions", parameters.orderExtensions);
@@ -27,26 +25,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          //var response = await MakeRequestWithJSONBody<OrderClientExtensionsModifyResponse, OrderClientExtensionsModifyErrorResponse, Dictionary<string, ClientExtensions>>("PUT", extensions, uri);
 
-         var response = await MakeRequestWithJSONBody<OrderClientExtensionsResponse, OrderClientExtensionsErrorResponse, OrderClientExtensionsParameters> ("PUT", parameters, uri);
+         var response = await MakeRequestWithJSONBody<OrderClientExtensionsResponse, OrderClientExtensionsErrorResponse, OrderClientExtensionsParameters>("PUT", parameters, uri);
 
          return response;
       }
-   }
 
-   public class OrderClientExtensionsParameters
-   {
-      /// <summary>
-      /// The Client Extensions to update for the Order. Do not set, modify, or
-      /// delete clientExtensions if your account is associated with MT4.
-      /// </summary>
-      public ClientExtensions clientExtensions { get; set; }
+      public class OrderClientExtensionsParameters
+      {
+         /// <summary>
+         /// The Client Extensions to update for the Order. Do not set, modify, or
+         /// delete clientExtensions if your account is associated with MT4.
+         /// </summary>
+         public ClientExtensions clientExtensions { get; set; }
 
-      /// <summary>
-      /// The Client Extensions to update for the Trade created when the Order is
-      /// filled. Do not set, modify, or delete clientExtensions if your account is
-      /// associated with MT4.
-      /// </summary>
-      public ClientExtensions tradeClientExtensions { get; set; }
+         /// <summary>
+         /// The Client Extensions to update for the Trade created when the Order is
+         /// filled. Do not set, modify, or delete clientExtensions if your account is
+         /// associated with MT4.
+         /// </summary>
+         public ClientExtensions tradeClientExtensions { get; set; }
+      }
    }
 
    public class OrderClientExtensionsResponse : Response

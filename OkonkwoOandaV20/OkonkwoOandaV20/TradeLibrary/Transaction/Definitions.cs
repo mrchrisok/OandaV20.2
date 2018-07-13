@@ -310,34 +310,34 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public decimal financing { get; set; }
    }
 
-   public class TradeAction
+   public abstract class TradeAction
    {
       /// <summary>
-      /// The ID of the Trade that was opened
+      /// The ID of the Trade targeted by the action.
       /// </summary>
       public long tradeID { get; set; }
 
       /// <summary>
-      /// The number of units opened by the Trade
+      /// The number of units transacted during the action.
       /// </summary>
       public long units { get; set; }
 
       /// <summary>
-      /// The average price that the units were opened at.
+      /// The overall price used for the trade action.
       /// </summary>
       public decimal price { get; set; }
 
       /// <summary>
-      /// This is the fee charged for opening the trade if it has a guaranteed Stop
+      /// This is the fee charged (if the trade action is a TradeOpen) for opening the trade if it has a guaranteed Stop
       /// Loss Order attached to it.
       /// </summary>
-      public decimal guaranteedExecutionFee { get; set; }
+      public decimal? guaranteedExecutionFee { get; set; }
 
       /// <summary>
-      /// The half spread cost for the trade open. This can be a positive or
+      /// The half spread cost (if the trade action is a TradeOpen). This can be a positive or
       /// negative value and is represented in the home currency of the Account.
       /// </summary>
-      public decimal halfSpreadCost { get; set; }
+      public decimal? halfSpreadCost { get; set; }
    }
 
    #region price object

@@ -15,7 +15,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>The Transactions associated with the patched dependent orders</returns>
       public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders";
 
          var requestBody = ConvertToJSON(parameters.GetAsDictionary());
 
@@ -122,7 +122,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          public const string Create = "CREATE";
          public const string Replace = "REPLACE";
          public const string Cancel = "CANCEL";
-      }
+      } }
 
       public class TradeOrdersResponse : Response
       {
@@ -228,4 +228,3 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          public TrailingStopLossOrderRejectTransaction trailingStopLossOrderRejectTransaction { get; set; }
       }
    }
-}

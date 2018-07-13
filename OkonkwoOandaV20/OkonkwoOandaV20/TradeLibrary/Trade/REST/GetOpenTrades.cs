@@ -12,7 +12,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>A list of TradeData objects (or empty list, if no trades)</returns>
       public static async Task<List<Trade.Trade>> GetOpenTradesAsync(string accountID)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/openTrades";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/openTrades";
 
          var response = await MakeRequestAsync<TradesResponse>(uri);
 

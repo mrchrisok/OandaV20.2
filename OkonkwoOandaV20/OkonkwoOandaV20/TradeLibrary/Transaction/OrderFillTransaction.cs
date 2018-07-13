@@ -49,7 +49,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       /// tradesClosed, tradeReduced and tradeOpened fields contain the
       /// exact/official price each unit was filled at.
       /// </summary>
-      [Obsolete("Deprecated: Will be removed in a future API update.", true)]
+      [Obsolete("Deprecated: Will be removed in a future API update.")]
       public decimal price { get; set; }
 
       /// <summary>

@@ -16,7 +16,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>A Transaction object with the details of the transaction</returns>
       public static async Task<ITransaction> GetTransactionAsync(string accountID, long transactionID)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/transactions/" + transactionID;
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/" + transactionID;
 
          var response = await MakeRequestAsync<TransactionResponse>(uri);
 
@@ -36,3 +36,4 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public ITransaction transaction { get; set; }
    }
 }
+

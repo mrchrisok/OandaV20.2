@@ -9,13 +9,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Close the given position
       /// This will close all trades on the provided account/instrument
       /// </summary>
-      /// <param name="accountId">the account to close trades on</param>
+      /// <param name="accountID">the account to close trades on</param>
       /// <param name="instrument">the instrument for which to close all trades</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>DeletePositionResponse object containing details about the actions taken</returns>
-      public static async Task<PositionCloseResponse> PutPositionCloseAsync(string accountId, string instrument, PositionCloseParameters parameters)
+      public static async Task<PositionCloseResponse> PutPositionCloseAsync(string accountID, string instrument, PositionCloseParameters parameters)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountId + "/positions/" + instrument + "/close";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument + "/close";
 
          var requestBody = ConvertToJSON(parameters);
 
@@ -23,37 +23,37 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          return response;
       }
-   }
 
-   public class PositionCloseParameters
-   {
-      /// <summary>
-      /// Indication of how much of the long Position to closeout. Either the
-      /// string “ALL”, the string “NONE”, or a DecimalNumber representing how many
-      /// units of the long position to close using a PositionCloseout MarketOrder.
-      /// The units specified must always be positive.
-      /// </summary>
-      public string longUnits { get; set; }
+      public class PositionCloseParameters
+      {
+         /// <summary>
+         /// Indication of how much of the long Position to closeout. Either the
+         /// string “ALL”, the string “NONE”, or a DecimalNumber representing how many
+         /// units of the long position to close using a PositionCloseout MarketOrder.
+         /// The units specified must always be positive.
+         /// </summary>
+         public string longUnits { get; set; }
 
-      /// <summary>
-      /// The client extensions to add to the MarketOrder used to close the long 
-      /// position.
-      /// </summary>
-      public ClientExtensions longClientExtensions { get; set; }
+         /// <summary>
+         /// The client extensions to add to the MarketOrder used to close the long 
+         /// position.
+         /// </summary>
+         public ClientExtensions longClientExtensions { get; set; }
 
-      /// <summary>
-      /// Indication of how much of the short Position to closeout. Either the
-      /// string “ALL”, the string “NONE”, or a DecimalNumber representing how many
-      /// units of the short position to close using a PositionCloseout
-      /// MarketOrder. The units specified must always be positive.
-      /// </summary>
-      public string shortUnits { get; set; }
+         /// <summary>
+         /// Indication of how much of the short Position to closeout. Either the
+         /// string “ALL”, the string “NONE”, or a DecimalNumber representing how many
+         /// units of the short position to close using a PositionCloseout
+         /// MarketOrder. The units specified must always be positive.
+         /// </summary>
+         public string shortUnits { get; set; }
 
-      /// <summary>
-      /// The client extensions to add to the MarketOrder used to close the short
-      /// position.
-      /// </summary>
-      public ClientExtensions shortClientExtensions { get; set; }
+         /// <summary>
+         /// The client extensions to add to the MarketOrder used to close the short
+         /// position.
+         /// </summary>
+         public ClientExtensions shortClientExtensions { get; set; }
+      }
    }
 
    public class PositionCloseResponse : Response

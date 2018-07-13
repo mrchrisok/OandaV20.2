@@ -17,12 +17,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
       public static async Task<PostOrderResponse> PostOrderAsync(string accountID, IOrderRequest request)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/orders";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders";
 
-         Dictionary<string, IOrderRequest> order = new Dictionary<string, IOrderRequest>();
-         order.Add("order", request);
+         var order = new Dictionary<string, IOrderRequest> { { "order", request } };
+         var body = ConvertToJSON(order);
 
-         string body = ConvertToJSON(order);
          var response = await MakeRequestWithJSONBody<PostOrderResponse, PostOrderErrorResponse>("POST", body, uri);
 
          return response;

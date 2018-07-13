@@ -14,7 +14,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>a PutCancelOrderResponse with details of the cancelled order</returns>
       public static async Task<OrderCancelResponse> PutOrderCancelAsync(string accountID, long orderSpecifier)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier + "/cancel";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier + "/cancel";
 
          var response = await MakeRequestAsync<OrderCancelResponse, OrderCancelErrorResponse>(uri, "PUT");
 

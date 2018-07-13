@@ -17,15 +17,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<Price>> GetPricingAsync(string accountID, PricingParameters parameters)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountID + "/pricing";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/pricing";
 
-         if (parameters.instruments == null || parameters.instruments.Count == 0)
+         if (!(parameters?.instruments?.Count > 0))
             throw new ArgumentException("List of instruments cannot be null or empty.");
 
          var requestParams = ConvertToDictionary(parameters);
 
-         string instrumentsCSV  = GetCommaSeparatedString(parameters.instruments);
-         requestParams.Add("instruments", Uri.EscapeDataString(instrumentsCSV));
+         string instrumentsCSV = GetCommaSeparatedString(parameters.instruments);
+         requestParams.Add("instruments", instrumentsCSV);
+
+         //requestParams.Add("instruments", Uri.EscapeDataString(instrumentsCSV));
 
          var response = await MakeRequestAsync<PricingResponse>(uri, "GET", requestParams);
 
@@ -60,24 +62,24 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// </summary>
          public bool? includeHomeConversions { get; set; }
       }
+   }
 
-      public class PricingResponse : Response
-      {
-         /// <summary>
-         /// The list of Price objects requested.
-         /// </summary>
-         public List<Price> prices;
+   public class PricingResponse : Response
+   {
+      /// <summary>
+      /// The list of Price objects requested.
+      /// </summary>
+      public List<Price> prices;
 
-         /// <summary>
-         /// The list of home currency conversion factors requested. This field will
-         /// only be present if includeHomeConversions was set to true in the request.
-         /// </summary>
-         public List<HomeConversions> homeConversions;
+      /// <summary>
+      /// The list of home currency conversion factors requested. This field will
+      /// only be present if includeHomeConversions was set to true in the request.
+      /// </summary>
+      public List<HomeConversions> homeConversions;
 
-         /// <summary>
-         /// The DateTime value to use for the “since” parameter in the next poll request.
-         /// </summary>
-         public string time;
-      }
+      /// <summary>
+      /// The DateTime value to use for the “since” parameter in the next poll request.
+      /// </summary>
+      public string time;
    }
 }

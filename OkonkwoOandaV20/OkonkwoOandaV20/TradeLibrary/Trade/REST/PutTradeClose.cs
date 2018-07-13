@@ -11,9 +11,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="tradeSpecifier">The Trade specifier</param>
       /// <returns>DeleteTradeResponse containing the details of the close</returns>
-      public static async Task<TradeCloseResponse> PutTradeCloseAsync(string accountId, long tradeSpecifier, TradeCloseParameters parameters)
+      public static async Task<TradeCloseResponse> PutTradeCloseAsync(string accountID, long tradeSpecifier, TradeCloseParameters parameters = null)
       {
-         string uri = ServerUri(Server.Account) + "accounts/" + accountId + "/trades/" + tradeSpecifier + "/close";
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/close";
+
+         parameters = parameters ?? new TradeCloseParameters();
 
          return await MakeRequestWithJSONBody<TradeCloseResponse, TradeCloseErrorResponse, TradeCloseParameters>("PUT", parameters, uri);
       }
@@ -32,34 +34,34 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// </summary>
          public string units { get; set; }
       }
+   }
 
-      public class TradeCloseResponse : Response
-      {
-         /// <summary>
-         /// The MarketOrder Transaction created to close the Trade.
-         /// </summary>
-         public MarketOrderTransaction orderCreateTransaction { get; set; }
+   public class TradeCloseResponse : Response
+   {
+      /// <summary>
+      /// The MarketOrder Transaction created to close the Trade.
+      /// </summary>
+      public MarketOrderTransaction orderCreateTransaction { get; set; }
 
-         /// <summary>
-         /// The OrderFill Transaction that fills the Trade-closing MarketOrder and 
-         /// closes the Trade.
-         /// </summary>
-         public OrderFillTransaction orderFillTransaction { get; set; }
+      /// <summary>
+      /// The OrderFill Transaction that fills the Trade-closing MarketOrder and 
+      /// closes the Trade.
+      /// </summary>
+      public OrderFillTransaction orderFillTransaction { get; set; }
 
-         /// <summary>
-         /// The OrderCancel Transaction that immediately cancelled the Trade-closing 
-         /// MarketOrder.
-         /// </summary>
-         public OrderCancelTransaction orderCancelTransaction { get; set; }
-      }
+      /// <summary>
+      /// The OrderCancel Transaction that immediately cancelled the Trade-closing 
+      /// MarketOrder.
+      /// </summary>
+      public OrderCancelTransaction orderCancelTransaction { get; set; }
+   }
 
-      public class TradeCloseErrorResponse : ErrorResponse
-      {
-         /// <summary>
-         /// The MarketOrderReject Transaction that rejects the creation of the Trade-
-         /// closing MarketOrder.
-         /// </summary>
-         public MarketOrderRejectTransaction orderRejectTransaction { get; set; }
-      }
+   public class TradeCloseErrorResponse : ErrorResponse
+   {
+      /// <summary>
+      /// The MarketOrderReject Transaction that rejects the creation of the Trade-
+      /// closing MarketOrder.
+      /// </summary>
+      public MarketOrderRejectTransaction orderRejectTransaction { get; set; }
    }
 }
