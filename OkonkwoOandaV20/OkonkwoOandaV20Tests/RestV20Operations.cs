@@ -139,8 +139,6 @@ namespace OkonkwoOandaV20Tests
       /// <param name="listCount"></param>
       private static async Task Account_GetAccountsList(short? listCount = null)
       {
-         string testNumber = GetTestNumber();
-
          short count = 0;
 
          List<AccountProperties> result = await Rest20.GetAccountsAsync();
@@ -151,7 +149,7 @@ namespace OkonkwoOandaV20Tests
          if (listCount.HasValue && listCount.Value > 0)
          {
             count++;
-            correctCount = result.Count == listCount;
+            correctCount = result.Count == listCount; 
             message = string.Format("Correct number of accounts ({0}) received.", result.Count);
          }
          m_Results.Verify("01." + count.ToString(), correctCount, message);
@@ -1094,9 +1092,9 @@ namespace OkonkwoOandaV20Tests
       /// Computes and returns the next test characteristic (whole number)
       /// </summary>
       /// <returns></returns>
-      private static string GetTestNumber(decimal currentTestNumber = 0)
+      private static string GetTestNumber(bool incrementCharacteristic = false)
       {
-         if (currentTestNumber == 0)
+         if (incrementCharacteristic)
             m_TestNumber = Math.Truncate(m_TestNumber) + 1;
          else
             m_TestNumber = m_TestNumber + (decimal).001;
