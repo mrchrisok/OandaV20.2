@@ -1,5 +1,7 @@
 # OANDAV20
 
+*** This branch (v2) is under development. DO NOT USE ***
+
 Spot Forex trading middleware that provides programmatic access to the OANDA© v20 REST endpoints.
 
 Written in C# 7.0
