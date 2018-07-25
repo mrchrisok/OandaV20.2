@@ -66,7 +66,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       private static async Task<T> MakeRequestAsync<T, E>(string uri, string method = "GET", Dictionary<string, string> requestParams = null) 
          where E : IErrorResponse
       {
-         if (requestParams != null && requestParams.Count > 0)
+         if (requestParams?.Count > 0)
          {
             var queryString = CreateQueryString(requestParams);
             uri = uri + "?" + queryString;

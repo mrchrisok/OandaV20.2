@@ -50,7 +50,7 @@ namespace OkonkwoOandaV20Tests
       {
          try
          {
-            await SetPracticeApiCredentials();
+            await SetApiCredentials();
 
             if (Credentials.GetDefaultCredentials() == null)
                throw new Exception("Exception: RestV20Test - Credentials must be defined to run this test.");
@@ -149,7 +149,7 @@ namespace OkonkwoOandaV20Tests
          if (listCount.HasValue && listCount.Value > 0)
          {
             count++;
-            correctCount = result.Count == listCount; 
+            correctCount = result.Count == listCount;
             message = string.Format("Correct number of accounts ({0}) received.", result.Count);
          }
          m_Results.Verify("01." + count.ToString(), correctCount, message);
@@ -240,7 +240,7 @@ namespace OkonkwoOandaV20Tests
          string alias = summary.alias;
          decimal? marginRate = summary.marginRate;
 
-         string testAlias = "testAlias";
+         string testAlias = $"testAlias_{DateTime.UtcNow.ToString("yyyyMMddTHHmmssfffffffK")}";
          decimal? testMarginRate = (decimal)(marginRate == null ? 0.5 : (((double)marginRate.Value == 0.5) ? 0.4 : 0.5));
          var parameters = new AccountConfigurationParameters()
          {
@@ -329,37 +329,40 @@ namespace OkonkwoOandaV20Tests
 
       private static async Task Instrument_GetInstrumentOrderBook()
       {
-         var parameters = new InstrumentOrderBookParameters() {
-            time = ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow, AcceptDatetimeFormat.RFC3339)
+         // currently, Oanda only provides snapshots at 0th, 20th and 40th minute of each hour
+         // this behavior appears to be undocumented, but was deduced by examining the 'Link' header of the response
+
+         // use the always available 0th hour snapshot for testing
+         string time = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+         var parameters = new InstrumentOrderBookParameters()
+         {
+            time = time
          };
 
          OrderBook result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters);
 
-         //m_Results.Verify("12.0", result != null, "Candles list received.");
-         //m_Results.Verify("12.1", result.Count() == count, "Candles count is correct.");
-         //m_Results.Verify("12.2", candle.instrument == instrument, "Candles instrument is correct.");
-         //m_Results.Verify("12.3", candle.granularity == granularity, "Candles granularity is correct.");
-         //m_Results.Verify("12.4", candle.mid != null && candle.mid.o > 0, "Candle has mid prices"); 
-         //m_Results.Verify("12.5", candle.bid != null && candle.bid.o > 0, "Candle has bid prices");
-         //m_Results.Verify("12.6", candle.ask != null && candle.ask.o > 0, "Candle has ask prices");
+         m_Results.Verify("19.0", result != null, "Order book snapshot was received.");
+         m_Results.Verify("19.1", result.time == time, "Order book snapshot time is correct.");
+         m_Results.Verify("19.2", result.buckets.Count > 0, "Order book snapshot has buckets.");
       }
 
       private static async Task Instrument_GetInstrumentPositionBook()
-      { 
+      {
+         // currently, Oanda only provides snapshots at 0th, 20th and 40th minute of each hour
+         // this behavior appears to be undocumented, but was deduced by examining the 'Link' header of the response
+
+         // use the always available 0th hour snapshot for testing
+         string time = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
          var parameters = new InstrumentPositionBookParameters()
          {
-            time = ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow, AcceptDatetimeFormat.RFC3339)
+            time = time
          };
 
          PositionBook result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters);
 
-         //m_Results.Verify("12.0", result != null, "Candles list received.");
-         //m_Results.Verify("12.1", result.Count() == count, "Candles count is correct.");
-         //m_Results.Verify("12.2", candle.instrument == instrument, "Candles instrument is correct.");
-         //m_Results.Verify("12.3", candle.granularity == granularity, "Candles granularity is correct.");
-         //m_Results.Verify("12.4", candle.mid != null && candle.mid.o > 0, "Candle has mid prices");
-         //m_Results.Verify("12.5", candle.bid != null && candle.bid.o > 0, "Candle has bid prices");
-         //m_Results.Verify("12.6", candle.ask != null && candle.ask.o > 0, "Candle has ask prices");
+         m_Results.Verify("20.0", result != null, "Position book snapshot was received.");
+         m_Results.Verify("20.1", result.time == time, "Position book snapshot time is correct.");
+         m_Results.Verify("20.2", result.buckets.Count > 0, "Position book snapshot has buckets.");
       }
       #endregion
 
@@ -1037,7 +1040,7 @@ namespace OkonkwoOandaV20Tests
       /// Reads the api key from a supplied file name
       /// </summary>
       /// <returns></returns>
-      private static async Task SetPracticeApiCredentials(string fileName = null)
+      private static async Task SetApiCredentials(string fileName = null)
       {
          fileName = fileName ?? @"C:\Users\Osita\SourceCode\GitHub\OandaV20\oandaPracticeApiCredentials.txt";
 
@@ -1060,7 +1063,7 @@ namespace OkonkwoOandaV20Tests
          {
             // warning: do not rely on these
             m_TestToken = "c9e9494d79013cac1d34f0e4dcb590cd-977a37b80762fb48cdb3b0b2e832628a";
-            m_TestAccount = "101-001-1913854-001";
+            m_TestAccount = "101-001-1913854-002";
          }
          catch (Exception ex)
          {

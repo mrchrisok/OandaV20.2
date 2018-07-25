@@ -14,7 +14,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>an OrderBook object</returns>
-      public static async Task<OrderBook> GetInstrumentOrderBookAsync(string instrument, InstrumentOrderBookParameters parameters)
+      public static async Task<OrderBook>  GetInstrumentOrderBookAsync(string instrument, InstrumentOrderBookParameters parameters)
       {
          string uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/orderBook";
          var requestParams = ConvertToDictionary(parameters);
