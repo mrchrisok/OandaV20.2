@@ -2,37 +2,39 @@
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
-   public enum EServer
+   public partial class Rest20
    {
-      Account,
-      Labs,
-      PricingStream,
-      TransactionsStream
-   }
-
-   public enum EEnvironment
-   {
-      Practice,
-      Trade
-   }
-
-   public class Credentials
-   {
-      public bool HasServer(EServer server)
+      public enum EServer
       {
-         return Servers[Environment].ContainsKey(server);
+         Account,
+         Labs,
+         PricingStream,
+         TransactionsStream
       }
 
-      public string GetServer(EServer server)
+      public enum EEnvironment
       {
-         if (HasServer(server))
+         Practice,
+         Trade
+      }
+
+      public class Credentials
+      {
+         public bool HasServer(EServer server)
          {
-            return Servers[Environment][server];
+            return Servers[Environment].ContainsKey(server);
          }
-         return null;
-      }
 
-      private static readonly Dictionary<EEnvironment, Dictionary<EServer, string>> Servers = new Dictionary<EEnvironment, Dictionary<EServer, string>>
+         public string GetServer(EServer server)
+         {
+            if (HasServer(server))
+            {
+               return Servers[Environment][server];
+            }
+            return null;
+         }
+
+         private static readonly Dictionary<EEnvironment, Dictionary<EServer, string>> Servers = new Dictionary<EEnvironment, Dictionary<EServer, string>>
       {
          {  EEnvironment.Practice, new Dictionary<EServer, string>
             {
@@ -52,25 +54,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          }
       };
 
-      private static Credentials m_DefaultCredentials;
+         private static Credentials m_DefaultCredentials;
 
-      public string AccessToken { get; set; }
-      public string DefaultAccountId { get; set; }
-      public EEnvironment Environment { get; set; }
+         public string AccessToken { get; set; }
+         public string DefaultAccountId { get; set; }
+         public EEnvironment Environment { get; set; }
 
-      public static Credentials GetDefaultCredentials()
-      {
-         return m_DefaultCredentials;
-      }
-
-      public static void SetCredentials(EEnvironment environment, string accessToken, string defaultAccount = "0")
-      {
-         m_DefaultCredentials = new Credentials
+         public static Credentials GetDefaultCredentials()
          {
-            Environment = environment,
-            AccessToken = accessToken,
-            DefaultAccountId = defaultAccount
-         };
+            return m_DefaultCredentials;
+         }
+
+         public static void SetCredentials(EEnvironment environment, string accessToken, string defaultAccount = "0")
+         {
+            m_DefaultCredentials = new Credentials
+            {
+               Environment = environment,
+               AccessToken = accessToken,
+               DefaultAccountId = defaultAccount
+            };
+         }
       }
    }
 }
