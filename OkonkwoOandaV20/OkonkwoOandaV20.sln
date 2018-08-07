@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OkonkwoOandaV20", "OkonkwoO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OkonkwoOandaV20Tests", "OkonkwoOandaV20Tests\OkonkwoOandaV20Tests.csproj", "{14A55170-5F71-49A4-BEA5-4B635EC5AF6F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OkonkwoOandaV20App", "OkonkwoOandaV20App\OkonkwoOandaV20App.csproj", "{0954AFB1-E5AC-4BC4-AA66-E35BF14A082B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +23,15 @@ Global
 		{14A55170-5F71-49A4-BEA5-4B635EC5AF6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14A55170-5F71-49A4-BEA5-4B635EC5AF6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14A55170-5F71-49A4-BEA5-4B635EC5AF6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0954AFB1-E5AC-4BC4-AA66-E35BF14A082B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0954AFB1-E5AC-4BC4-AA66-E35BF14A082B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0954AFB1-E5AC-4BC4-AA66-E35BF14A082B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0954AFB1-E5AC-4BC4-AA66-E35BF14A082B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A11D351F-DE2A-4BC0-8777-FE11033ED2E0}
 	EndGlobalSection
 EndGlobal
