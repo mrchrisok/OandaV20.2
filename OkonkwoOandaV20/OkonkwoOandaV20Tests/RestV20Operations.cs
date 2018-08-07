@@ -25,12 +25,21 @@ namespace OkonkwoOandaV20Tests
    /// </summary>
    public partial class Restv20Test
    {
+      #region Default Configuration
+
+      // warning: do not rely on these
+      // For best results, please create and use your own or your organization's Oanda Practice account
+
+      static EEnvironment m_TestEnvironment = EEnvironment.Practice;
+      static string m_TestToken = "c9e9494d79013cac1d34f0e4dcb590cd-977a37b80762fb48cdb3b0b2e832628a";
+      static short m_TokenAccounts = 2;
+      static string m_TestAccount = "101-001-1913854-002";
+
+      #endregion
+
       #region Declarations
+
       static bool m_ApiOperationsComplete = false;
-      static EEnvironment m_TestEnvironment;
-      static string m_TestToken;
-      static string m_TestAccount;
-      static short m_TokenAccounts;
       static string m_Currency = "USD";
       static string m_TestInstrument = InstrumentName.Currency.USDCHF;
       static List<Instrument> m_OandaInstruments;
@@ -41,6 +50,7 @@ namespace OkonkwoOandaV20Tests
       static decimal m_TestNumber;
 
       protected List<Price> _prices;
+
       #endregion
 
       static string AccountID { get { return Credentials.GetDefaultCredentials().DefaultAccountId; } }
@@ -64,7 +74,7 @@ namespace OkonkwoOandaV20Tests
                // second, check market status
                await Initialize_GetMarketStatus();
 
-               // third, proceed with all others
+               // third, proceed with all other operations
                await Account_GetAccountDetails();
                await Account_GetAccountSummary();
                await Account_GetAccountsInstruments();
@@ -113,7 +123,7 @@ namespace OkonkwoOandaV20Tests
          }
          catch (MarketHaltedException ex)
          {
-            throw ex;
+            throw ex; 
          }
          catch (Exception ex)
          {
@@ -332,17 +342,31 @@ namespace OkonkwoOandaV20Tests
          // currently, Oanda only provides snapshots at 0th, 20th and 40th minute of each hour
          // this behavior appears to be undocumented, but was deduced by examining the 'Link' header of the response
 
-         // use the always available 0th hour snapshot for testing
-         string time = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+         OrderBook result = null;
+
+         // error test - future snapshot time
+         var futureDateTime = DateTime.UtcNow.AddHours(1);
+         string unavailableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
          var parameters = new InstrumentOrderBookParameters()
          {
-            time = time
+            time = unavailableSnapshotTime,
+            getLastTimeOnFailure = false
          };
+         try { result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters); }
+         catch (Exception ex)
+         {
+            var errorResponse = ErrorResponseFactory.Create(ex.Message);
+            m_Results.Verify("19.E0", errorResponse != null, "Future snapshot time returns an error response.");
+         }
 
-         OrderBook result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters);
+         // get the 0th hour (or previous) snapshot
+         string availableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+         parameters.time = availableSnapshotTime;
+         parameters.getLastTimeOnFailure = true;
+         result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters);
 
          m_Results.Verify("19.0", result != null, "Order book snapshot was received.");
-         m_Results.Verify("19.1", result.time == time, "Order book snapshot time is correct.");
+         m_Results.Verify("19.1", result.time == availableSnapshotTime, "Order book snapshot time is correct.");
          m_Results.Verify("19.2", result.buckets.Count > 0, "Order book snapshot has buckets.");
       }
 
@@ -351,17 +375,31 @@ namespace OkonkwoOandaV20Tests
          // currently, Oanda only provides snapshots at 0th, 20th and 40th minute of each hour
          // this behavior appears to be undocumented, but was deduced by examining the 'Link' header of the response
 
-         // use the always available 0th hour snapshot for testing
-         string time = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+         PositionBook result = null;
+
+         // error test - future snapshot time
+         var futureDateTime = DateTime.UtcNow.AddHours(1);
+         string unavailableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
          var parameters = new InstrumentPositionBookParameters()
          {
-            time = time
+            time = unavailableSnapshotTime,
+            getLastTimeOnFailure = false
          };
+         try {  result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters); }
+         catch (Exception ex)
+         {
+            var errorResponse = ErrorResponseFactory.Create(ex.Message);
+            m_Results.Verify("20.E0", errorResponse != null, "Future snapshot time returns an error response.");
+         }
 
-         PositionBook result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters);
+         // get the 0th hour (or previous) snapshot
+         string availableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+         parameters.time = availableSnapshotTime;
+         parameters.getLastTimeOnFailure = true;
+         result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters);
 
          m_Results.Verify("20.0", result != null, "Position book snapshot was received.");
-         m_Results.Verify("20.1", result.time == time, "Position book snapshot time is correct.");
+         m_Results.Verify("20.1", result.time == availableSnapshotTime, "Position book snapshot time is correct.");
          m_Results.Verify("20.2", result.buckets.Count > 0, "Position book snapshot has buckets.");
       }
       #endregion
@@ -713,7 +751,7 @@ namespace OkonkwoOandaV20Tests
          //var patch1 = new PatchExitOrdersRequest() { takeProfit = takeProfit };
          var patch1 = new TradeOrdersParameters();
          patch1.SetTakeProfit(TradeOrdersAction.Create, takeProfit);
-
+          
          // error test - patch open trade
          TradeOrdersResponse response = null;
          patch1.takeProfit.price = -1;
@@ -762,21 +800,28 @@ namespace OkonkwoOandaV20Tests
                tag = "trailing_stop_loss"
             }
          };
+
          var patch3 = new TradeOrdersParameters();
+
+         // stopLoss and trailingStopLoss cannot exist simultaneously
+         // thus the stopLoss must be cancelled whilst creating the trailingStopLoss
+         patch3.SetStopLoss(TradeOrdersAction.Cancel, null);
          patch3.SetTrailingStopLoss(TradeOrdersAction.Create, trailingStopLoss);
-         var trailingStopLossPatch = (await Rest20.PutTradeOrdersAsync(AccountID, trade.id, patch3)).trailingStopLossOrderTransaction;
-         m_Results.Verify("13.12", trailingStopLossPatch != null && trailingStopLossPatch.id > 0, "Trailing stop loss patch received.");
-         m_Results.Verify("13.13", trailingStopLossPatch.distance == distance, "Trade patched with trailing stop loss.");
+
+         var trailingStopLossPatch = (await Rest20.PutTradeOrdersAsync(AccountID, trade.id, patch3));
+         var trailingStopLossOrderTransaction = trailingStopLossPatch.trailingStopLossOrderTransaction;
+         m_Results.Verify("13.12", trailingStopLossPatch.stopLossOrderCancelTransaction != null, "Stop loss cancelled.");
+         m_Results.Verify("13.13", trailingStopLossOrderTransaction != null && trailingStopLossOrderTransaction.id > 0, "Trailing stop loss patch created.");
+         m_Results.Verify("13.14", trailingStopLossOrderTransaction.distance == distance, "Trade patched with correct trailing stop loss.");
 
          // remove dependent orders
          var tradeOrdersParameters = new TradeOrdersParameters();
          tradeOrdersParameters.SetTakeProfit(TradeOrdersAction.Cancel, null);
          tradeOrdersParameters.SetTrailingStopLoss(TradeOrdersAction.Cancel, null);
-         tradeOrdersParameters.SetTrailingStopLoss(TradeOrdersAction.Cancel, null);
 
          var result = await Rest20.PutTradeOrdersAsync(AccountID, trade.id, tradeOrdersParameters);
-         m_Results.Verify("13.14", result.takeProfitOrderCancelTransaction != null, "Take profit cancelled.");
-         m_Results.Verify("13.15", result.stopLossOrderCancelTransaction != null, "Stop loss cancelled.");
+         m_Results.Verify("13.15", result.takeProfitOrderCancelTransaction != null, "Take profit cancelled.");
+         //m_Results.Verify("13.15", result.stopLossOrderCancelTransaction != null, "Stop loss cancelled.");
          m_Results.Verify("13.16", result.trailingStopLossOrderCancelTransaction != null, "Trailing stop loss cancelled.");
 
          if (await Utilities.IsMarketHalted())
@@ -789,7 +834,7 @@ namespace OkonkwoOandaV20Tests
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeCloseErrorResponse;
-            m_Results.Verify("13.E2", errorResponse != null, "Error response has correct type: TradeCloseResponse");
+             m_Results.Verify("13.E2", errorResponse != null, "Error response has correct type: TradeCloseResponse");
          }
 
          // close an open trade
@@ -906,6 +951,7 @@ namespace OkonkwoOandaV20Tests
             from = m_FirstTransactionID,
             to = m_LastTransactionID
          };
+
          List<ITransaction> results = await Rest20.GetTransactionsByIdRangeAsync(AccountID, parameters);
          results.OrderBy(x => x.id);
 
@@ -1062,8 +1108,8 @@ namespace OkonkwoOandaV20Tests
          catch (DirectoryNotFoundException)
          {
             // warning: do not rely on these
-            m_TestToken = "c9e9494d79013cac1d34f0e4dcb590cd-977a37b80762fb48cdb3b0b2e832628a";
-            m_TestAccount = "101-001-1913854-002";
+            //m_TestToken = "c9e9494d79013cac1d34f0e4dcb590cd-977a37b80762fb48cdb3b0b2e832628a";
+            //m_TestAccount = "101-001-1913854-002";
          }
          catch (Exception ex)
          {
@@ -1071,10 +1117,10 @@ namespace OkonkwoOandaV20Tests
          }
 
          // set this to the correct environment based on the account
-         m_TestEnvironment = EEnvironment.Practice;
+         //m_TestEnvironment = EEnvironment.Practice;
 
          // set this to the correct number of v20 accounts associated with the token     
-         m_TokenAccounts = 1;
+         //m_TokenAccounts = 2;
 
          Credentials.SetCredentials(m_TestEnvironment, m_TestToken, m_TestAccount);
       }

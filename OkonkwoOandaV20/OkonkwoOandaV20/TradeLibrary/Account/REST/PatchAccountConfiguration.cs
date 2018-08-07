@@ -1,4 +1,6 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework.JsonConverters;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
@@ -34,6 +36,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// The margin rate the Account should be set to.
          /// </summary>
          [DataMember(EmitDefaultValue = false)]
+         [JsonConverter(typeof(StringDecimalConverter))]
          public decimal? marginRate { get; set; }
       }
    }

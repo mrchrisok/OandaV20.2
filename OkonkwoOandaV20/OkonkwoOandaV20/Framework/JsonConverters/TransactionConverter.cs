@@ -9,24 +9,11 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 {
    public class TransactionConverter : JsonConverterBase
    {
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="objectType"></param>
-      /// <returns></returns>
       public override bool CanConvert(Type objectType)
       {
          return objectType == typeof(ITransaction);
       }
 
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="reader"></param>
-      /// <param name="objectType"></param>
-      /// <param name="existingValue"></param>
-      /// <param name="serializer"></param>
-      /// <returns></returns>
       public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
       {
          var jsonToken = JToken.Load(reader);

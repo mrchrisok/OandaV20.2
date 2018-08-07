@@ -12,25 +12,12 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 {
    public class TransactionsStreamResponseConverter : JsonConverterBase
    {
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="objectType"></param>
-      /// <returns></returns>
       public override bool CanConvert(Type objectType)
       {
          bool canConvert = objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IStreamResponse));
          return canConvert;
       }
 
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="reader"></param>
-      /// <param name="objectType"></param>
-      /// <param name="existingValue"></param>
-      /// <param name="serializer"></param>
-      /// <returns>A TransactionsStreamResponse object</returns>
       public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
       {
          var response = new TransactionsStreamResponse();

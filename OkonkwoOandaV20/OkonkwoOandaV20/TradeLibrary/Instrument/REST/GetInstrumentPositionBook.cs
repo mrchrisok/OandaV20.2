@@ -1,4 +1,7 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Instrument;
+﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework.Factories;
+using OkonkwoOandaV20.TradeLibrary.Instrument;
+using System;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -19,18 +22,40 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          string uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/positionBook";
          var requestParams = ConvertToDictionary(parameters);
 
-         var response = await MakeRequestAsync<InstrumentPositionBookResponse>(uri, "GET", requestParams);
+         InstrumentPositionBookResponse response = null;
+         try { response = await MakeRequestAsync<InstrumentPositionBookResponse>(uri, "GET", requestParams); }
+         catch (Exception ex)
+         {
+            if (parameters.getLastTimeOnFailure)
+            {
+               parameters.time = null;
+               response = await MakeRequestAsync<InstrumentPositionBookResponse>(uri, "GET", requestParams);
+            }            
+            else
+               throw ex;
+         }
 
          return response.positionBook;
-      }
+      } 
 
       public class InstrumentPositionBookParameters
       {
+         public InstrumentPositionBookParameters(bool getLastTimeOnFailure = true)
+         {
+            this.getLastTimeOnFailure = getLastTimeOnFailure;
+         }
+
          /// <summary>
          /// The time of the snapshot to fetch. If not specified, then the most recent snapshot 
          /// is fetched.
          /// </summary>
          public string time { get; set; }
+
+         /// <summary>
+         /// 
+         /// </summary>
+         [JsonIgnore]
+         public bool getLastTimeOnFailure { get; set; }
       }
    }
 

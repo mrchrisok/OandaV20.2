@@ -9,7 +9,7 @@ namespace OkonkwoOandaV20.Framework
    }
 
    /// <summary>
-   /// 
+   /// Provides metadata for PriceObject instances
    /// </summary>
    public class PriceInformation
    {

@@ -24,9 +24,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             uri = parameters.page;
 
-            if (parameters?.type.Count > 0)
-               uri += "&" + GetCommaSeparatedString(parameters.type);
-
             response = await MakeRequestAsync<TransactionsResponse>(uri);
          }
          else
@@ -34,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange";
 
             var requestParams = ConvertToDictionary(parameters);
-            if (parameters?.type.Count > 0)
+            if (parameters.type?.Count > 0)
                requestParams.Add("type", GetCommaSeparatedString(parameters.type));
 
             response = await MakeRequestAsync<TransactionsResponse>(uri, "GET", requestParams);

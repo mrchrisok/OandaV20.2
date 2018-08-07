@@ -90,13 +90,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          public virtual void SetStopLoss(string action, StopLossDetails details)
          {
-            takeProfitAction = action;
+            stopLossAction = action;
             stopLoss = action == TradeOrdersAction.Cancel ? null : details;
          }
 
          public virtual void SetTrailingStopLoss(string action, TrailingStopLossDetails details)
          {
-            takeProfitAction = action;
+            trailingStopLossAction = action;
             trailingStopLoss = action == TradeOrdersAction.Cancel ? null : details;
          }
          #endregion
@@ -110,7 +110,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             if (stopLossAction != TradeOrdersAction.None)
                result.Add("stopLoss", stopLoss);
             if (trailingStopLossAction != TradeOrdersAction.None)
-               result.Add("trailingStopLossAction", trailingStopLoss);
+               result.Add("trailingStopLoss", trailingStopLoss);
 
             return result;
          }

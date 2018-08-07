@@ -18,52 +18,53 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    public partial class Rest20
    {
       /// <summary>
-      /// The time of the last request made to an Account endpoint
+      /// The time of the last request made to an Oanda V20 service
       /// </summary>
       private static DateTime m_LastRequestTime = DateTime.UtcNow;
-       
+
       /// <summary>
-      /// The active access token for the Account
+      /// The V20 access token for the user's or organization's Oanda Account.
+      /// The token also authenticates operations on all sub accounts.
       /// </summary>
       private static string AccessToken { get { return Credentials.GetDefaultCredentials().AccessToken; } }
 
       /// <summary>
-      /// Oanda recommends that requests per Account are throttled to a maximium of 100 requests/second
+      /// Oanda recommends that requests per Account are throttled to a maximium of 100 requests/second.
       /// http://developer.oanda.com/rest-live-v20/best-practices/
       /// </summary>
       public static int RequestDelayMilliSeconds = 11;
 
       #region request
       /// <summary>
-      /// Returns the base uri of the target server
+      /// Gets the base uri of the target service
       /// </summary>
-      /// <param name="server">The target server</param>
-      /// <returns></returns>
+      /// <param name="server">The enurmeration for the target service</param>
+      /// <returns>Returns the base uri of the target server</returns>
       private static string ServerUri(EServer server) { return Credentials.GetDefaultCredentials().GetServer(server); }
 
       /// <summary>
-      /// Primary (internal) request handler
+      /// Sends a web request to a remote endpoint (uri).
       /// </summary>
       /// <typeparam name="T">The response type</typeparam>
-      /// <param name="uri">the uri of the request</param>
+      /// <param name="uri">The uri of the remote service</param>
       /// <param name="method">method for the request (defaults to GET)</param>
       /// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
-      /// <returns>response via type T</returns>
+      /// <returns>A success response object of type T or a failure response object of type ErrorResponse</returns>
       private static async Task<T> MakeRequestAsync<T>(string uri, string method = "GET", Dictionary<string, string> requestParams = null)
       {
          return await MakeRequestAsync<T, ErrorResponse>(uri, method, requestParams);
       }
 
       /// <summary>
-      /// Primary (internal) request handler
+      /// Sends a web request to a remote service (uri).
       /// </summary>
       /// <typeparam name="T">The success response type</typeparam>
       /// <typeparam name="E">The error  response type</typeparam>
-      /// <param name="uri">the uri of the request</param>
-      /// <param name="method">method for the request (defaults to GET)</param>
+      /// <param name="uri">The uri of the remote service</param>
+      /// <param name="method">The request verb for the request. Default is GET</param>
       /// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
-      /// <returns>response via type T</returns>
-      private static async Task<T> MakeRequestAsync<T, E>(string uri, string method = "GET", Dictionary<string, string> requestParams = null) 
+      /// <returns>A success response object of type T or a failure response object of type E</returns>
+      private static async Task<T> MakeRequestAsync<T, E>(string uri, string method = "GET", Dictionary<string, string> requestParams = null)
          where E : IErrorResponse
       {
          if (requestParams?.Count > 0)
@@ -76,15 +77,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
 
       /// <summary>
-      /// Secondary (internal) request handler. differs from primary in that parameters are placed in the body instead of the request string
+      /// Sends a web request with a JSON body to a remote service (uri). 
       /// </summary>
       /// <typeparam name="T">The success response type</typeparam>
       /// <typeparam name="E">The error response type</typeparam>
-      /// <param name="method">method to use (usually POST or PATCH)</param>
-      /// <param name="requestBody">request body (must be a valid json string)</param>
-      /// <param name="uri">the uri of the request</param>
-      /// <returns>response, via type T</returns>
-      private static async Task<T> MakeRequestWithJSONBody<T, E>(string method, string requestBody, string uri) 
+      /// <param name="method">The request verb for the request</param>
+      /// <param name="requestBody">The request body (must be a valid json string)</param>
+      /// <param name="uri">The uri of the remote service</param>
+      /// <returns>A success response object of type T or a failure response object of type E</returns>
+      private static async Task<T> MakeRequestWithJSONBody<T, E>(string method, string requestBody, string uri)
          where E : IErrorResponse
       {
          // Create the request
@@ -98,22 +99,19 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
 
       /// <summary>
-      /// Secondary (internal) request handler.
-      /// Differs from primary in that parameters are placed in the body instead of the request string.
+      /// Sends a web request with a JSON body to a remote service (uri).
       /// </summary>
       /// <typeparam name="T">The success response type</typeparam>
       /// <typeparam name="E">The error response type</typeparam>
       /// <typeparam name="P">The requestParams object type</typeparam>
-      /// <param name="method">method to use (usually POST or PATCH)</param>
+      /// <param name="method">The request verb for the request</param>
       /// <param name="requestParams">the parameters to pass in the request body</param>
-      /// <param name="uri">the uri of the request</param>
-      /// <returns>response, via type T</returns>
-      private static async Task<T> MakeRequestWithJSONBody<T, E, P>(string method, P requestParams, string uri) 
+      /// <param name="uri">The uri of the remote service</param>
+      /// <returns>A success response object of type T or a failure response object of type E</returns>
+      private static async Task<T> MakeRequestWithJSONBody<T, E, P>(string method, P requestParams, string uri)
          where E : IErrorResponse
       {
-         var requestBody = (typeof(P).GetInterfaces().Contains(typeof(IDictionary)) == false)
-            ? CreateJSONBody(ConvertToDictionary(requestParams))
-            : CreateJSONBody(requestParams);
+         var requestBody = CreateJSONBody(requestParams);
 
          return await MakeRequestWithJSONBody<T, E>(method, requestBody, uri);
       }
@@ -121,12 +119,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       #region response
       /// <summary>
-      /// Sends an Http request to a remote server and returns the de-serialized response
+      /// Sends an Http request to a remote service and returns the de-serialized response
       /// </summary>
-      /// <typeparam name="T">>Type of the response returned by the remote server</typeparam>
-      /// <typeparam name="E">>Type of the error response returned by the remote server</typeparam>
-      /// <param name="request">Request sent to the remote server</param>
-      /// <returns>The object of type T returned by the remote server</returns>
+      /// <typeparam name="T">>Type of the response returned by the remote service</typeparam>
+      /// <typeparam name="E">>Type of the error response returned by the remote service</typeparam>
+      /// <param name="request">The request sent to the remote service</param>
+      /// <returns>A success response object of type T or a failure response object of type E</returns>
       private static async Task<T> GetWebResponse<T, E>(HttpWebRequest request)
       {
          while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
@@ -164,57 +162,63 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
 
       /// <summary>
-      /// Writes the response from the remote server to a text stream
+      /// Writes the response from the remote service to a text stream
       /// </summary>
-      /// <param name="response">The response received from the remote server</param>
-      /// <returns>A text stream object</returns>
+      /// <param name="response">The response received from the remote service</param>
+      /// <returns>A stream object. The stream may be a subclass (GZipStream or DeflateStream) if
+      /// the response header indicates matched encoding.</returns>
       private static Stream GetResponseStream(WebResponse response)
       {
          var stream = response.GetResponseStream();
-         if (response.Headers["Content-Encoding"] == "gzip")
-         {  // if we received a gzipped response, handle that
+
+         // handle a gzipped response
+         if (response.Headers[HttpResponseHeader.ContentEncoding] == "gzip")
             stream = new GZipStream(stream, CompressionMode.Decompress);
-         }
-         else if (response.Headers["Content-Encoding"] == "deflate")
-         {  // if we received a deflated response, handle that
+
+         // handle a deflated response
+         else if (response.Headers[HttpResponseHeader.ContentEncoding] == "deflate")
             stream = new DeflateStream(stream, CompressionMode.Decompress);
-         }
+
          return stream;
       }
       #endregion
 
       #region json
       /// <summary>
-      /// Helper function to create the request body as a JSON string
+      /// Creates the request body as a JSON string
       /// </summary>
       /// <typeparam name="P">The type of the parameterObject</typeparam>
-      /// <param name="obj">The object containing the request body parameters</param>
+      /// <param name="parameterObject">The object containing the request body parameters</param>
       /// <param name="simpleDictionary">Indicates if the passed object is a Dictionary</param>
       /// <returns>A JSON string representing the request body</returns>
-      protected static string CreateJSONBody<P>(P parameterObject, bool simpleDictionary = false)
+      private static string CreateJSONBody<P>(P parameterObject, bool simpleDictionary = false)
       {
-         // trap this in case of forgetting
+         // for parameters passed as dictionaries
          if (typeof(P).GetInterfaces().Contains(typeof(IDictionary)))
-            simpleDictionary = true;
-
-         var settings = new DataContractJsonSerializerSettings();
-         settings.UseSimpleDictionaryFormat = simpleDictionary;
-
-         var jsonSerializer = new DataContractJsonSerializer(typeof(P), settings);
-         using (var ms = new MemoryStream())
          {
-            jsonSerializer.WriteObject(ms, parameterObject);
-            var msBytes = ms.ToArray();
-            return Encoding.UTF8.GetString(msBytes, 0, msBytes.Length);
+            var settings = new DataContractJsonSerializerSettings();
+            settings.UseSimpleDictionaryFormat = true;
+
+            var jsonSerializer = new DataContractJsonSerializer(typeof(P), settings);
+            using (var ms = new MemoryStream())
+            {
+               jsonSerializer.WriteObject(ms, parameterObject);
+               var msBytes = ms.ToArray();
+               return Encoding.UTF8.GetString(msBytes, 0, msBytes.Length);
+            }
          }
+         // for parameters passed as objects
+         else
+            return ConvertToJSON(parameterObject);
       }
 
       /// <summary>
       /// Serializes an object to a JSON string
       /// </summary>
-      /// <param name="obj">the object to serialize</param>
+      /// <param name="obj">The object to serialize</param>
+      /// <param name="ignoreNulls">Indicates if null properties should be excluded from the JSON output</param>
       /// <returns>A JSON string representing the input object</returns>
-      protected static string ConvertToJSON(object obj, bool ignoreNulls = true)
+      private static string ConvertToJSON(object obj, bool ignoreNulls = true)
       {
          var nullHandling = ignoreNulls ? NullValueHandling.Ignore : NullValueHandling.Include;
 
@@ -234,13 +238,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       #region utilities
       /// <summary>
-      /// Helper function to create the parameter string out of a dictionary of parameters
+      /// Creates the request object string out of a dictionary of parameters
       /// </summary>
-      /// <param name="requestParams">the parameters to convert</param>
-      /// <returns>string containing all the parameters for use in requests</returns>
-      protected static HttpWebRequest CreateHttpRequest(string uri, string method)
+      /// <param name="uri">The uri of the remote service</param>
+      /// <param name="method">The Http verb for the request</param>
+      /// <returns>An HttpWebRequest object</returns>
+      private static HttpWebRequest CreateHttpRequest(string uri, string method)
       {
-         // Create the request
          HttpWebRequest request = WebRequest.CreateHttp(uri);
          request.Headers[HttpRequestHeader.Authorization] = "Bearer " + AccessToken;
          request.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
@@ -255,23 +259,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="items">The list of strings to convert to csv</param>
       /// <returns>A csv string of the list items</returns>
-      protected static string GetCommaSeparatedString(List<string> items)
+      private static string GetCommaSeparatedString(List<string> items)
       {
-         StringBuilder result = new StringBuilder();
+         var stringBuilder = new StringBuilder();
          foreach (var item in items)
          {
-            if (!result.ToString().Contains(item))
-               result.Append(item + ",");
+            if (!stringBuilder.ToString().Contains(item))
+               stringBuilder.Append(item + ",");
          }
-         return result.ToString().Trim(',');
+         return stringBuilder.ToString().Trim(',');
       }
 
       /// <summary>
-      /// Helper function to create the query string out of a dictionary of parameters
+      /// Creates a query string from a dictionary of parameters
       /// </summary>
-      /// <param name="requestParams">the parameters to convert</param>
-      /// <returns>string containing all the parameters for use in requests</returns>
-      protected static string CreateQueryString(Dictionary<string, string> requestParams)
+      /// <param name="requestParams">The parameters dictionary to convert to a query string.</param>
+      /// <returns>A query string</returns>
+      private static string CreateQueryString(Dictionary<string, string> requestParams)
       {
          string queryString = "";
          foreach (var pair in requestParams)
@@ -285,8 +289,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Converts an object into a dictionary of key-value pairs
       /// </summary>
-      /// <param name="input"></param>
-      /// <returns>a Dictionary{string,string] object.</returns>
+      /// <param name="input">The object to convet to a dictionary</param>
+      /// <returns>A Dictionary{string,string} object.</returns>
       public static Dictionary<string, string> ConvertToDictionary(object input)
       {
          if (input == null)

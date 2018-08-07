@@ -71,6 +71,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// Number of milliSeconds by which to throttle the transactions page requests. Throttled retrieval
          /// may be used optionally in test or resource-constrained production environments.
          /// </summary>
+         [JsonIgnore]
          public int pagingDelayMilliSeconds { get; set; }
       }
    }
