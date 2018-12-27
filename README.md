@@ -1,4 +1,4 @@
-﻿# OANDAV20
+﻿# OANDAV20.2
 
 Spot Forex trading middleware that provides programmatic access to the OANDA© v20 REST endpoints.
 
