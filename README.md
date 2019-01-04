@@ -4,6 +4,11 @@ Spot Forex trading middleware that provides programmatic access to the OANDA© v
 
 Written in C# 7.0
 
+Version 2 Improvements
+- Strongly typed parameters for all V20 api operations
+- XML documentation comments for all properties and methods
+- Fully updated to Oanda REST-V20 Release 3.0.22
+
 To get the repo, run: git clone https://github.com/mrchrisok/OANDAV20.2.git
 
 To install the Nuget package, run: Install-Package OkonkwoOandaV20
