@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions";
 
-         var pagesResponse = await MakeRequestAsync<TransactionPagesResponse>(uri, "GET", requestParams);
+         var pagesResponse = await MakeRequestAsync<TransactionPagesResponse, TransactionPagesErrorResponse>(uri, "GET", requestParams);
 
          var transactions = new List<ITransaction>();
          foreach (string page in pagesResponse.pages)
@@ -77,7 +78,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    }
 
    /// <summary>
-   /// http://developer.oanda.com/rest-live-v20/transaction-ep/
+   /// The GET success response received from accounts/accountID/transactions
    /// </summary>
    public class TransactionPagesResponse : Response
    {
@@ -112,4 +113,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       public List<string> pages { get; set; }
    }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/transactions
+   /// </summary>
+   public class TransactionPagesErrorResponse : ErrorResponse
+   {
+   }
+
+   #region base classes
+   public class TransactionsResponse : Response
+   {
+      /// <summary>
+      /// The list of Transactions that satisfy the request.
+      /// </summary>
+      [JsonConverter(typeof(TransactionConverter))]
+      public List<ITransaction> transactions;
+   }
+
+   public class TransactionsErrorResponse : ErrorResponse
+   {
+   }
+   #endregion
 }

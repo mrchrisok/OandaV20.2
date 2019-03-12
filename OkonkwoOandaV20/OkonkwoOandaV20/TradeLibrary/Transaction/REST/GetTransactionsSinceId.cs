@@ -18,9 +18,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/sinceid";
          uri += "?id=" + transactionID;
 
-         var response = await MakeRequestAsync<TransactionsResponse>(uri);
+         var response = await MakeRequestAsync<TransactionsSinceIdRangeResponse, TransactionsSinceIdRangeErrorResponse>(uri);
 
          return response.transactions;
       }
+   }
+
+   /// <summary>
+   /// The GET success response received from accounts/accountID/transactions/sinceid
+   /// </summary>
+   public class TransactionsSinceIdRangeResponse : TransactionsResponse
+   {
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/transactions/sinceid
+   /// </summary>
+   public class TransactionsSinceIdRangeErrorResponse : TransactionsErrorResponse
+   {
    }
 }

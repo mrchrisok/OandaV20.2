@@ -56,6 +56,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The PUT success response received from accounts/accountID/positions/instrument/close
+   /// </summary>
    public class PositionCloseResponse : Response
    {
       /// <summary>
@@ -91,6 +94,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public OrderCancelTransaction shortOrderCancelTransaction { get; set; }
    }
 
+   /// <summary>
+   /// The PUT error response received from accounts/accountID/positions/instrument/close
+   /// </summary>
    public class PositionCloseErrorResponse : ErrorResponse
    {
       /// <summary>

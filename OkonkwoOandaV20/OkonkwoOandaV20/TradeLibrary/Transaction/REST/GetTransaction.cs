@@ -18,14 +18,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/" + transactionID;
 
-         var response = await MakeRequestAsync<TransactionResponse>(uri);
+         var response = await MakeRequestAsync<TransactionResponse, TransactionErrorResponse>(uri);
 
          return response.transaction;
       }
    }
 
    /// <summary>
-   /// http://developer.oanda.com/rest-live-v20/transaction-ep/#_collapse_3_200
+   /// The GET success response received from accounts/accountID/transactions/transactionID
    /// </summary>
    public class TransactionResponse : Response
    {
@@ -34,6 +34,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       [JsonConverter(typeof(TransactionConverter))]
       public ITransaction transaction { get; set; }
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/transactions/transactionID
+   /// </summary>
+   public class TransactionErrorResponse : ErrorResponse
+   {
    }
 }
 

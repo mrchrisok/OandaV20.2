@@ -32,6 +32,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The PUT success response received from accounts/accountID/orders/orderSpecifier
+   /// </summary>
    public class OrderReplaceResponse : Response
    {
       /// <summary>
@@ -74,6 +77,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public OrderCancelTransaction replacingOrderCancelTransaction { get; set; }
    }
 
+   /// <summary>
+   /// The PUT error response received from accounts/accountID/orders/orderSpecifier
+   /// </summary>
    public class OrderReplaceErrorResponse : OrderCancelErrorResponse
    {
       /// <summary>

@@ -25,7 +25,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          if (parameters?.ids?.Count > 0)
             requestParams.Add("ids", GetCommaSeparatedString(parameters.ids));
 
-         var response = await MakeRequestAsync<OrdersResponse>(uri, "GET", requestParams);
+         var response = await MakeRequestAsync<OrdersResponse, OrdersErrorResponse>(uri, "GET", requestParams);
 
          return new List<IOrder>(response.orders);
       }
@@ -61,6 +61,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The success response received from accounts/accountID/orders
+   /// </summary>
    public class OrdersResponse : Response
    {
       /// <summary>
@@ -68,5 +71,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       [JsonConverter(typeof(OrderConverter))]
       public List<IOrder> orders { get; set; }
+   }
+
+   /// <summary>
+   /// The error response received from accounts/accountID/orders
+   /// </summary>
+   public class OrdersErrorResponse : ErrorResponse
+   {
    }
 }

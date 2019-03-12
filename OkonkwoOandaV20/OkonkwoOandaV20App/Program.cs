@@ -37,7 +37,7 @@ namespace OkonkwoOandaV20App
 
             AccountID = "101-001-1913854-002";
             var environment = EEnvironment.Practice;
-            var token = "c9e9494d79013cac1d34f0e4dcb590cd-977a37b80762fb48cdb3b0b2e832628a";
+            var token = "d74f1d18196cdf2dd8f1cb443743effa-93ce3fd1b9820eaac5b93784ec044b85";
 
             Credentials.SetCredentials(environment, token, AccountID);
 

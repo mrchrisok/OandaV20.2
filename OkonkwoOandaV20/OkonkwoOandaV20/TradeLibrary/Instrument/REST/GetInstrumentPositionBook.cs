@@ -23,13 +23,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var requestParams = ConvertToDictionary(parameters);
 
          InstrumentPositionBookResponse response = null;
-         try { response = await MakeRequestAsync<InstrumentPositionBookResponse>(uri, "GET", requestParams); }
+         try { response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(uri, "GET", requestParams); }
          catch (Exception ex)
          {
             if (parameters.getLastTimeOnFailure)
             {
                parameters.time = null;
-               response = await MakeRequestAsync<InstrumentPositionBookResponse>(uri, "GET", requestParams);
+               response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(uri, "GET", requestParams);
             }            
             else
                throw ex;
@@ -59,11 +59,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The GET success response received from instruments/instrument/positionBook
+   /// </summary>
    public class InstrumentPositionBookResponse : Response
    {
       /// <summary>
       /// The instrument’s position book
       /// </summary>
       public PositionBook positionBook;
+   }
+
+   /// <summary>
+   /// The GET error response received from instruments/instrument/positionBook
+   /// </summary>
+   public class InstrumentPositionBookErrorResponse : ErrorResponse
+   {
    }
 }

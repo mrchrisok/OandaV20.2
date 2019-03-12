@@ -34,7 +34,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             if (parameters.type?.Count > 0)
                requestParams.Add("type", GetCommaSeparatedString(parameters.type));
 
-            response = await MakeRequestAsync<TransactionsResponse>(uri, "GET", requestParams);
+            response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(uri, "GET", requestParams);
          }
 
          return response.transactions;
@@ -67,15 +67,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    }
 
    /// <summary>
-   /// The requested range of Transactions
-   /// http://developer.oanda.com/rest-live-v20/transaction-ep/
+   /// The GET success response received from accounts/accountID/transactions/idrange
    /// </summary>
-   public class TransactionsResponse : Response
+   public class TransactionsByIdRangeResponse : TransactionsResponse
    {
-      /// <summary>
-      /// The list of Transactions that satisfy the request.
-      /// </summary>
-      [JsonConverter(typeof(TransactionConverter))]
-      public List<ITransaction> transactions;
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/transactions/idrange
+   /// </summary>
+   public class TransactionsByIdRangeErrorResponse : TransactionsErrorResponse
+   {
    }
 }

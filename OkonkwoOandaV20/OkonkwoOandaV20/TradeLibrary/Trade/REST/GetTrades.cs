@@ -20,7 +20,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          if (parameters?.ids.Count > 0)
             requestParams.Add("ids", GetCommaSeparatedString(parameters.ids));
 
-         var response = await MakeRequestAsync<TradesResponse>(uri, "GET", requestParams);
+         var response = await MakeRequestAsync<TradesResponse, TradesErrorResponse>(uri, "GET", requestParams);
 
          return response.trades ?? new List<Trade.Trade>();
       }
@@ -56,11 +56,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The GET success response received from accounts/accountID/trades
+   /// </summary>
    public class TradesResponse : Response
    {
       /// <summary>
       /// The list of Trade detail objects
       /// </summary>
       public List<Trade.Trade> trades { get; set; }
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/trades
+   /// </summary>
+   public class TradesErrorResponse : ErrorResponse
+   {
    }
 }

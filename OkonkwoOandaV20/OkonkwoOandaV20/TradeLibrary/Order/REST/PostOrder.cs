@@ -28,6 +28,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The POST success response received from accounts/accountID/orders
+   /// </summary>
    public class PostOrderResponse : Response
    {
       /// <summary>
@@ -63,6 +66,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public Transaction.Transaction orderReissueRejectTransaction { get; set; }
    }
 
+   /// <summary>
+   /// The POST error response received from accounts/accountID/orders
+   /// </summary>
    public class PostOrderErrorResponse : ErrorResponse
    {
       /// <summary>

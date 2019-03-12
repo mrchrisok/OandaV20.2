@@ -18,7 +18,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          uri += "?sinceTransactionID=" + parameters.sinceTransactionID;
 
-         var response = await MakeRequestAsync<AccountChangesResponse>(uri);
+         var response = await MakeRequestAsync<AccountChangesResponse, AccountChangesErrorResponse>(uri);
 
          return response;
       }
@@ -32,6 +32,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The GET success response received from the accounts/accountID/changes
+   /// </summary>
    public class AccountChangesResponse : Response
    {
       /// <summary>
@@ -45,5 +48,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// The Account’s current price-dependent state.
       /// </summary>
       public AccountChangesState state { get; set; }
+   }
+
+   /// <summary>
+   /// The GET error response received from the accounts/accountID/changes
+   /// </summary>
+   public class AccountChangesErrorResponse : ErrorResponse
+   {
    }
 }

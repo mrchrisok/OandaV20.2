@@ -14,17 +14,27 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions";
 
-         var response = await MakeRequestAsync<PositionsResponse>(uri);
+         var response = await MakeRequestAsync<PositionsResponse, PositionsErrorResponse>(uri);
 
          return response.positions ?? new List<Position.Position>();
       }
    }
 
+   /// <summary>
+   /// The GET success response received from accounts/accountID/positions/instrument/close
+   /// </summary>
    public class PositionsResponse : Response
    {
       /// <summary>
       /// The list of Account Positions
       /// </summary>
       public List<Position.Position> positions { get; set; }
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/positions/instrument/close
+   /// </summary>
+   public class PositionsErrorResponse : ErrorResponse
+   {
    }
 }

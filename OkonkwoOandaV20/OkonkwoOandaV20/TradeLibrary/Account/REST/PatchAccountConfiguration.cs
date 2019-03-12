@@ -41,6 +41,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The PATCH success response received from the accounts/accountID/configuration
+   /// </summary>
    public class AccountConfigurationResponse : Response
    {
       /// <summary>
@@ -49,6 +52,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public ClientConfigureTransaction clientConfigureTransaction;
    }
 
+   /// <summary>
+   /// The PATCH success response received from the accounts/accountID/configuration
+   /// </summary>
    public class AccountConfigurationErrorResponse : ErrorResponse
    {
       /// <summary>

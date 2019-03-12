@@ -21,12 +21,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/instruments";
 
          if (parameters?.instruments?.Count > 0)
-         { 
+         {
             string commaSeparatedInstruments = GetCommaSeparatedString(parameters.instruments);
             uri += "?instruments=" + Uri.EscapeDataString(commaSeparatedInstruments);
          }
 
-         var response = await MakeRequestAsync<AccountInstrumentsResponse>(uri);
+         var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(uri);
          return response.instruments;
       }
 
@@ -39,11 +39,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The GET success response received from the accounts/accountID/instruments
+   /// </summary>
    public class AccountInstrumentsResponse : Response
    {
       /// <summary>
       /// The requested list of instruments.
       /// </summary>
       public List<Instrument.Instrument> instruments { get; set; }
+   }
+
+   /// <summary>
+   /// The GET error response received from the accounts/accountID/instruments
+   /// </summary>
+   public class AccountInstrumentsErrorResponse : ErrorResponse
+   {
    }
 }

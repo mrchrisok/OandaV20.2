@@ -23,8 +23,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    }
 
    /// <summary>
-   /// The Order was cancelled as specified.
-   /// http://developer.oanda.com/rest-live-v20/order-ep/#_collapse_7_200
+   /// The PUT response received from accounts/accountID/orders/orderSpecifier/cancel
    /// </summary>
    public class OrderCancelResponse : Response
    {
@@ -35,8 +34,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    }
 
    /// <summary>
-   /// The Account or Order specified does not exist
-   /// http://developer.oanda.com/rest-live-v20/order-ep/#_collapse_7_404
+   /// The PUT error response received from accounts/accountID/orders/orderSpecifier/cancel
    /// </summary>
    public class OrderCancelErrorResponse : ErrorResponse
    {

@@ -273,8 +273,8 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    }
 
    /// <summary>
-   /// A TradeReduce object represents a Trade for an instrument that was reduced (either partially or fully) in 
-   /// an Account. It is found embedded in Transactions that affect the position of an instrument in the account, 
+   /// A TradeOpen object represents a Trade for an instrument that was opened in an Account. 
+   /// It is found embedded in Transactions that affect the position of an instrument in the account, 
    /// specifically the OrderFill Transaction.
    /// </summary>
    public class TradeOpen : TradeAction
@@ -299,6 +299,12 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    /// </summary>
    public class TradeReduce : TradeAction
    {
+      /// <summary>
+      /// The client Id for the Trade. 
+      /// This is the same as the id in the clientExtensions (if provided) for the opened Trade.
+      /// </summary>
+      public string clientTradeID { get; set; }
+
       /// <summary>
       /// The PL realized when reducing the Trade
       /// </summary>

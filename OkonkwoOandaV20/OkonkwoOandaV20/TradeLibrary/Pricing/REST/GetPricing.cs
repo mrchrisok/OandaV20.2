@@ -29,7 +29,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          //requestParams.Add("instruments", Uri.EscapeDataString(instrumentsCSV));
 
-         var response = await MakeRequestAsync<PricingResponse>(uri, "GET", requestParams);
+         var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(uri, "GET", requestParams);
 
          return response.prices ?? new List<Price>();
       }
@@ -64,6 +64,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The GET success response received from accounts/accountID/pricing
+   /// </summary>
    public class PricingResponse : Response
    {
       /// <summary>
@@ -81,5 +84,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// The DateTime value to use for the “since” parameter in the next poll request.
       /// </summary>
       public string time;
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/pricing
+   /// </summary>
+   public class PricingErrorResponse : ErrorResponse
+   {
    }
 }

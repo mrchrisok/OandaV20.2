@@ -29,7 +29,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             if (parameters.getLastTimeOnFailure)
             {
                parameters.time = null;
-               response = await MakeRequestAsync<InstrumentOrderBookResponse>(uri, "GET", requestParams);
+               response = await MakeRequestAsync<InstrumentOrderBookResponse, InstrumentOrderBookErrorResponse>(uri, "GET", requestParams);
             }
             else
                throw ex;
@@ -59,11 +59,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The GET success response received from instruments/instrument/orderBook
+   /// </summary>
    public class InstrumentOrderBookResponse : Response
    {
       /// <summary>
       /// The instrument’s order book
       /// </summary>
       public OrderBook orderBook;
+   }
+
+   /// <summary>
+   /// The GET error response received from instruments/instrument/orderBook
+   /// </summary>
+   public class InstrumentOrderBookErrorResponse : ErrorResponse
+   {
    }
 }

@@ -15,17 +15,27 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          string uri = ServerUri(EServer.Account) + "accounts";
 
-         var response = await MakeRequestAsync<AccountsResponse>(uri);
+         var response = await MakeRequestAsync<AccountsResponse, AccountsErrorResponse>(uri);
          return response.accounts;
       }
    }
 
+   /// <summary>
+   /// The GET success response received from the accounts
+   /// </summary>
    public class AccountsResponse : Response
    {
       /// <summary>
       /// The list of Accounts the client is authorized to access and their 
       /// associated properties.
       /// </summary>
-		public List<AccountProperties> accounts;
+      public List<AccountProperties> accounts;
+   }
+
+   /// <summary>
+   /// The GET error response received from the accounts
+   /// </summary>
+   public class AccountsErrorResponse : ErrorResponse
+   {
    }
 }

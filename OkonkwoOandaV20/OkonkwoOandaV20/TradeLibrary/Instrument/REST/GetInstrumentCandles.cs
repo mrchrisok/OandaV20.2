@@ -20,7 +20,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          string uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/candles";
          var requestParams = ConvertToDictionary(parameters);
 
-         var response = await MakeRequestAsync<InstrumentCandlesResponse>(uri, "GET", requestParams);
+         var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(uri, "GET", requestParams);
 
          var candles = new List<CandlestickPlus>();
          foreach (var candle in response.candles)
@@ -104,6 +104,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The GET success response received from instruments/instrument/candles
+   /// </summary>
    public class InstrumentCandlesResponse : Response
    {
       /// <summary>
@@ -120,5 +123,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// The list of candlesticks that satisfy the request.
       /// </summary>
       public List<Candlestick> candles;
+   }
+
+   /// <summary>
+   /// The GET error response received from instruments/instrument/candles
+   /// </summary>
+   public class InstrumentCandlesErrorResponse : ErrorResponse
+   {
    }
 }

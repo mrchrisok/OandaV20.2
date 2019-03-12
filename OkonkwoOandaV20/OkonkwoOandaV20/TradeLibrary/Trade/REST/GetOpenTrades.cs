@@ -14,9 +14,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/openTrades";
 
-         var response = await MakeRequestAsync<TradesResponse>(uri);
+         var response = await MakeRequestAsync<OpenTradesResponse, OpenTradesErrorResponse>(uri);
 
          return response.trades ?? new List<Trade.Trade>();
       }
+   }
+
+   /// <summary>
+   /// The GET success response received from accounts/accountID/openTrades
+   /// </summary>
+   public class OpenTradesResponse : TradesResponse
+   {
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/openTrades
+   /// </summary>
+   public class OpenTradesErrorResponse : TradesErrorResponse
+   {
    }
 }

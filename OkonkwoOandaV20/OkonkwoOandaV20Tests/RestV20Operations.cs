@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20Tests
       // For best results, please create and use your own or your organization's Oanda Practice account
 
       static EEnvironment m_TestEnvironment = EEnvironment.Practice;
-      static string m_TestToken = "c9e9494d79013cac1d34f0e4dcb590cd-977a37b80762fb48cdb3b0b2e832628a";
+      static string m_TestToken = "d74f1d18196cdf2dd8f1cb443743effa-93ce3fd1b9820eaac5b93784ec044b85";
       static short m_TokenAccounts = 2;
       static string m_TestAccount = "101-001-1913854-002";
 
@@ -123,7 +123,7 @@ namespace OkonkwoOandaV20Tests
          }
          catch (MarketHaltedException ex)
          {
-            throw ex; 
+            throw ex;
          }
          catch (Exception ex)
          {
@@ -183,7 +183,9 @@ namespace OkonkwoOandaV20Tests
       {
          // first, kill all open trades
          var closeList = await Rest20.GetOpenTradesAsync(AccountID);
-         closeList.ForEach(trade => Rest20.PutTradeCloseAsync(AccountID, trade.id).Wait());
+
+         foreach (var trade in closeList)
+            Rest20.PutTradeCloseAsync(AccountID, trade.id).Wait();
 
          Account result = await Rest20.GetAccountAsync(AccountID);
 
@@ -385,7 +387,7 @@ namespace OkonkwoOandaV20Tests
             time = unavailableSnapshotTime,
             getLastTimeOnFailure = false
          };
-         try {  result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters); }
+         try { result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message);
@@ -751,7 +753,7 @@ namespace OkonkwoOandaV20Tests
          //var patch1 = new PatchExitOrdersRequest() { takeProfit = takeProfit };
          var patch1 = new TradeOrdersParameters();
          patch1.SetTakeProfit(TradeOrdersAction.Create, takeProfit);
-          
+
          // error test - patch open trade
          TradeOrdersResponse response = null;
          patch1.takeProfit.price = -1;
@@ -834,7 +836,7 @@ namespace OkonkwoOandaV20Tests
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeCloseErrorResponse;
-             m_Results.Verify("13.E2", errorResponse != null, "Error response has correct type: TradeCloseResponse");
+            m_Results.Verify("13.E2", errorResponse != null, "Error response has correct type: TradeCloseResponse");
          }
 
          // close an open trade

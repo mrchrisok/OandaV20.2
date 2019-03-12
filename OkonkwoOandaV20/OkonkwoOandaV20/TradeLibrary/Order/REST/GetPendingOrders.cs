@@ -18,9 +18,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/pendingOrders";
 
-         var response = await MakeRequestAsync<OrdersResponse>(uri);
+         var response = await MakeRequestAsync<PendingOrdersResponse, PendingOrdersErrorResponse>(uri);
 
          return new List<IOrder>(response.orders);
       }
+   }
+
+   /// <summary>
+   /// The GET success response received from accounts/accountID/pendingOrders
+   /// </summary>
+   public class PendingOrdersResponse : OrdersResponse
+   {
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/pendingOrders
+   /// </summary>
+   public class PendingOrdersErrorResponse : OrdersErrorResponse
+   {
    }
 }

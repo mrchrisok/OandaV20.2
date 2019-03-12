@@ -32,6 +32,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   /// <summary>
+   /// The PUT success response received from accounts/accountID/trades/tradeSpecifier/clientExtensions
+   /// </summary>
    public class TradeClientExtensionsResponse : Response
    {
       /// <summary>
@@ -40,6 +43,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public TradeClientExtensionsModifyTransaction tradeClientExtensionsModifyTransaction { get; set; }
    }
 
+   /// <summary>
+   /// The PUT error response received from accounts/accountID/trades/tradeSpecifier/clientExtensions
+   /// </summary>
    public class TradeClientExtensionsErrorResponse : ErrorResponse
    {
       /// <summary>
