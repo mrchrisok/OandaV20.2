@@ -6,18 +6,33 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 {
    public partial class Rest20
    {
-      /// <summary>
-      /// Get a list of all Accounts authorized for the provided token.
-      /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_2
-      /// </summary>
-      /// <returns>a List of AccountProperties that includes basic information about the accounts</returns>
-      public static async Task<List<AccountProperties>> GetAccountsAsync()
-      {
-         string uri = ServerUri(EServer.Account) + "accounts";
+	  /// <summary>
+	  /// Get a list of all Accounts authorized for the provided token.
+	  /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_2
+	  /// </summary>
+	  /// <returns>a List of AccountProperties that includes basic information about the accounts</returns>
+	  public static async Task<List<AccountProperties>> GetAccountsAsync(AccountPropertiesParameters parameters = null)
+	  {
+		 parameters ??= new AccountPropertiesParameters();
 
-         var response = await MakeRequestAsync<AccountsResponse, AccountsErrorResponse>(uri);
-         return response.accounts;
-      }
+		 var request = new AccountPropertiesRequest()
+		 {
+			Uri = ServerUri(EServer.Account) + "accounts",
+			Method = "GET",
+			Parameters = parameters
+		 };
+
+		 var response = await MakeRequestAsync<AccountsResponse, AccountsErrorResponse>(request);
+		 return response.accounts;
+	  }
+
+	  public class AccountPropertiesParameters : Parameters
+	  {
+	  }
+   }
+
+   public class AccountPropertiesRequest : Request
+   {
    }
 
    /// <summary>
@@ -25,11 +40,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// </summary>
    public class AccountsResponse : Response
    {
-      /// <summary>
-      /// The list of Accounts the client is authorized to access and their 
-      /// associated properties.
-      /// </summary>
-      public List<AccountProperties> accounts;
+	  /// <summary>
+	  /// The list of Accounts the client is authorized to access and their 
+	  /// associated properties.
+	  /// </summary>
+	  public List<AccountProperties> accounts;
    }
 
    /// <summary>
