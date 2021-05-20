@@ -24,7 +24,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			Parameters = parameters
 		 };
 
-		 var response = await MakeRequestWithJSONBody<AccountConfigurationResponse, AccountConfigurationErrorResponse, AccountConfigurationParameters>(request);
+		 var response = await MakeRequestWithJSONBody<AccountConfigurationResponse, AccountConfigurationErrorResponse>(request);
 
 		 return response;
 	  }
