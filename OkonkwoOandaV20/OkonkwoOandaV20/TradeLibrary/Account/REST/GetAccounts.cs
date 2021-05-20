@@ -11,9 +11,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_2
 	  /// </summary>
 	  /// <returns>a List of AccountProperties that includes basic information about the accounts</returns>
-	  public static async Task<List<AccountProperties>> GetAccountsAsync(AccountPropertiesParameters parameters = null)
+	  public static async Task<List<AccountProperties>> GetAccountsAsync()
 	  {
-		 parameters ??= new AccountPropertiesParameters();
+		 var parameters = new AccountPropertiesParameters()
+		 {
+			AcceptDatetimeFormat = null
+		 };
 
 		 var request = new AccountPropertiesRequest()
 		 {
