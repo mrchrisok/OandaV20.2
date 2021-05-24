@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
+using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -14,16 +15,27 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <param name="accountID">the identifier of the account to post on</param>
 	  /// <param name="request">the order request to post</param>
 	  /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
-	  public static async Task<PostOrderResponse> PostOrderAsync(string accountID, OrderRequest request)
+	  public static async Task<PostOrderResponse> PostOrderAsync(string accountID, PostOrderParameters parameters)
 	  {
-		 string uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/orders";
+		 var request = new Request()
+		 {
+			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/orders",
+			Method = "POST",
+			Parameters = parameters
+		 };
 
-		 var order = new Dictionary<string, OrderRequest> { { "order", request } };
-		 var body = ConvertToJSON(order);
-
-		 var response = await MakeRequestWithJSONBody<PostOrderResponse, PostOrderErrorResponse>("POST", body, uri);
+		 var response = await MakeRequestWithJSONBodyAsync<PostOrderResponse, PostOrderErrorResponse>(request);
 
 		 return response;
+	  }
+
+	  public class PostOrderParameters : Parameters
+	  {
+		 /// <summary>
+		 /// Specification of the Order to create
+		 /// </summary>
+		 [Body]
+		 public IOrderRequest order { get; set; }
 	  }
    }
 

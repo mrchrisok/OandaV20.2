@@ -18,13 +18,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>a List of Order objects (or empty list, if no orders)</returns>
 	  public static async Task<IOrder> GetOrderAsync(string accountID, long orderSpecifier, OrderParameters parameters = null)
 	  {
-		 parameters ??= new OrderParameters();
-
-		 var request = new PendingOrdersRequest()
+		 var request = new Request()
 		 {
 			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/orders/{orderSpecifier}",
 			Method = "GET",
-			Parameters = parameters
+			Parameters = parameters ?? new OrderParameters()
 		 };
 
 		 var response = await MakeRequestAsync<OrderResponse, OrderErrorResponse>(request);
@@ -35,10 +33,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  public class OrderParameters : Parameters
 	  {
 	  }
-   }
-
-   public class OrderRequest : Request
-   {
    }
 
    /// <summary>

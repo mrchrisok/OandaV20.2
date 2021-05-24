@@ -1,6 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -16,13 +15,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>a PutCancelOrderResponse with details of the cancelled order</returns>
 	  public static async Task<OrderCancelResponse> PutOrderCancelAsync(string accountID, long orderSpecifier, OrderCancelParameters parameters = null)
 	  {
-		 parameters ??= new OrderCancelParameters();
-
-		 var request = new OrderCancelRequest()
+		 var request = new Request()
 		 {
 			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/orders/{orderSpecifier}/cancel",
 			Method = "PUT",
-			Parameters = parameters
+			Parameters = parameters ?? new OrderCancelParameters()
 		 };
 
 		 var response = await MakeRequestAsync<OrderCancelResponse, OrderCancelErrorResponse>(request);
@@ -35,27 +32,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// <summary>
 		 /// Client specified RequestID to be sent with request.
 		 /// </summary>
-		 [JsonIgnore]
+		 [Header]
 		 public string ClientRequestID { get; set; }
-
-		 [JsonIgnore]
-		 public override ReadOnlyDictionary<string, string> Headers
-		 {
-			get
-			{
-			   if (!string.IsNullOrWhiteSpace(ClientRequestID))
-			   {
-				  _headers["ClientRequestID"] = ClientRequestID;
-			   }
-
-			   return new ReadOnlyDictionary<string, string>(base.Headers);
-			}
-		 }
 	  }
-   }
-
-   public class OrderCancelRequest : Request
-   {
    }
 
    /// <summary>

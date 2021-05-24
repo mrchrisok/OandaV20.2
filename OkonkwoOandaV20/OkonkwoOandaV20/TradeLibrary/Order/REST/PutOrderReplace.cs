@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
+using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -18,16 +19,33 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <param name="orderSpecifier">the orderSpecifier of the order to cancel</param>
 	  /// <param name="parameters">the parameters for the request</param>
 	  /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
-	  public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(string accountID, long orderSpecifier, OrderRequest request)
+	  public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(string accountID, long orderSpecifier, OrderReplaceParameters parameters)
 	  {
-		 string uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/orders/{orderSpecifier}";
+		 var request = new Request()
+		 {
+			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/orders/{orderSpecifier}",
+			Method = "PUT",
+			Parameters = parameters
+		 };
 
-		 var order = new Dictionary<string, OrderRequest> { { "order", request } };
-		 var body = ConvertToJSON(order);
-
-		 var response = await MakeRequestWithJSONBody<OrderReplaceResponse, OrderReplaceErrorResponse>("PUT", body, uri);
+		 var response = await MakeRequestAsync<OrderReplaceResponse, OrderReplaceErrorResponse>(request);
 
 		 return response;
+	  }
+
+	  public class OrderReplaceParameters : Parameters
+	  {
+		 /// <summary>
+		 /// Client specified RequestID to be sent with request.
+		 /// </summary>
+		 [Header]
+		 public string ClientRequestID { get; set; }
+
+		 /// <summary>
+		 /// Specification of the replacing Order
+		 /// </summary>
+		 [Body]
+		 public IOrderRequest order { get; set; }
 	  }
    }
 

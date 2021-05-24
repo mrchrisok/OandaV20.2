@@ -6,7 +6,7 @@ using OkonkwoOandaV20.TradeLibrary.Transaction;
 namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequests
 {
    [JsonConverter(typeof(PriceObjectConverter))]
-   public abstract class OrderRequest : Parameters, IOrderRequest, IHasPrices
+   public abstract class OrderRequest : IOrderRequest, IHasPrices
    {
 	  public OrderRequest()
 	  {
@@ -24,7 +24,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequests
 	  public ClientExtensions clientExtensions { get; set; }
 
 	  /// <summary>
-	  /// The ORder's price metadata.
+	  /// The Order's price metadata.
 	  /// </summary>
 	  [JsonIgnore]
 	  public PriceInformation priceInformation { get; set; }

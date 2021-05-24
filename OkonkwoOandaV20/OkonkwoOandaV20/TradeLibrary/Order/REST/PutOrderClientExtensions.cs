@@ -1,4 +1,5 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,14 +16,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>an OrderClientExtensionsModifyResponse (throws an OrderClientExtensionsModifyErrorResponse if the request fails.)</returns>
 	  public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(string accountID, long orderSpecifier, OrderClientExtensionsParameters parameters)
 	  {
-		 var request = new OrderClientExtensionsRequest()
+		 var request = new Request()
 		 {
 			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/orders/{orderSpecifier}/clientExtensions",
 			Method = "PUT",
 			Parameters = parameters
 		 };
 
-		 var response = await MakeRequestWithJSONBody<OrderClientExtensionsResponse, OrderClientExtensionsErrorResponse>(request);
+		 var response = await MakeRequestAsync<OrderClientExtensionsResponse, OrderClientExtensionsErrorResponse>(request);
 
 		 return response;
 	  }
@@ -33,6 +34,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// The Client Extensions to update for the Order. Do not set, modify, or
 		 /// delete clientExtensions if your account is associated with MT4.
 		 /// </summary>
+		 [Body]
 		 public ClientExtensions clientExtensions { get; set; }
 
 		 /// <summary>
@@ -40,12 +42,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// filled. Do not set, modify, or delete clientExtensions if your account is
 		 /// associated with MT4.
 		 /// </summary>
+		 [Body]
 		 public ClientExtensions tradeClientExtensions { get; set; }
 	  }
-   }
-
-   public class OrderClientExtensionsRequest : Request
-   {
    }
 
    /// <summary>
