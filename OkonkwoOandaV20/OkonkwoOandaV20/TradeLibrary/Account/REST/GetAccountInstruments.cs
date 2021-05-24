@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,38 +19,45 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// the account are returned.</returns>
 	  public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null)
 	  {
-		 parameters.AcceptDatetimeFormat = null;
+		 //parameters.AcceptDatetimeFormat = null;
 
-		 string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/instruments";
+		 //string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/instruments";
 
-		 if (parameters?.instruments?.Count > 0)
+		 //if (parameters?.instruments?.Count > 0)
+		 //{
+		 //string commaSeparatedInstruments = GetCommaSeparatedString(parameters.instruments);
+		 //uri += "?instruments=" + Uri.EscapeDataString(commaSeparatedInstruments);
+		 //}
+
+		 var request = new Request()
 		 {
-			string commaSeparatedInstruments = GetCommaSeparatedString(parameters.instruments);
-			uri += "?instruments=" + Uri.EscapeDataString(commaSeparatedInstruments);
-		 }
-
-		 var request = new AccountInstrumentsRequest()
-		 {
-			Uri = uri,
+			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/instruments",
 			Method = "GET",
 			Parameters = parameters
 		 };
 
 		 var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(request);
+
 		 return response.instruments;
 	  }
 
 	  public class AccountInstrumentsParameters : Parameters
 	  {
+		 public override AcceptDatetimeFormat? AcceptDatetimeFormat
+		 {
+			get => null;
+			set => base.AcceptDatetimeFormat = value;
+		 }
+
 		 /// <summary>
 		 /// List of instruments to query specifically.
 		 /// </summary>
+		 [JsonIgnore]
 		 public List<string> instruments { get; set; }
-	  }
-   }
 
-   public class AccountInstrumentsRequest : Request
-   {
+		 [Query(Name = nameof(instruments))]
+		 internal string instrumentsCSV => this?.instruments?.Count > 0 ? GetCommaSeparatedString(instruments) : null;
+	  }
    }
 
    /// <summary>

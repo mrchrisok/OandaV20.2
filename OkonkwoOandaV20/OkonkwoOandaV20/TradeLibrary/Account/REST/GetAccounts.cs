@@ -13,29 +13,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>a List of AccountProperties that includes basic information about the accounts</returns>
 	  public static async Task<List<AccountProperties>> GetAccountsAsync()
 	  {
-		 var parameters = new AccountPropertiesParameters()
-		 {
-			AcceptDatetimeFormat = null
-		 };
-
-		 var request = new AccountPropertiesRequest()
+		 var request = new Request()
 		 {
 			Uri = ServerUri(EServer.Account) + "accounts",
-			Method = "GET",
-			Parameters = parameters
+			Method = "GET"
 		 };
 
 		 var response = await MakeRequestAsync<AccountsResponse, AccountsErrorResponse>(request);
 		 return response.accounts;
 	  }
-
-	  public class AccountPropertiesParameters : Parameters
-	  {
-	  }
-   }
-
-   public class AccountPropertiesRequest : Request
-   {
    }
 
    /// <summary>

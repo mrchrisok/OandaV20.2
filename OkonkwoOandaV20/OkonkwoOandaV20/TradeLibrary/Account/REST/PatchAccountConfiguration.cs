@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Runtime.Serialization;
@@ -17,14 +18,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>an AccountConfigurationResponse object containing the updated values that were applied to the account</returns>
 	  public static async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(string accountID, AccountConfigurationParameters parameters)
 	  {
-		 var request = new AccountConfigurationRequest()
+		 var request = new Request()
 		 {
-			Uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/configuration",
+			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/configuration",
 			Method = "PATCH",
 			Parameters = parameters
 		 };
 
-		 var response = await MakeRequestWithJSONBody<AccountConfigurationResponse, AccountConfigurationErrorResponse>(request);
+		 var response = await MakeRequestWithJSONBodyAsync<AccountConfigurationResponse, AccountConfigurationErrorResponse>(request);
 
 		 return response;
 	  }
@@ -35,6 +36,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// Client-defined alias (name) for the Account
 		 /// </summary>
 		 [DataMember(EmitDefaultValue = false)]
+		 [Body]
 		 public string alias { get; set; }
 
 		 /// <summary>
@@ -42,12 +44,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// </summary>
 		 [DataMember(EmitDefaultValue = false)]
 		 [JsonConverter(typeof(StringDecimalConverter))]
+		 [Body]
 		 public decimal? marginRate { get; set; }
 	  }
-   }
-
-   public class AccountConfigurationRequest : Request
-   {
    }
 
    /// <summary>

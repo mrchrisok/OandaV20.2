@@ -1,4 +1,5 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Account;
+﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.TradeLibrary.Account;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -14,12 +15,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>an AccountChangesResponse object</returns>
 	  public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters)
 	  {
-		 string uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/changes";
-		 string query = $"?sinceTransactionID={parameters.sinceTransactionID}";
-
-		 var request = new AccountChangesRequest()
+		 var request = new Request()
 		 {
-			Uri = uri + query,
+			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/changes",
 			Method = "GET",
 			Parameters = parameters
 		 };
@@ -34,12 +32,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// <summary>
 		 /// ID of the Transaction to get Account changes since.
 		 /// </summary>
+		 [Query]
 		 public long sinceTransactionID { get; set; }
 	  }
-   }
-
-   public class AccountChangesRequest : Request
-   {
    }
 
    /// <summary>

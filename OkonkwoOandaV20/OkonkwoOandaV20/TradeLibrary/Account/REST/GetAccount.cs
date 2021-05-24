@@ -13,13 +13,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>an Account object containing the account details</returns>
 	  public static async Task<Account.Account> GetAccountAsync(string accountID, AccountParameters parameters = null)
 	  {
-		 parameters ??= new AccountParameters();
-
-		 var request = new AccountRequest()
+		 var request = new Request()
 		 {
 			Uri = ServerUri(EServer.Account) + "accounts/" + accountID,
 			Method = "GET",
-			Parameters = parameters
+			Parameters = parameters ?? new AccountParameters()
 		 };
 
 		 var response = await MakeRequestAsync<AccountResponse, AccountErrorResponse>(request);
@@ -29,10 +27,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  public class AccountParameters : Parameters
 	  {
 	  }
-   }
-
-   public class AccountRequest : Request
-   {
    }
 
    /// <summary>
