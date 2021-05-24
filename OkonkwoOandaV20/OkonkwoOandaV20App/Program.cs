@@ -51,7 +51,7 @@ namespace OkonkwoOandaV20App
 
 		 // first, check the market status for EUR_USD
 		 // if it is tradeable, we'll try to make some money :)
-		 if (!(await Utilities.IsMarketHalted(INSTRUMENT)))
+		 if (!(await Utilities.IsMarketHaltedAsync(INSTRUMENT)))
 		 {
 			WriteNewLine("EUR_USD is open and rockin', so let's start trading!");
 
@@ -150,7 +150,7 @@ namespace OkonkwoOandaV20App
 		 _transactionReceived = new Semaphore(0, 100);
 		 _transactionsSession.DataReceived += OnTransactionReceived;
 
-		 _transactionsSession.StartSession();
+		 _transactionsSession.StartSessionAsync();
 
 		 bool success = _transactionReceived.WaitOne(10000);
 
