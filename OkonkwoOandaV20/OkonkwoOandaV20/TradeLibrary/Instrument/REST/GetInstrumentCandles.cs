@@ -1,4 +1,5 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Instrument;
+﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,9 +18,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>List of Candlestick objects (or empty list) </returns>
 	  public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(string instrument, InstrumentCandlesParameters parameters)
 	  {
-		 var request = new InstrumentCandlesRequest()
+		 var request = new Request()
 		 {
-			Uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/candles",
+			Uri = $"{ServerUri(EServer.Account)}instruments/{instrument}/candles",
 			Method = "GET",
 			Parameters = parameters
 		 };
@@ -43,12 +44,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// [default=M]
 		 /// Valid values are specified in the CandleStickPriceType class.
 		 /// </summary>
+		 [Query]
 		 public string price { get; set; }
 
 		 /// <summary>
 		 /// The granularity of the candlesticks to fetch [default=S5].
 		 /// Valid values are specifiec in the CandleStickGranularity class.
 		 /// </summary>
+		 [Query]
 		 public string granularity { get; set; }
 
 		 /// <summary>
@@ -57,16 +60,19 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// combined with the graularity will determine the number of candlesticks to return. 
 		 /// [default=500, maximum=5000]
 		 /// </summary>
+		 [Query]
 		 public int? count { get; set; }
 
 		 /// <summary>
 		 /// The start of the time range to fetch candlesticks for.
 		 /// </summary>
+		 [Query]
 		 public string from { get; set; }
 
 		 /// <summary>
 		 /// The end of the time range to fetch candlesticks for.
 		 /// </summary>
+		 [Query]
 		 public string to { get; set; }
 
 		 /// <summary>
@@ -75,6 +81,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// unsmoothed candlestick uses the first price from its time range as its open price.
 		 /// [default=False]
 		 /// </summary>
+		 [Query]
 		 public bool? smooth { get; set; }
 
 		 /// <summary>
@@ -83,12 +90,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// the last completed candlestick received to poll for future candlesticks but avoid 
 		 /// receiving the previous candlestick repeatedly. [default=True]
 		 /// </summary>
+		 [Query]
 		 public bool? includeFirst { get; set; }
 
 		 /// <summary>
 		 /// The hour of the day (in the specified timezone) to use for granularities that have 
 		 /// daily alignments. [default=17, minimum=0, maximum=23]
 		 /// </summary>
+		 [Query]
 		 public int? dailyAlignment { get; set; }
 
 		 /// <summary>
@@ -98,21 +107,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// Review this <see cref="http://developer.oanda.com/docs/timezones.txt">Oanda Timezones List</see>
 		 /// to see all supported timezone values.
 		 /// </summary>
+		 [Query]
 		 public string alignmentTimezone { get; set; }
 
 		 /// <summary>
 		 /// The day of the week used for granularities that have weekly alignment. [default=Friday]
 		 /// </summary>
 		 /// Valid values are specified in the WeeklyAlignment class.
+		 [Query]
 		 public string weeklyAlignment { get; set; }
 	  }
-   }
-
-   /// <summary>
-   /// A container for the request properties, parameters and headers
-   /// </summary>
-   public class InstrumentCandlesRequest : Request
-   {
    }
 
    /// <summary>

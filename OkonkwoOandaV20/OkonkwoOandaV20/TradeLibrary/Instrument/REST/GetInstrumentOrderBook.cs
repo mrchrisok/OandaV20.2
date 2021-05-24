@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
 using System.Threading.Tasks;
@@ -18,9 +19,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>an OrderBook object</returns>
 	  public static async Task<OrderBook> GetInstrumentOrderBookAsync(string instrument, InstrumentOrderBookParameters parameters)
 	  {
-		 var request = new InstrumentOrderBookRequest()
+		 var request = new Request()
 		 {
-			Uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/orderBook",
+			Uri = $"{ServerUri(EServer.Account)}instruments/{instrument}/orderBook",
 			Method = "GET",
 			Parameters = parameters
 		 };
@@ -55,6 +56,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// The time of the snapshot to fetch. If not specified, then the most recent snapshot 
 		 /// is fetched.
 		 /// </summary>
+		 [Query]
 		 public string time { get; set; }
 
 		 /// <summary>
@@ -63,10 +65,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 [JsonIgnore]
 		 public bool getLastTimeOnFailure { get; set; }
 	  }
-   }
-
-   public class InstrumentOrderBookRequest : Request
-   {
    }
 
    /// <summary>
