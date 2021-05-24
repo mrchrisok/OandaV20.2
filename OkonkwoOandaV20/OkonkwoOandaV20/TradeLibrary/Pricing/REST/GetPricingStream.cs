@@ -102,7 +102,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 _includeHomeConversions = includeHomeConversions;
 	  }
 
-	  protected override async Task<WebResponse> GetSession()
+	  protected override async Task<WebResponse> GetSessionAsync()
 	  {
 		 var instruments = new List<string>();
 		 _instruments.ForEach(instrument => instruments.Add(instrument.name));

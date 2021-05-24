@@ -45,7 +45,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
 		 [JsonProperty(PropertyName = "ids")]
 		 [Query]
-		 internal string idString => this?.ids.Count > 0 ? GetCommaSeparatedString(ids) : null;
+		 internal string idString => this?.ids?.Count > 0 ? GetCommaSeparatedString(ids) : null;
 
 		 /// <summary>
 		 /// The state to filter the requested Trades by. [default=OPEN]

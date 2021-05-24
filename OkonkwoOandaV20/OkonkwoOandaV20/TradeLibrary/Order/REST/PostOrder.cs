@@ -24,7 +24,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			Parameters = parameters
 		 };
 
-		 var response = await MakeRequestWithJSONBodyAsync<PostOrderResponse, PostOrderErrorResponse>(request);
+		 var response = await MakeRequestAsync<PostOrderResponse, PostOrderErrorResponse>(request);
 
 		 return response;
 	  }

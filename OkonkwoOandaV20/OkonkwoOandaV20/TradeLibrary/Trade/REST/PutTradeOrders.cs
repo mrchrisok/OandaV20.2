@@ -106,7 +106,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 #endregion
 
 
-		 internal override IDictionary<string, object> GetRequestParameters<P>()
+		 internal override IDictionary<string, object> GetRequestParameters<P>(bool excludeNulls = true)
 		 {
 			if (typeof(P) == typeof(BodyAttribute))
 			{
@@ -122,7 +122,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			   return result;
 			}
 
-			return base.GetRequestParameters<P>();
+			return base.GetRequestParameters<P>(excludeNulls);
 		 }
 	  }
 

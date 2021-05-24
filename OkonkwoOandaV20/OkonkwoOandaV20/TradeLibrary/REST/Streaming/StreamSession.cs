@@ -8,74 +8,75 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
 {
    public abstract class StreamSession<T> where T : IStreamResponse
    {
-      protected readonly string _accountID;
-      protected WebResponse _response;
-      protected bool _shutdown;
+	  protected readonly string _accountID;
+	  protected WebResponse _response;
+	  protected bool _shutdown;
 
-      public delegate void DataHandler(T data);
-      public event DataHandler DataReceived;
-      public void OnDataReceived(T data)
-      {
-         DataReceived?.Invoke(data);
-      }
+	  public delegate void DataHandler(T data);
+	  public event DataHandler DataReceived;
+	  public void OnDataReceived(T data)
+	  {
+		 DataReceived?.Invoke(data);
+	  }
 
-      public delegate void SessionStatusHandler(string accountID, bool started, Exception e);
-      public event SessionStatusHandler SessionStatusChanged;
-      public void OnSessionStatusChanged(bool started, Exception e)
-      {
-         SessionStatusChanged?.Invoke(_accountID, started, e);
-      }
+	  public delegate void SessionStatusHandler(string accountID, bool started, Exception e);
+	  public event SessionStatusHandler SessionStatusChanged;
+	  public void OnSessionStatusChanged(bool started, Exception e)
+	  {
+		 SessionStatusChanged?.Invoke(_accountID, started, e);
+	  }
 
-      protected StreamSession(string accountID)
-      {
-         _accountID = accountID;
-      }
+	  protected StreamSession(string accountID)
+	  {
+		 _accountID = accountID;
+	  }
 
-      protected abstract Task<WebResponse> GetSession();
+	  protected abstract Task<WebResponse> GetSessionAsync();
 
-      public virtual async Task StartSession()
-      {
-         _shutdown = false;
-         _response = await GetSession();
+	  public virtual async Task StartSessionAsync()
+	  {
+		 _shutdown = false;
+		 _response = await GetSessionAsync();
 
-         await Task.Run(() =>
-         {
-            try
-            {
-               using (_response)
-               {
-                  StreamReader reader = new StreamReader(_response.GetResponseStream());
-                  while (!_shutdown)
-                  {
-                     string line = reader.ReadLine();
-                     var data = JsonConvert.DeserializeObject<T>(line);
+		 await Task.Run(() =>
+		 {
+			try
+			{
+			   using (_response)
+			   {
+				  var reader = new StreamReader(_response.GetResponseStream());
 
-                     OnSessionStatusChanged(!_shutdown, null);
+				  while (!_shutdown)
+				  {
+					 string line = reader.ReadLine();
+					 var data = JsonConvert.DeserializeObject<T>(line);
 
-                     OnDataReceived(data);
-                  }
-               }
-            }
-            catch (Exception e)
-            {
-               _shutdown = true;
-               throw e;
-            }
-            finally
-            {
-               _response = null;
-            }
-         });
-      }
+					 OnSessionStatusChanged(!_shutdown, null);
 
-      public void StopSession()
-      {
-         _shutdown = true;
-      }
+					 OnDataReceived(data);
+				  }
+			   }
+			}
+			catch (Exception e)
+			{
+			   _shutdown = true;
+			   throw e;
+			}
+			finally
+			{
+			   _response = null;
+			}
+		 });
+	  }
 
-      public bool Stopped()
-      {
-         return _shutdown;
-      }
+	  public void StopSession()
+	  {
+		 _shutdown = true;
+	  }
+
+	  public bool Stopped()
+	  {
+		 return _shutdown;
+	  }
    }
 }

@@ -66,7 +66,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  {
 	  }
 
-	  protected override async Task<WebResponse> GetSession()
+	  protected override async Task<WebResponse> GetSessionAsync()
 	  {
 		 return await Rest20.GetTransactionsStream(_accountID);
 	  }

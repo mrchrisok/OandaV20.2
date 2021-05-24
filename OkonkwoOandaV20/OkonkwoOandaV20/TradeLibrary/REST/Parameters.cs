@@ -15,15 +15,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
 	  #endregion
 
-	  internal virtual IDictionary<string, object> GetRequestParameters<P>() where P : RequestAttribute
+	  internal virtual IDictionary<string, object> GetRequestParameters<P>(bool excludeNulls = true) where P : RequestAttribute
 	  {
-		 var parametersProperties = GetObjectParameters<P>(this);
+		 var parametersProperties = GetObjectParameters<P>(this, excludeNulls);
 
 		 var order = this.GetType().GetProperties().Where(prop => prop.GetType() == typeof(OrderRequest)).FirstOrDefault();
 
 		 if (order != default)
 		 {
-			var orderParameters = GetObjectParameters<P>(order);
+			var orderParameters = GetObjectParameters<P>(order, excludeNulls);
 			foreach (var parameter in orderParameters.ToList())
 			{
 			   parametersProperties.Add(parameter.Key, parameter.Value);
@@ -33,10 +33,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 return parametersProperties;
 	  }
 
-	  private Dictionary<string, object> GetObjectParameters<P>(object obj) where P : RequestAttribute
+	  private Dictionary<string, object> GetObjectParameters<P>(object obj, bool excludeNulls = true) where P : RequestAttribute
 	  {
 		 var requestParameters = obj.GetType()
-			.GetProperties()
+			.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
 			.Where(prop => prop.GetCustomAttribute<P>() != null)
 			.Select(prop =>
 			{
@@ -44,6 +44,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			   var propName = !string.IsNullOrWhiteSpace(customName) ? customName : prop.Name;
 			   return new KeyValuePair<string, object>(propName, prop.GetValue(this));
 			})
+			.Where(param => !excludeNulls || param.Value != null)
 			.ToDictionary(x => x.Key, x => x.Value);
 
 		 return requestParameters;
