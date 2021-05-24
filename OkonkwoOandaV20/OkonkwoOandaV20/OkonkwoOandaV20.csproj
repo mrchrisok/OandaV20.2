@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -46,7 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Framework\Attributes.cs" />
+    <Compile Include="Framework\Attributes\RequestAttribute.cs" />
+    <Compile Include="Framework\Attributes\QueryAttribute.cs" />
+    <Compile Include="Framework\Attributes\BodyAttribute.cs" />
+    <Compile Include="Framework\Attributes\HeaderAttribute.cs" />
+    <Compile Include="Framework\Attributes\IsOptional.cs" />
     <Compile Include="Framework\Common.cs" />
     <Compile Include="Framework\Factories\ErrorResponseFactory.cs" />
     <Compile Include="Framework\Factories\OrderFactory.cs" />
@@ -78,6 +84,7 @@
     <Compile Include="TradeLibrary\Account\REST\PatchAccountConfiguration.cs" />
     <Compile Include="TradeLibrary\Instrument\Candlestick.cs" />
     <Compile Include="TradeLibrary\Instrument\CandleStickData.cs" />
+    <Compile Include="TradeLibrary\Instrument\CandleStickResponse.cs" />
     <Compile Include="TradeLibrary\Instrument\Definitions.cs" />
     <Compile Include="TradeLibrary\Instrument\Instrument.cs" />
     <Compile Include="TradeLibrary\Instrument\InstrumentCommission.cs" />
@@ -101,17 +108,18 @@
     <Compile Include="TradeLibrary\Order\REST\GetOrder.cs" />
     <Compile Include="TradeLibrary\Order\REST\GetOrders.cs" />
     <Compile Include="TradeLibrary\Order\REST\GetPendingOrders.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\EntryOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\ExitOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\IOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\LimitOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\MarketIfTouchedOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\MarketOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\PriceEntryOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\StopLossOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\StopOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\TakeProfitOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\TrailingStopLossOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\EntryOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\OrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\ExitOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\IOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\LimitOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\MarketIfTouchedOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\MarketOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\PriceEntryOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\StopLossOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\StopOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\TakeProfitOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\TrailingStopLossOrderRequest.cs" />
     <Compile Include="TradeLibrary\Order\REST\PostOrder.cs" />
     <Compile Include="TradeLibrary\Order\REST\PutOrderCancel.cs" />
     <Compile Include="TradeLibrary\Order\REST\PutOrderClientExtensions.cs" />
@@ -128,11 +136,14 @@
     <Compile Include="TradeLibrary\Position\REST\GetPositions.cs" />
     <Compile Include="TradeLibrary\Position\REST\PutPositionClose.cs" />
     <Compile Include="TradeLibrary\Pricing\ClientPrice.cs" />
-    <Compile Include="TradeLibrary\Pricing\Definitions.cs" />
+    <Compile Include="TradeLibrary\Pricing\PriceStatus.cs" />
+    <Compile Include="TradeLibrary\Pricing\CandleSpecification.cs" />
     <Compile Include="TradeLibrary\Pricing\HomeConversions.cs" />
     <Compile Include="TradeLibrary\Pricing\Price.cs" />
     <Compile Include="TradeLibrary\Pricing\PriceBucket.cs" />
     <Compile Include="TradeLibrary\Pricing\QuoteHomeConversionFactors.cs" />
+    <Compile Include="TradeLibrary\Pricing\REST\GetPricingInstrumentCandles.cs" />
+    <Compile Include="TradeLibrary\Pricing\REST\GetPricingCandlesLatest.cs" />
     <Compile Include="TradeLibrary\Pricing\REST\GetPricing.cs" />
     <Compile Include="TradeLibrary\Pricing\REST\GetPricingStream.cs" />
     <Compile Include="TradeLibrary\Pricing\UnitsAvailable.cs" />
@@ -140,6 +151,7 @@
     <Compile Include="TradeLibrary\Rest20.cs" />
     <Compile Include="TradeLibrary\REST\Credentials.cs" />
     <Compile Include="TradeLibrary\REST\Primitives.cs" />
+    <Compile Include="TradeLibrary\REST\Parameters.cs" />
     <Compile Include="TradeLibrary\REST\Request.cs" />
     <Compile Include="TradeLibrary\REST\Response.cs" />
     <Compile Include="TradeLibrary\REST\Streaming\Heartbeat.cs" />
