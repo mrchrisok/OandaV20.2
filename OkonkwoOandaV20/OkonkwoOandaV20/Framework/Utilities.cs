@@ -12,7 +12,7 @@ namespace OkonkwoOandaV20.Framework
       /// </summary>
       /// <param name="instrument">Instrument to check if halted. Default is EUR_USD.</param>
       /// <returns>True if trading is halted, false if trading is not halted.</returns>
-      public static async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD)
+      public static async Task<bool> IsMarketHaltedAsync(string instrument = InstrumentName.Currency.EURUSD)
       {
          var accountID = Credentials.GetDefaultCredentials().DefaultAccountId;
          var parameters = new PricingParameters() { instruments = new List<string>() { instrument } };
