@@ -6,35 +6,35 @@
    /// </summary>
    public enum AcceptDatetimeFormat
    {
-      /// <summary>
-      /// If “UNIX” is specified DateTime fields will be specified or returned in the “12345678.000000123” format.
-      /// </summary>
-      Unix,
+	  /// <summary>
+	  /// If “UNIX” is specified, DateTime fields will be specified or returned in the “12345678.000000123” format.
+	  /// </summary>
+	  Unix,
 
-      /// <summary>
-      /// If “RFC3339” is specified DateTime will be specified or returned in “YYYY-MM-DDTHH:MM:SS.nnnnnnnnnZ” format.
-      /// </summary>
-      RFC3339
+	  /// <summary>
+	  /// If “RFC3339” is specified, DateTime will be specified or returned in “YYYY-MM-DDTHH:MM:SS.nnnnnnnnnZ” format.
+	  /// </summary>
+	  RFC3339
    }
 
    public class InstrumentName
    {
-      /// <summary>
-      /// Quotes and trading of these currency pairs are supported via v20 as of 2018-07-06.
-      /// Visit <see cref="https://www.oanda.com/currency/live-exchange-rates/">Oanda's Live Exchange Rates</see> page 
-      /// for a complete and current list of supported pairs.
-      /// </summary>
-      public class Currency
-      {
-         public const string EURUSD = "EUR_USD";
-         public const string USDJPY = "USD_JPY";
-         public const string AUDUSD = "AUD_USD";
-         public const string AUDJPY = "AUD_JPY";
-         public const string GBPUSD = "GBP_USD";
-         public const string NZDUSD = "NZD_USD";
-         public const string USDCHF = "USD_CHF";
-         public const string USDCAD = "USD_CAD";
-      }
+	  /// <summary>
+	  /// Quotes and trading of these currency pairs are supported via v20 as of 2018-07-06.
+	  /// Visit <see cref="https://www.oanda.com/currency/live-exchange-rates/">Oanda's Live Exchange Rates</see> page 
+	  /// for a complete and current list of supported pairs.
+	  /// </summary>
+	  public class Currency
+	  {
+		 public const string EURUSD = "EUR_USD";
+		 public const string USDJPY = "USD_JPY";
+		 public const string AUDUSD = "AUD_USD";
+		 public const string AUDJPY = "AUD_JPY";
+		 public const string GBPUSD = "GBP_USD";
+		 public const string NZDUSD = "NZD_USD";
+		 public const string USDCHF = "USD_CHF";
+		 public const string USDCAD = "USD_CAD";
+	  }
    }
 
    /// <summary>
@@ -43,18 +43,18 @@
    /// </summary>
    public class GuaranteedStopLossOrderLevelRestriction
    {
-      /// <summary>
-      /// Applies to Trades with a guaranteed Stop Loss Order attached for the
-      /// specified Instrument. This is the total allowed Trade volume that can
-      /// exist within the priceRange based on the trigger prices of the guaranteed
-      /// Stop Loss Orders.
-      /// </summary>
-      public decimal volume { get; set; }
+	  /// <summary>
+	  /// Applies to Trades with a guaranteed Stop Loss Order attached for the
+	  /// specified Instrument. This is the total allowed Trade volume that can
+	  /// exist within the priceRange based on the trigger prices of the guaranteed
+	  /// Stop Loss Orders.
+	  /// </summary>
+	  public decimal volume { get; set; }
 
-      /// <summary>
-      /// The price range the volume applies to. This value is in price units.
-      /// </summary>
-      public decimal priceRange { get; set; }
+	  /// <summary>
+	  /// The price range the volume applies to. This value is in price units.
+	  /// </summary>
+	  public decimal priceRange { get; set; }
    }
 
    /// <summary>
@@ -62,15 +62,15 @@
    /// </summary>
    public class Direction
    {
-      /// <summary>
-      /// A long Order is used to to buy units of an Instrument. A Trade is long when it has bought units of an 
-      /// Instrument.
-      /// </summary>
-      public const string Long = "LONG";
+	  /// <summary>
+	  /// A long Order is used to to buy units of an Instrument. A Trade is long when it has bought units of an 
+	  /// Instrument.
+	  /// </summary>
+	  public const string Long = "LONG";
 
-      /// <summary>
-      /// A short Order is used to to sell units of an Instrument. A Trade is short when it has sold units of an Instrument.
-      /// </summary>
-      public const string Short = "SHORT";
+	  /// <summary>
+	  /// A short Order is used to to sell units of an Instrument. A Trade is short when it has sold units of an Instrument.
+	  /// </summary>
+	  public const string Short = "SHORT";
    }
 }
