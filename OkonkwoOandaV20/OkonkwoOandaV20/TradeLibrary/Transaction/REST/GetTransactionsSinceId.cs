@@ -1,4 +1,6 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,35 +8,59 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 {
    public partial class Rest20
    {
-      /// <summary>
-      /// Get a range of Transactions for an Account starting at (but not including) a provided Transaction ID.
-      /// http://developer.oanda.com/rest-live-v20/transaction-ep/#_collapse_endpoint_5
-      /// </summary>
-      /// <param name="accountID">the id of the account to which the transaction belongs</param>
-      /// <param name="transactionID">the id of the first transaction to retrieve</param>
-      /// <returns>A list of transaction objects</returns>
-      public static async Task<List<ITransaction>> GetTransactionsSinceIdAsync(string accountID, long transactionID)
-      {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/sinceid";
-         uri += "?id=" + transactionID;
+	  /// <summary>
+	  /// Get a range of Transactions for an Account starting at (but not including) a provided Transaction ID.
+	  /// http://developer.oanda.com/rest-live-v20/transaction-ep/#_collapse_endpoint_5
+	  /// </summary>
+	  /// <param name="accountID">the id of the account to which the transactions belongs</param>
+	  /// <param name="parameters">the parameters for the request</param>
+	  /// <returns>A list of transaction objects</returns>
+	  public static async Task<List<ITransaction>> GetTransactionsSinceIdAsync(string accountID, TransactionsSinceIdParameters parameters)
+	  {
+		 var request = new Request()
+		 {
+			Uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/sinceid",
+			Method = "GET",
+			Parameters = parameters
+		 };
 
-         var response = await MakeRequestAsync<TransactionsSinceIdRangeResponse, TransactionsSinceIdRangeErrorResponse>(uri);
+		 var response = await MakeRequestAsync<TransactionsSinceIdResponse, TransactionsSinceIdErrorResponse>(request);
 
-         return response.transactions;
-      }
+		 return response.transactions;
+	  }
+
+	  public class TransactionsSinceIdParameters : Parameters
+	  {
+		 /// <summary>
+		 /// The ID of the last Transaction fetched. 
+		 /// This query will return all Transactions newer than the TransactionID. [required]
+		 /// </summary>
+		 [Query]
+		 public long id { get; set; }
+
+		 /// <summary>
+		 /// A filter for restricting the types of Transactions to retrieve.
+		 /// The valid values are defined in the TransactionFilter class.
+		 /// </summary>
+		 [JsonIgnore]
+		 public List<string> type { get; set; }
+
+		 [Query(Name = nameof(type))]
+		 internal string typeCSV => this?.type?.Count > 0 ? GetCommaSeparatedString(type) : null;
+	  }
    }
 
    /// <summary>
    /// The GET success response received from accounts/accountID/transactions/sinceid
    /// </summary>
-   public class TransactionsSinceIdRangeResponse : TransactionsResponse
+   public class TransactionsSinceIdResponse : TransactionsResponse
    {
    }
 
    /// <summary>
    /// The GET error response received from accounts/accountID/transactions/sinceid
    /// </summary>
-   public class TransactionsSinceIdRangeErrorResponse : TransactionsErrorResponse
+   public class TransactionsSinceIdErrorResponse : TransactionsErrorResponse
    {
    }
 }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
@@ -8,73 +9,80 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 {
    public partial class Rest20
    {
-      /// <summary>
-      /// Get a list of Transactions pages that satisfy a time-based Transaction query.
-      /// </summary>
-      /// <param name="accountID">Account identifier</param>
-      /// <param name="parameters">The parameters for the request</param>
-      /// <returns></returns>
-      public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters)
-      {
-         var requestParams = ConvertToDictionary(parameters);
+	  /// <summary>
+	  /// Get a list of Transactions pages that satisfy a time-based Transaction query.
+	  /// </summary>
+	  /// <param name="accountID">Account identifier</param>
+	  /// <param name="parameters">The parameters for the request</param>
+	  /// <returns></returns>
+	  public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters)
+	  {
+		 var request = new Request()
+		 {
+			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/transactions",
+			Method = "GET",
+			Parameters = parameters
+		 };
 
-         string type = null;
-         if (parameters.type != null)
-         {
-            type = GetCommaSeparatedString(parameters.type);
-            requestParams.Add("type", type);
-         }
+		 var pagesResponse = await MakeRequestAsync<TransactionPagesResponse, TransactionPagesErrorResponse>(request);
 
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions";
+		 var transactions = new List<ITransaction>();
+		 foreach (string page in pagesResponse.pages)
+		 {
+			var pageParams = new TransactionsByIdRangeParameters
+			{
+			   AcceptDatetimeFormat = request.Parameters.AcceptDatetimeFormat,
+			   page = page,
+			   type = parameters.type
+			};
 
-         var pagesResponse = await MakeRequestAsync<TransactionPagesResponse, TransactionPagesErrorResponse>(uri, "GET", requestParams);
+			transactions.AddRange(await GetTransactionsByIdRangeAsync(accountID, pageParams));
 
-         var transactions = new List<ITransaction>();
-         foreach (string page in pagesResponse.pages)
-         {
-            var pageParams = new TransactionsByIdRangeParameters { page = page, type = parameters.type };
+			await Task.Delay(parameters.pagingDelayMilliSeconds); // throttle
+		 }
 
-            transactions.AddRange(await GetTransactionsByIdRangeAsync(accountID, pageParams));
+		 return transactions;
+	  }
 
-            await Task.Delay(parameters.pagingDelayMilliSeconds); // throttle these a bit
-         }
+	  public class TransactionsParameters : Parameters
+	  {
+		 /// <summary>
+		 /// The starting time (inclusive) of the time range for the Transactions being queried. 
+		 /// [default=Account Creation Time]
+		 /// </summary>
+		 [Query]
+		 public string from { get; set; }
 
-         return transactions;
-      }
+		 /// <summary>
+		 /// The ending time (inclusive) of the time range for the Transactions being queried. 
+		 /// [default=Request Time]
+		 /// </summary>
+		 [Query]
+		 public string to { get; set; }
 
-      public class TransactionsParameters
-      {
-         /// <summary>
-         /// The starting time (inclusive) of the time range for the Transactions being queried. 
-         /// [default=Account Creation Time]
-         /// </summary>
-         public string from { get; set; }
+		 /// <summary>
+		 /// The number of Transactions to include in each page of the results. [default=100, maximum=1000]
+		 /// </summary>
+		 [Query]
+		 public int? pageSize { get; set; }
 
-         /// <summary>
-         /// The ending time (inclusive) of the time range for the Transactions being queried. 
-         /// [default=Request Time]
-         /// </summary>
-         public string to { get; set; }
+		 /// <summary>
+		 /// A filter for restricting the types of Transactions to retrieve.
+		 /// The valid values are defined in the TransactionFilter class.
+		 /// </summary>
+		 [JsonIgnore]
+		 public List<string> type { get; set; }
 
-         /// <summary>
-         /// The number of Transactions to include in each page of the results. [default=100, maximum=1000]
-         /// </summary>
-         public int? pageSize { get; set; }
+		 [Query(Name = nameof(type))]
+		 internal string typeCSV => this?.type?.Count > 0 ? GetCommaSeparatedString(type) : null;
 
-         /// <summary>
-         /// A list of TransactionFilter values that restricts the types of Transactions to retreive.
-         /// The valid values are defined in the TransactionFilter class.
-         /// </summary>
-         [JsonIgnore]
-         public List<string> type { get; set; }
-
-         /// <summary>
-         /// Number of milliSeconds by which to throttle the transactions page requests. Throttled retrieval
-         /// may be used optionally in test or resource-constrained production environments.
-         /// </summary>
-         [JsonIgnore]
-         public int pagingDelayMilliSeconds { get; set; }
-      }
+		 /// <summary>
+		 /// Number of milliSeconds by which to throttle the transactions page requests. Throttled retrieval
+		 /// may be used optionally in test or resource-constrained production environments.
+		 /// </summary>
+		 [JsonIgnore]
+		 public int pagingDelayMilliSeconds { get; set; }
+	  }
    }
 
    /// <summary>
@@ -82,36 +90,36 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// </summary>
    public class TransactionPagesResponse : Response
    {
-      /// <summary>
-      /// The starting time provided in the request.
-      /// </summary>
-      public string from { get; set; }
+	  /// <summary>
+	  /// The starting time provided in the request.
+	  /// </summary>
+	  public string from { get; set; }
 
-      /// <summary>
-      /// The ending time provided in the request.
-      /// </summary>
-      public string to { get; set; }
+	  /// <summary>
+	  /// The ending time provided in the request.
+	  /// </summary>
+	  public string to { get; set; }
 
-      /// <summary>
-      /// The pageSize provided in the requests
-      /// </summary>
-      public int pageSize { get; set; }
+	  /// <summary>
+	  /// The pageSize provided in the requests
+	  /// </summary>
+	  public int pageSize { get; set; }
 
-      /// <summary>
-      /// The Transaction-type filter provided in the request
-      /// </summary>
-      public List<string> type { get; set; }
+	  /// <summary>
+	  /// The Transaction-type filter provided in the request
+	  /// </summary>
+	  public List<string> type { get; set; }
 
-      /// <summary>
-      /// The number of Transactions that are contained in the pages returned
-      /// </summary>
-      public int count { get; set; }
+	  /// <summary>
+	  /// The number of Transactions that are contained in the pages returned
+	  /// </summary>
+	  public int count { get; set; }
 
-      /// <summary>
-      /// The list of URLs that represent idrange queries providing the data for
-      /// each page in the query results
-      /// </summary>
-      public List<string> pages { get; set; }
+	  /// <summary>
+	  /// The list of URLs that represent idrange queries providing the data for
+	  /// each page in the query results
+	  /// </summary>
+	  public List<string> pages { get; set; }
    }
 
    /// <summary>
@@ -124,11 +132,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    #region base classes
    public class TransactionsResponse : Response
    {
-      /// <summary>
-      /// The list of Transactions that satisfy the request.
-      /// </summary>
-      [JsonConverter(typeof(TransactionConverter))]
-      public List<ITransaction> transactions;
+	  /// <summary>
+	  /// The list of Transactions that satisfy the request.
+	  /// </summary>
+	  [JsonConverter(typeof(TransactionConverter))]
+	  public List<ITransaction> transactions;
    }
 
    public class TransactionsErrorResponse : ErrorResponse
