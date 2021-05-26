@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -60,17 +59,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  private static async Task<T> MakeRequestAsync<T, E>(Request request)
 		 where E : IErrorResponse
 	  {
-		 HttpWebRequest webRequest = CreateHttpRequest(request.Uri, request.Method, request.Headers);
+		 HttpWebRequest webRequest = await CreateHttpRequestAsync(request);
 
-		 if (!string.IsNullOrWhiteSpace(request.Body))
-		 {
-			using (var writer = new StreamWriter(await webRequest.GetRequestStreamAsync()))
-			{
-			   await writer.WriteAsync(request.Body);
-			}
-		 }
-
-		 return await GetWebResponse<T, E>(webRequest);
+		 return await GetWebResponseAsync<T, E>(webRequest);
 	  }
 
 	  /// <summary>
@@ -80,7 +71,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>A response object containing the stream handle.</returns>
 	  private static async Task<WebResponse> MakeStreamRequestAsync(Request request)
 	  {
-		 var webRequest = CreateHttpRequest(request.Uri, request.Method, request.Headers);
+		 var webRequest = await CreateHttpRequestAsync(request);
 
 		 try
 		 {
@@ -106,7 +97,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <typeparam name="E">>Type of the error response returned by the remote service</typeparam>
 	  /// <param name="request">The request sent to the remote service</param>
 	  /// <returns>A success response object of type T or a failure response object of type E</returns>
-	  private static async Task<T> GetWebResponse<T, E>(HttpWebRequest request)
+	  private static async Task<T> GetWebResponseAsync<T, E>(HttpWebRequest request)
 	  {
 		 while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
 		 {
@@ -174,23 +165,31 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <param name="uri">The uri of the remote service</param>
 	  /// <param name="method">The Http verb for the request</param>
 	  /// <returns>An HttpWebRequest object</returns>
-	  private static HttpWebRequest CreateHttpRequest(string uri, string method, IDictionary<string, string> headers = null)
+	  private static async Task<HttpWebRequest> CreateHttpRequestAsync(Request request)
 	  {
-		 HttpWebRequest request = WebRequest.CreateHttp(uri);
-		 request.Method = method;
-		 request.ContentType = "application/json";
+		 HttpWebRequest webRequest = WebRequest.CreateHttp(request.Uri);
+		 webRequest.Method = request.Method;
+		 webRequest.ContentType = "application/json";
 
-		 if (headers != null)
+		 if (request.Headers != null)
 		 {
-			foreach (var header in headers)
+			foreach (var header in request.Headers)
 			{
-			   request.Headers[header.Key] = header.Value;
+			   webRequest.Headers[header.Key] = header.Value;
 			}
 		 }
-		 request.Headers[HttpRequestHeader.Authorization] = $"Bearer {AccessToken}";
-		 request.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
+		 webRequest.Headers[HttpRequestHeader.Authorization] = $"Bearer {AccessToken}";
+		 webRequest.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
 
-		 return request;
+		 if (!string.IsNullOrWhiteSpace(request.Body))
+		 {
+			using (var writer = new StreamWriter(await webRequest.GetRequestStreamAsync()))
+			{
+			   await writer.WriteAsync(request.Body);
+			}
+		 }
+
+		 return webRequest;
 	  }
 
 	  #endregion
