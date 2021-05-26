@@ -28,7 +28,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       /// <summary>
       /// The number of units filled by the Order.
       /// </summary>
-      public long units { get; set; }
+      public decimal units { get; set; }
 
       /// <summary>
       /// This is the conversion factor in effect for the Account at the time of

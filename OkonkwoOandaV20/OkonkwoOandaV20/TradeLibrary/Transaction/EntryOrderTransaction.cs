@@ -12,7 +12,7 @@
       /// number of units results in a long Order, and a negative number of units
       /// results in a short Order.
       /// </summary>
-      public long units { get; set; }
+      public decimal units { get; set; }
 
       /// <summary>
       /// The time-in-force requested for the Entry Order.
