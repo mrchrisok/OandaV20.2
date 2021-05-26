@@ -21,7 +21,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <param name="accountID">Name of the Instrument [required]</param>
 	  /// <param name="parameters">The parameters for the request</param>
 	  /// <returns>List of Candlestick objects (or empty list) </returns>
-	  public static async Task<List<CandleStickResponse>> GetPricingCandlesLatest(string accountID, PricingCandlesLatestParameters parameters)
+	  public static async Task<List<CandleStickResponse>> GetPricingCandlesLatestAsync(string accountID, PricingCandlesLatestParameters parameters)
 	  {
 		 if (parameters.candleSpecifications == null)
 		 {
