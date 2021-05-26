@@ -1,8 +1,10 @@
 ﻿# OANDAV20.2
 
-Spot Forex trading middleware that provides programmatic access to the OANDA© v20 REST Api.
+Spot Forex trading SDK that provides programmatic access to the OANDA© v20 REST Api.
 
-Written in C# 7.0
+Technologies
+- C# 7.0
+- .NET Framework 4.7.2
 
 Version 2 Improvements
 - Strongly typed parameters for all V20 api operations

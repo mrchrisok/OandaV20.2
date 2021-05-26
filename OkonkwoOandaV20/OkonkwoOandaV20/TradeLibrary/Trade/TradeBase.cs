@@ -9,9 +9,9 @@ namespace OkonkwoOandaV20.TradeLibrary.Trade
 	  public decimal price { get; set; }
 	  public string openTime { get; set; }
 	  public string state { get; set; }
-	  public long initialUnits { get; set; }
+	  public decimal initialUnits { get; set; }
 	  public decimal initialMarginRequired { get; set; }
-	  public long currentUnits { get; set; }
+	  public decimal currentUnits { get; set; }
 	  public decimal realizedPL { get; set; }
 	  public decimal averageClosePrice { get; set; }
 	  public List<long> closingTransactionIDs { get; set; }
