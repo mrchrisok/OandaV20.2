@@ -1069,7 +1069,11 @@ namespace OkonkwoOandaV20Tests
 		 {
 			// wait until a transaction is received .. max 20secs
 			var autoStopTime = DateTime.UtcNow.AddSeconds(20);
-			while (!_gotTransaction || DateTime.UtcNow < autoStopTime) { }
+			do
+			{
+			   Task.Delay(millisecondsDelay: 250);
+			}
+			while (!_gotTransaction || DateTime.UtcNow < autoStopTime);
 
 			// this will set _shutdown to true in StreamSession.cs
 			// once _shutdown = true, the pricing stream is stopped and disposed
