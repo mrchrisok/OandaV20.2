@@ -4,7 +4,7 @@ Spot Forex trading middleware that provides programmatic access to the OANDA© v
 
 Technologies
 - C# 7.0
-- .NETFramework 4.7.2
+- .NET Framework 4.7.2
 
 Version 2 Improvements
 - Strongly typed parameters for all V20 api operations
