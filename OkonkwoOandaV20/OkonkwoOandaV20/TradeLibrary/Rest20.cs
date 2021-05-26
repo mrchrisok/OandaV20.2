@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -60,15 +59,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  private static async Task<T> MakeRequestAsync<T, E>(Request request)
 		 where E : IErrorResponse
 	  {
-		 HttpWebRequest webRequest = CreateHttpRequest(request.Uri, request.Method, request.Headers);
-
-		 if (!string.IsNullOrWhiteSpace(request.Body))
-		 {
-			using (var writer = new StreamWriter(await webRequest.GetRequestStreamAsync()))
-			{
-			   await writer.WriteAsync(request.Body);
-			}
-		 }
+		 HttpWebRequest webRequest = await CreateHttpRequest(request);
 
 		 return await GetWebResponse<T, E>(webRequest);
 	  }
@@ -80,7 +71,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>A response object containing the stream handle.</returns>
 	  private static async Task<WebResponse> MakeStreamRequestAsync(Request request)
 	  {
-		 var webRequest = CreateHttpRequest(request.Uri, request.Method, request.Headers);
+		 var webRequest = await CreateHttpRequest(request);
 
 		 try
 		 {
@@ -174,23 +165,28 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <param name="uri">The uri of the remote service</param>
 	  /// <param name="method">The Http verb for the request</param>
 	  /// <returns>An HttpWebRequest object</returns>
-	  private static HttpWebRequest CreateHttpRequest(string uri, string method, IDictionary<string, string> headers = null)
+	  private static async Task<HttpWebRequest> CreateHttpRequest(Request request)
 	  {
-		 HttpWebRequest request = WebRequest.CreateHttp(uri);
-		 request.Method = method;
-		 request.ContentType = "application/json";
+		 HttpWebRequest webRequest = WebRequest.CreateHttp(request.Uri);
+		 webRequest.Method = request.Method;
+		 webRequest.ContentType = "application/json";
 
-		 if (headers != null)
+		 foreach (var header in request?.Headers)
 		 {
-			foreach (var header in headers)
+			webRequest.Headers[header.Key] = header.Value;
+		 }
+		 webRequest.Headers[HttpRequestHeader.Authorization] = $"Bearer {AccessToken}";
+		 webRequest.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
+
+		 if (!string.IsNullOrWhiteSpace(request.Body))
+		 {
+			using (var writer = new StreamWriter(await webRequest.GetRequestStreamAsync()))
 			{
-			   request.Headers[header.Key] = header.Value;
+			   await writer.WriteAsync(request.Body);
 			}
 		 }
-		 request.Headers[HttpRequestHeader.Authorization] = $"Bearer {AccessToken}";
-		 request.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
 
-		 return request;
+		 return webRequest;
 	  }
 
 	  #endregion
