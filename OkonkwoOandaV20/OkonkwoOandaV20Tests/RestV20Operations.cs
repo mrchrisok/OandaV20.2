@@ -1002,12 +1002,16 @@ namespace OkonkwoOandaV20Tests
 		 session.DataReceived += OnTransactionReceived;
 		 session.StartSession();
 
+		 // wait 10secs or until a message is received
+		 bool success = _transactionReceived.WaitOne(10000);
+		 m_Results.Verify("07.0", success, "Transaction events stream is functioning.");
+
 		 return Task.Run(() =>
 		 {
-			// wait 20sec or until an event is received
-			bool success = _transactionReceived.WaitOne(20000);
+			// wait until a transaction is received .. max 20secs
+			var autoStopTime = DateTime.UtcNow.AddSeconds(20);
+			while (!_gotTransaction || DateTime.UtcNow < autoStopTime) { }
 			session.StopSession();
-			m_Results.Verify("07.0", success, "Transaction events stream is functioning.");
 		 });
 	  }
 
