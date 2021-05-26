@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework;
+﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -67,11 +67,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// A comma separated list (csv) that restricts the types of Transactions to retreive.
 		 /// The valid values are defined in the TransactionFilter class.
 		 /// </summary>
-		 [JsonIgnore]
+		 [Query(converter: typeof(ListToCsvConverter))]
 		 public List<string> type { get; set; }
-
-		 [Query(Name = nameof(type))]
-		 internal string typeCSV => this?.type?.Count > 0 ? Utilities.ConvertListToDelimitedValues(type) : null;
 	  }
    }
 

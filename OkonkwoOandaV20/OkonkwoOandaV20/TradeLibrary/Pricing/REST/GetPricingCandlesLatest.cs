@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework;
+﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using System;
@@ -56,12 +56,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// <summary>
 		 /// List of candle specifications to get pricing for. [required]
 		 /// </summary>
-		 [JsonIgnore]
+		 [Query(converter: typeof(ListToCsvConverter))]
 		 public List<CandleSpecification> candleSpecifications { get; set; }
-
-		 [Query(Name = nameof(candleSpecifications))]
-		 internal string candleSpecificationsCSV =>
-			this?.candleSpecifications?.Count > 0 ? Utilities.ConvertListToDelimitedValues(candleSpecifications) : null;
 
 		 /// <summary>
 		 /// The number of units used to calculate the volume-weighted average bid and ask prices in the 

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -70,11 +71,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// A filter for restricting the types of Transactions to retrieve.
 		 /// The valid values are defined in the TransactionFilter class.
 		 /// </summary>
-		 [JsonIgnore]
+		 [Query(converter: typeof(ListToCsvConverter))]
 		 public List<string> type { get; set; }
-
-		 [Query(Name = nameof(type))]
-		 internal string typeCSV => this?.type?.Count > 0 ? Utilities.ConvertListToDelimitedValues(type) : null;
 
 		 /// <summary>
 		 /// Number of milliSeconds by which to throttle the transactions page requests. Throttled retrieval

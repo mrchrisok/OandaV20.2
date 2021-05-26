@@ -83,9 +83,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 }
 		 catch (WebException ex)
 		 {
-			var response = (HttpWebResponse)ex.Response;
-			var reader = new StreamReader(response.GetResponseStream());
-			var message = reader.ReadToEnd();
+			var message = GetResponseMessage<string>(ex.Response, request);
 			throw new Exception(message);
 		 }
 	  }

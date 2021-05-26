@@ -33,7 +33,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <summary>
 	  /// A collection of headers that will be sent with the request.
 	  /// </summary>
-	  public IDictionary<string, string> Headers
+	  internal IDictionary<string, string> Headers
 	  {
 		 get
 		 {
@@ -46,7 +46,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <summary>
 	  /// A collection of query parameters that will be appended to the request Uri.
 	  /// </summary>
-	  public IDictionary<string, string> Query
+	  internal IDictionary<string, string> Query
 	  {
 		 get
 		 {
@@ -56,23 +56,25 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 }
 	  }
 
+	  private string _cachedBody;
 	  /// <summary>
 	  /// A Json string that will be written into the body of the request.
 	  /// </summary>
-	  public string Body
+	  internal string Body
 	  {
 		 get
 		 {
-			var bodyProperties = Parameters?.GetRequestParameters<BodyAttribute>();
-
-			if (bodyProperties?.Count > 0)
+			if (_cachedBody == null)
 			{
-			   var requestBody = JsonConvert.SerializeObject(bodyProperties, JsonSerializerSettings);
+			   var bodyProperties = Parameters?.GetRequestParameters<BodyAttribute>();
 
-			   return requestBody;
+			   if (bodyProperties?.Count > 0)
+			   {
+				  _cachedBody = JsonConvert.SerializeObject(bodyProperties, JsonSerializerSettings);
+			   }
 			}
 
-			return null;
+			return _cachedBody;
 		 }
 	  }
 
@@ -134,30 +136,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 var questionMark = includeQuestionMark ? "?" : null;
 
 		 return $"{questionMark}{queryString}";
-	  }
-
-	  /// <summary>
-	  /// Serializes an object to a Json string
-	  /// </summary>
-	  /// <param name="obj">The object to serialize</param>
-	  /// <param name="ignoreNulls">Indicates if null properties should be excluded from the JSON output</param>
-	  /// <returns>A JSON string representing the input object</returns>
-	  private static string ConvertToJson(object obj, bool ignoreNulls = true, IList<JsonConverter> converters = null)
-	  {
-		 var nullHandling = ignoreNulls ? NullValueHandling.Ignore : NullValueHandling.Include;
-
-		 // oco: look into the DateFormatting
-		 // might be able to use DateTime instead of string in objects
-		 var settings = new JsonSerializerSettings()
-		 {
-			TypeNameHandling = TypeNameHandling.None,
-			NullValueHandling = nullHandling,
-			Converters = converters
-		 };
-
-		 string result = JsonConvert.SerializeObject(obj, settings);
-
-		 return result;
 	  }
 
 	  #endregion
