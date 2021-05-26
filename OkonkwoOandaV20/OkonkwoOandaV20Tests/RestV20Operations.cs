@@ -1004,8 +1004,8 @@ namespace OkonkwoOandaV20Tests
 
 		 return Task.Run(() =>
 		 {
-			// wait 10sec or until an event is received
-			bool success = _transactionReceived.WaitOne(10000);
+			// wait 20sec or until an event is received
+			bool success = _transactionReceived.WaitOne(20000);
 			session.StopSession();
 			m_Results.Verify("07.0", success, "Transaction events stream is functioning.");
 		 });
@@ -1016,15 +1016,18 @@ namespace OkonkwoOandaV20Tests
 	  {
 		 if (!_gotTransaction)
 		 {
-			m_Results.Verify("07.1", data.transaction != null, "Transaction received");
-			if (data.transaction != null)
+			if (!data.IsHeartbeat())
 			{
-			   m_Results.Verify("07.2", data.transaction.id != 0, "Transaction has id.");
-			   m_Results.Verify("07.3", data.transaction.accountID == AccountID, string.Format("Transaction has correct accountID: ({0}).", AccountID));
-			}
+			   m_Results.Verify("07.1", data.transaction != null, "Transaction received");
+			   if (data.transaction != null)
+			   {
+				  m_Results.Verify("07.2", data.transaction.id != 0, "Transaction has id.");
+				  m_Results.Verify("07.3", data.transaction.accountID == AccountID, string.Format("Transaction has correct accountID: ({0}).", AccountID));
+			   }
 
-			// only testing first data
-			_gotTransaction = !data.IsHeartbeat();
+			   // only testing first data
+			   _gotTransaction = true;
+			}
 		 }
 
 		 _transactionReceived.Release();
