@@ -71,7 +71,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 public List<string> type { get; set; }
 
 		 [Query(Name = nameof(type))]
-		 internal string typeCSV => this?.type?.Count > 0 ? GetCommaSeparatedString(type) : null;
+		 internal string typeCSV => this?.type?.Count > 0 ? Utilities.ConvertListToDelimitedValues(type) : null;
 	  }
    }
 
