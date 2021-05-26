@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -59,7 +60,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  private static async Task<T> MakeRequestAsync<T, E>(Request request)
 		 where E : IErrorResponse
 	  {
-		 HttpWebRequest webRequest = await CreateHttpRequest(request);
+		 HttpWebRequest webRequest = CreateHttpRequest(request.Uri, request.Method, request.Headers);
+
+		 if (!string.IsNullOrWhiteSpace(request.Body))
+		 {
+			using (var writer = new StreamWriter(await webRequest.GetRequestStreamAsync()))
+			{
+			   await writer.WriteAsync(request.Body);
+			}
+		 }
 
 		 return await GetWebResponse<T, E>(webRequest);
 	  }
@@ -71,7 +80,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>A response object containing the stream handle.</returns>
 	  private static async Task<WebResponse> MakeStreamRequestAsync(Request request)
 	  {
-		 var webRequest = await CreateHttpRequest(request);
+		 var webRequest = CreateHttpRequest(request.Uri, request.Method, request.Headers);
 
 		 try
 		 {
@@ -165,28 +174,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <param name="uri">The uri of the remote service</param>
 	  /// <param name="method">The Http verb for the request</param>
 	  /// <returns>An HttpWebRequest object</returns>
-	  private static async Task<HttpWebRequest> CreateHttpRequest(Request request)
+	  private static HttpWebRequest CreateHttpRequest(string uri, string method, IDictionary<string, string> headers = null)
 	  {
-		 HttpWebRequest webRequest = WebRequest.CreateHttp(request.Uri);
-		 webRequest.Method = request.Method;
-		 webRequest.ContentType = "application/json";
+		 HttpWebRequest request = WebRequest.CreateHttp(uri);
+		 request.Method = method;
+		 request.ContentType = "application/json";
 
-		 foreach (var header in request?.Headers)
+		 if (headers != null)
 		 {
-			webRequest.Headers[header.Key] = header.Value;
-		 }
-		 webRequest.Headers[HttpRequestHeader.Authorization] = $"Bearer {AccessToken}";
-		 webRequest.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
-
-		 if (!string.IsNullOrWhiteSpace(request.Body))
-		 {
-			using (var writer = new StreamWriter(await webRequest.GetRequestStreamAsync()))
+			foreach (var header in headers)
 			{
-			   await writer.WriteAsync(request.Body);
+			   request.Headers[header.Key] = header.Value;
 			}
 		 }
+		 request.Headers[HttpRequestHeader.Authorization] = $"Bearer {AccessToken}";
+		 request.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
 
-		 return webRequest;
+		 return request;
 	  }
 
 	  #endregion

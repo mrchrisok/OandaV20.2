@@ -15,7 +15,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// </summary>
 	  /// <param name="accountID">the account ID you want to stream on</param>
 	  /// <returns>the WebResponse object that can be used to retrieve the events as they stream</returns>
-	  public static async Task<WebResponse> GetTransactionsStreamAsync(string accountID)
+	  public static async Task<WebResponse> GetTransactionsStream(string accountID)
 	  {
 		 var request = new Request()
 		 {
@@ -68,7 +68,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
 	  protected override async Task<WebResponse> GetSessionAsync()
 	  {
-		 return await Rest20.GetTransactionsStreamAsync(_accountID);
+		 return await Rest20.GetTransactionsStream(_accountID);
 	  }
    }
 }

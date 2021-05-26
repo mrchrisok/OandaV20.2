@@ -25,7 +25,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <param name="accountID"></param>
 	  /// <param name="parameters">The parameters for the request</param>
 	  /// <returns>The WebResponse object that can be used to retrieve the prices as they stream</returns>
-	  public static async Task<WebResponse> GetPricingStreamAsync(string accountID, PricingStreamParameters parameters)
+	  public static async Task<WebResponse> GetPricingStream(string accountID, PricingStreamParameters parameters)
 	  {
 		 var request = new Request()
 		 {
@@ -112,7 +112,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			includeHomeConversions = _includeHomeConversions
 		 };
 
-		 return await Rest20.GetPricingStreamAsync(_accountID, parameters);
+		 return await Rest20.GetPricingStream(_accountID, parameters);
 	  }
    }
 }

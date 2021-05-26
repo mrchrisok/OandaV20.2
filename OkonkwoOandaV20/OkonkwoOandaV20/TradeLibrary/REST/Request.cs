@@ -57,7 +57,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 				  return null;
 			   }
 
-			   var requestBody = ConvertToJson(bodyProperties, ignoreNulls: true, getConverters());
+			   var requestBody = ConvertToJson(bodyProperties, true, getConverters());
 
 			   return requestBody;
 			}
