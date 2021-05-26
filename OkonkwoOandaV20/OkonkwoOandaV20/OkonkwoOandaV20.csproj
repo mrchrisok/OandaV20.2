@@ -153,6 +153,7 @@
     <Compile Include="TradeLibrary\Pricing\UnitsAvailable.cs" />
     <Compile Include="TradeLibrary\Pricing\UnitsAvailableDetails.cs" />
     <Compile Include="TradeLibrary\Rest20.cs" />
+    <Compile Include="TradeLibrary\REST\WebSession.cs" />
     <Compile Include="TradeLibrary\REST\Credentials.cs" />
     <Compile Include="TradeLibrary\REST\Primitives.cs" />
     <Compile Include="TradeLibrary\REST\Parameters.cs" />

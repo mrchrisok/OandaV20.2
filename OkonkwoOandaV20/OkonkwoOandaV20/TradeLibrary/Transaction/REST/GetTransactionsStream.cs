@@ -2,7 +2,6 @@
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,7 +14,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// </summary>
 	  /// <param name="accountID">the account ID you want to stream on</param>
 	  /// <returns>the WebResponse object that can be used to retrieve the events as they stream</returns>
-	  public static async Task<WebResponse> GetTransactionsStreamAsync(string accountID)
+	  public static async Task<WebSession> GetTransactionsStreamAsync(string accountID)
 	  {
 		 var request = new Request()
 		 {
@@ -24,7 +23,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			Parameters = new TransactionsStreamParameters()
 		 };
 
-		 var response = await MakeStreamRequestAsync(request);
+		 var response = await MakeSessionRequestAsync(request);
 
 		 return response;
 	  }
@@ -66,7 +65,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  {
 	  }
 
-	  protected override async Task<WebResponse> GetSessionAsync()
+	  protected override async Task<WebSession> GetSessionAsync()
 	  {
 		 return await Rest20.GetTransactionsStreamAsync(_accountID);
 	  }

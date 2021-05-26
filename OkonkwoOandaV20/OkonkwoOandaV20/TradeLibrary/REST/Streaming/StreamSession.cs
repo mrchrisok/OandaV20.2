@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
@@ -9,7 +8,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
    public abstract class StreamSession<T> where T : IStreamResponse
    {
 	  protected readonly string _accountID;
-	  protected WebResponse _response;
+	  protected WebSession _session;
 	  protected bool _shutdown;
 
 	  public delegate void DataHandler(T data);
@@ -31,25 +30,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
 		 _accountID = accountID;
 	  }
 
-	  protected abstract Task<WebResponse> GetSessionAsync();
+	  protected abstract Task<WebSession> GetSessionAsync();
 
 	  public virtual async Task StartSessionAsync()
 	  {
 		 _shutdown = false;
-		 _response = await GetSessionAsync();
+		 _session = await GetSessionAsync();
 
 		 await Task.Run(() =>
 		 {
 			try
 			{
-			   using (_response)
+			   using (_session.WebResponse)
 			   {
-				  var reader = new StreamReader(_response.GetResponseStream());
+				  var stream = Rest20.GetResponseStream(_session.WebResponse);
+				  var reader = new StreamReader(stream);
 
 				  while (!_shutdown)
 				  {
 					 string line = reader.ReadLine();
-					 var data = JsonConvert.DeserializeObject<T>(line);
+					 var data = JsonConvert.DeserializeObject<T>(line, _session.JsonSerializerSettings);
 
 					 OnSessionStatusChanged(!_shutdown, null);
 
@@ -64,7 +64,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
 			}
 			finally
 			{
-			   _response = null;
+			   _session = null;
 			}
 		 });
 	  }

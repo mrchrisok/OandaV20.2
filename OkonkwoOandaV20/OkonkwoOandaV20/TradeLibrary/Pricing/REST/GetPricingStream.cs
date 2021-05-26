@@ -5,7 +5,6 @@ using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -25,7 +24,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <param name="accountID"></param>
 	  /// <param name="parameters">The parameters for the request</param>
 	  /// <returns>The WebResponse object that can be used to retrieve the prices as they stream</returns>
-	  public static async Task<WebResponse> GetPricingStream(string accountID, PricingStreamParameters parameters)
+	  public static async Task<WebSession> GetPricingStreamAsync(string accountID, PricingStreamParameters parameters)
 	  {
 		 var request = new Request()
 		 {
@@ -34,9 +33,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			Parameters = parameters
 		 };
 
-		 var response = await MakeStreamRequestAsync(request);
+		 var webSession = await MakeSessionRequestAsync(request);
 
-		 return response;
+		 return webSession;
 	  }
 
 	  public class PricingStreamParameters : Parameters
@@ -100,7 +99,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 _includeHomeConversions = includeHomeConversions;
 	  }
 
-	  protected override async Task<WebResponse> GetSessionAsync()
+	  protected override async Task<WebSession> GetSessionAsync()
 	  {
 		 var instruments = new List<string>();
 		 _instruments.ForEach(instrument => instruments.Add(instrument.name));
@@ -112,7 +111,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			includeHomeConversions = _includeHomeConversions
 		 };
 
-		 return await Rest20.GetPricingStream(_accountID, parameters);
+		 return await Rest20.GetPricingStreamAsync(_accountID, parameters);
 	  }
    }
 }

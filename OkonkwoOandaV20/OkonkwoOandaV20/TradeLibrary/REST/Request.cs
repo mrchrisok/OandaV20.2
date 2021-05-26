@@ -7,18 +7,32 @@ using System.Net;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
-   internal class Request
+   public class Request
    {
 	  private string _uri;
+
+	  /// <summary>
+	  /// The URI of the host server.
+	  /// </summary>
 	  public string Uri
 	  {
 		 get => $"{_uri}{CreateQueryString(Query)}";
 		 set => _uri = value;
 	  }
 
+	  /// <summary>
+	  /// The HttpMethod that will be used to send the request message.
+	  /// </summary>
 	  public string Method { get; set; }
+
+	  /// <summary>
+	  /// The Parameters that will be used to construct the request message.
+	  /// </summary>
 	  public Parameters Parameters { get; set; }
 
+	  /// <summary>
+	  /// A collection of headers that will be sent with the request.
+	  /// </summary>
 	  public IDictionary<string, string> Headers
 	  {
 		 get
@@ -29,6 +43,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 }
 	  }
 
+	  /// <summary>
+	  /// A collection of query parameters that will be appended to the request Uri.
+	  /// </summary>
 	  public IDictionary<string, string> Query
 	  {
 		 get
@@ -39,6 +56,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 }
 	  }
 
+	  /// <summary>
+	  /// A Json string that will be written into the body of the request.
+	  /// </summary>
 	  public string Body
 	  {
 		 get
@@ -47,22 +67,41 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
 			if (bodyProperties?.Count > 0)
 			{
-			   IList<JsonConverter> getConverters()
-			   {
-				  if (Parameters.AcceptDatetimeFormat.HasValue)
-				  {
-					 var acceptDateTimeConverter = new AcceptDateTimeConverter(Parameters.AcceptDatetimeFormat.Value);
-					 return new List<JsonConverter>() { acceptDateTimeConverter };
-				  }
-				  return null;
-			   }
-
-			   var requestBody = ConvertToJson(bodyProperties, true, getConverters());
+			   var requestBody = JsonConvert.SerializeObject(bodyProperties, JsonSerializerSettings);
 
 			   return requestBody;
 			}
 
 			return null;
+		 }
+	  }
+
+	  /// <summary>
+	  /// The serializer settings used to serialize the request body.
+	  /// The same settings will be used to de-serialize the response.
+	  /// </summary>
+	  internal JsonSerializerSettings JsonSerializerSettings
+	  {
+		 get
+		 {
+			IList<JsonConverter> getConverters()
+			{
+			   if (Parameters?.AcceptDatetimeFormat.HasValue ?? false)
+			   {
+				  var acceptDateTimeConverter = new AcceptDateTimeConverter(Parameters.AcceptDatetimeFormat.Value);
+				  return new List<JsonConverter>() { acceptDateTimeConverter };
+			   }
+			   return null;
+			}
+
+			var settings = new JsonSerializerSettings()
+			{
+			   TypeNameHandling = TypeNameHandling.None,
+			   NullValueHandling = NullValueHandling.Ignore,
+			   Converters = getConverters()
+			};
+
+			return settings;
 		 }
 	  }
 

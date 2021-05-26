@@ -42,7 +42,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// Sends a web request to a remote endpoint (uri).
 	  /// </summary>
 	  /// <typeparam name="T">The response type</typeparam>
-	  /// <param name="request">The request definition.</param>
+	  /// <param name="request">The request specification.</param>
 	  /// <returns>A success response object of type T or a failure response object of type ErrorResponse</returns>
 	  private static async Task<T> MakeRequestAsync<T>(Request request)
 	  {
@@ -50,120 +50,50 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  }
 
 	  /// <summary>
-	  /// Sends a web request to a remote service (uri).
+	  /// Sends a message request to a remote service (uri).
 	  /// </summary>
 	  /// <typeparam name="T">The success response type</typeparam>
 	  /// <typeparam name="E">The error  response type</typeparam>
-	  /// <param name="request">The request definition.</param>
+	  /// <param name="request">The request specification.</param>
 	  /// <returns>A success response object of type T or a failure response object of type E</returns>
 	  private static async Task<T> MakeRequestAsync<T, E>(Request request)
 		 where E : IErrorResponse
 	  {
 		 HttpWebRequest webRequest = await CreateHttpRequestAsync(request);
 
-		 return await GetWebResponseAsync<T, E>(webRequest);
+		 return await GetWebResponseAsync<T, E>(webRequest, request);
 	  }
 
 	  /// <summary>
-	  /// Sends a web stream request to a remote service (uri).
+	  /// Sends a stream stream request to a remote service (uri).
 	  /// </summary>
-	  /// <param name="request">The request definition.</param>
-	  /// <returns>A response object containing the stream handle.</returns>
-	  private static async Task<WebResponse> MakeStreamRequestAsync(Request request)
+	  /// <param name="request">The Request specification for the WebResponse</param>
+	  /// <returns>A WebSession that encapsulates the WebResponse containing stream handle.</returns>
+	  private static async Task<WebSession> MakeSessionRequestAsync(Request request)
 	  {
-		 var webRequest = await CreateHttpRequestAsync(request);
+		 HttpWebRequest webRequest = await CreateHttpRequestAsync(request);
 
 		 try
 		 {
 			WebResponse response = await webRequest.GetResponseAsync();
-			return response;
+
+			var session = new WebSession(request, webRequest, response);
+
+			return session;
 		 }
 		 catch (WebException ex)
 		 {
 			var response = (HttpWebResponse)ex.Response;
-			var stream = new StreamReader(response.GetResponseStream());
-			var result = stream.ReadToEnd();
-			throw new Exception(result);
-		 }
-	  }
-
-	  #endregion
-
-	  #region response
-	  /// <summary>
-	  /// Sends an Http request to a remote service and returns the de-serialized response
-	  /// </summary>
-	  /// <typeparam name="T">>Type of the response returned by the remote service</typeparam>
-	  /// <typeparam name="E">>Type of the error response returned by the remote service</typeparam>
-	  /// <param name="request">The request sent to the remote service</param>
-	  /// <returns>A success response object of type T or a failure response object of type E</returns>
-	  private static async Task<T> GetWebResponseAsync<T, E>(HttpWebRequest request)
-	  {
-		 while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
-		 {
-		 }
-
-		 try
-		 {
-			using (WebResponse response = await request.GetResponseAsync())
-			{
-			   var stream = GetResponseStream(response);
-			   var reader = new StreamReader(stream);
-			   var json = reader.ReadToEnd();
-			   var result = JsonConvert.DeserializeObject<T>(json);
-			   return result;
-			}
-		 }
-		 catch (WebException ex)
-		 {
-			var stream = GetResponseStream(ex.Response);
-			var reader = new StreamReader(stream);
-			var result = reader.ReadToEnd();
-
-			// add a 'type' property for the ErrorResponseFactory
-			dynamic error = JsonConvert.DeserializeObject(result);
-			error.type = typeof(E).Name;
-			var errorResult = JsonConvert.SerializeObject(error);
-
-			throw new Exception(errorResult);
-		 }
-		 finally
-		 {
-			m_LastRequestTime = DateTime.UtcNow;
+			var reader = new StreamReader(response.GetResponseStream());
+			var message = reader.ReadToEnd();
+			throw new Exception(message);
 		 }
 	  }
 
 	  /// <summary>
-	  /// Writes the response from the remote service to a text stream
+	  /// Creates the HttpWebRequest from a Request specification
 	  /// </summary>
-	  /// <param name="response">The response received from the remote service</param>
-	  /// <returns>A stream object. The stream may be a subclass (GZipStream or DeflateStream) if
-	  /// the response header indicates matched encoding.</returns>
-	  private static Stream GetResponseStream(WebResponse response)
-	  {
-		 var stream = response.GetResponseStream();
-
-		 // handle a gzipped response
-		 if (response.Headers[HttpResponseHeader.ContentEncoding] == "gzip")
-			stream = new GZipStream(stream, CompressionMode.Decompress);
-
-		 // handle a deflated response
-		 else if (response.Headers[HttpResponseHeader.ContentEncoding] == "deflate")
-			stream = new DeflateStream(stream, CompressionMode.Decompress);
-
-		 return stream;
-	  }
-	  #endregion
-
-
-
-	  #region utilities
-
-	  /// <summary>
-	  /// Creates the request object string out of a dictionary of parameters
-	  /// </summary>
-	  /// <param name="uri">The uri of the remote service</param>
-	  /// <param name="method">The Http verb for the request</param>
+	  /// <param name="request">The Request specification</param>
 	  /// <returns>An HttpWebRequest object</returns>
 	  private static async Task<HttpWebRequest> CreateHttpRequestAsync(Request request)
 	  {
@@ -190,6 +120,86 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 }
 
 		 return webRequest;
+	  }
+
+	  #endregion
+
+	  #region response
+
+	  /// <summary>
+	  /// Sends an Http request to a remote service and returns the de-serialized response
+	  /// </summary>
+	  /// <typeparam name="T">>Type of the response returned by the remote service</typeparam>
+	  /// <typeparam name="E">>Type of the error response returned by the remote service</typeparam>
+	  /// <param name="webRequest">The request sent to the remote service</param>
+	  /// <param name="request">The Request specification</param>
+	  /// <returns>A success response object of type T or a failure response object of type E</returns>
+	  private static async Task<T> GetWebResponseAsync<T, E>(HttpWebRequest webRequest, Request request)
+	  {
+		 while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
+		 {
+		 }
+
+		 try
+		 {
+			using (WebResponse response = await webRequest.GetResponseAsync())
+			{
+			   var message = GetResponseMessage<T>(response, request);
+			   return message;
+			}
+		 }
+		 catch (WebException ex)
+		 {
+			// add a 'type' property for the ErrorResponseFactory
+			dynamic error = GetResponseMessage<object>(ex.Response, request);
+			error.type = typeof(E).Name;
+			var errorResult = JsonConvert.SerializeObject(error);
+
+			throw new Exception(errorResult);
+		 }
+		 finally
+		 {
+			m_LastRequestTime = DateTime.UtcNow;
+		 }
+	  }
+
+	  /// <summary>
+	  /// Deserializes and returns the message from a WebResponse
+	  /// </summary>
+	  /// <typeparam name="T">The response message type</typeparam>
+	  /// <param name="response">A WebResponse</param>
+	  /// <param name="request">The Request specification for the WebResponse</param>
+	  /// <returns>The deserialized WebResponse message</returns>
+	  private static T GetResponseMessage<T>(WebResponse response, Request request)
+	  {
+		 var stream = GetResponseStream(response);
+		 var reader = new StreamReader(stream);
+		 var message = reader.ReadToEnd();
+
+		 T result = JsonConvert.DeserializeObject<T>(message, request.JsonSerializerSettings);
+
+		 return result;
+	  }
+
+	  /// <summary>
+	  /// Writes the response from the remote service to a text stream
+	  /// </summary>
+	  /// <param name="response">The response received from the remote service</param>
+	  /// <returns>A stream object. The stream may be a subclass (GZipStream or DeflateStream) if
+	  /// the response header indicates matched encoding.</returns>
+	  internal static Stream GetResponseStream(WebResponse response)
+	  {
+		 var stream = response.GetResponseStream();
+
+		 // handle a gzipped response
+		 if (response.Headers[HttpResponseHeader.ContentEncoding] == "gzip")
+			stream = new GZipStream(stream, CompressionMode.Decompress);
+
+		 // handle a deflated response
+		 else if (response.Headers[HttpResponseHeader.ContentEncoding] == "deflate")
+			stream = new DeflateStream(stream, CompressionMode.Decompress);
+
+		 return stream;
 	  }
 
 	  #endregion
