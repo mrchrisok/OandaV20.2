@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using System.Collections.Generic;
@@ -45,11 +46,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// <summary>
 		 /// List of Instruments to stream Prices for. [required]
 		 /// </summary>
-		 [JsonIgnore]
+		 [Query(converter: typeof(ListToCsvConverter))]
 		 public List<string> instruments { get; set; }
-
-		 [Query(Name = nameof(instruments))]
-		 internal string instrumentsCSV => this?.instruments?.Count > 0 ? GetCommaSeparatedString(instruments) : null;
 
 		 /// <summary>
 		 /// Flag that enables/disables the sending of a pricing snapshot when 

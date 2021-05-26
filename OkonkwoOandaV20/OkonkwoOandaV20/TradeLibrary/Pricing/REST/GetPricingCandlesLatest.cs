@@ -61,7 +61,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
 		 [Query(Name = nameof(candleSpecifications))]
 		 internal string candleSpecificationsCSV =>
-			this?.candleSpecifications?.Count > 0 ? GetCommaSeparatedString(candleSpecifications) : null;
+			this?.candleSpecifications?.Count > 0 ? Utilities.ConvertListToDelimitedValues(candleSpecifications) : null;
 
 		 /// <summary>
 		 /// The number of units used to calculate the volume-weighted average bid and ask prices in the 
