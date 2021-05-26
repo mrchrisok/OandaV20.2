@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20Tests
 	  // For best results, please create and use your own or your organization's Oanda Practice account
 
 	  static EEnvironment m_TestEnvironment = EEnvironment.Practice;
-	  static string m_TestToken = "d74f1d18196cdf2dd8f1cb443743effa-93ce3fd1b9820eaac5b93784ec044b85";
+	  static string m_TestToken = "d845d3f81613358410e3e5298aebdce1-111fcc1d52a6c625c42c05366a22a286";
 	  static short m_TokenAccounts = 2;
 	  static string m_TestAccount = "101-001-1913854-002";
 
