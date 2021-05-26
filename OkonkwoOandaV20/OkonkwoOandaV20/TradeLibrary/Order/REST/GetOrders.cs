@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.Order;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -37,12 +38,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// <summary>
 		 /// Comma separated list of Order IDs to retrieve
 		 /// </summary>
-		 [JsonIgnore]
+		 [Query(converter: typeof(ListToCsvConverter))]
 		 public List<string> ids { get; set; }
-
-		 [JsonProperty(PropertyName = "ids")]
-		 [Query]
-		 internal string idString => this?.ids?.Count > 0 ? GetCommaSeparatedString(ids) : null;
 
 		 /// <summary>
 		 /// The state to filter the requested Orders by [default=PENDING]

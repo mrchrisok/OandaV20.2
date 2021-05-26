@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -192,22 +191,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 request.Headers[HttpRequestHeader.AcceptEncoding] = "gzip, deflate";
 
 		 return request;
-	  }
-
-	  /// <summary>
-	  /// Converts a list of strings into a comma-separated values list (csv)
-	  /// </summary>
-	  /// <param name="items">The list of strings to convert to csv</param>
-	  /// <returns>A csv string of the list items</returns>
-	  private static string GetCommaSeparatedString<T>(List<T> items)
-	  {
-		 var stringBuilder = new StringBuilder();
-		 foreach (var item in items)
-		 {
-			if (!stringBuilder.ToString().Contains(item.ToString()))
-			   stringBuilder.Append(item + ",");
-		 }
-		 return stringBuilder.ToString().Trim(',');
 	  }
 
 	  #endregion

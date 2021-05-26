@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.Framework.JsonConverters;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Serialization.Json;
-using System.Text;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -49,7 +47,18 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
 			if (bodyProperties?.Count > 0)
 			{
-			   var requestBody = ConvertToJson(bodyProperties);
+			   IList<JsonConverter> getConverters()
+			   {
+				  if (Parameters.AcceptDatetimeFormat.HasValue)
+				  {
+					 var acceptDateTimeConverter = new AcceptDateTimeConverter(Parameters.AcceptDatetimeFormat.Value);
+					 return new List<JsonConverter>() { acceptDateTimeConverter };
+				  }
+				  return null;
+			   }
+
+			   var requestBody = ConvertToJson(bodyProperties, true, getConverters());
+
 			   return requestBody;
 			}
 
@@ -89,42 +98,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  }
 
 	  /// <summary>
-	  /// Creates the request body as a Json string
-	  /// </summary>
-	  /// <typeparam name="P">The type of the parameterObject</typeparam>
-	  /// <param name="parameterObject">The object containing the request body parameters</param>
-	  /// <param name="simpleDictionary">Indicates if the passed object is a Dictionary</param>
-	  /// <returns>A JSON string representing the request body</returns>
-	  private static string ConvertToJson<P>(P parameterObject)
-	  {
-		 // for parameters passed as dictionaries
-		 if (typeof(P).GetInterfaces().Contains(typeof(System.Collections.IDictionary)))
-		 {
-			var settings = new DataContractJsonSerializerSettings
-			{
-			   UseSimpleDictionaryFormat = true
-			};
-
-			var jsonSerializer = new DataContractJsonSerializer(typeof(P), settings);
-			using (var ms = new MemoryStream())
-			{
-			   jsonSerializer.WriteObject(ms, parameterObject);
-			   var msBytes = ms.ToArray();
-			   return Encoding.UTF8.GetString(msBytes, 0, msBytes.Length);
-			}
-		 }
-		 // for parameters passed as objects
-		 else
-			return ConvertObjectToJson(parameterObject);
-	  }
-
-	  /// <summary>
 	  /// Serializes an object to a Json string
 	  /// </summary>
 	  /// <param name="obj">The object to serialize</param>
 	  /// <param name="ignoreNulls">Indicates if null properties should be excluded from the JSON output</param>
 	  /// <returns>A JSON string representing the input object</returns>
-	  private static string ConvertObjectToJson(object obj, bool ignoreNulls = true)
+	  private static string ConvertToJson(object obj, bool ignoreNulls = true, IList<JsonConverter> converters = null)
 	  {
 		 var nullHandling = ignoreNulls ? NullValueHandling.Ignore : NullValueHandling.Include;
 
@@ -133,7 +112,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 var settings = new JsonSerializerSettings()
 		 {
 			TypeNameHandling = TypeNameHandling.None,
-			NullValueHandling = nullHandling
+			NullValueHandling = nullHandling,
+			Converters = converters
 		 };
 
 		 string result = JsonConvert.SerializeObject(obj, settings);

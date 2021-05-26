@@ -42,10 +42,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			{
 			   var customName = prop.GetCustomAttribute<P>().Name;
 			   var propName = !string.IsNullOrWhiteSpace(customName) ? customName : prop.Name;
-			   return new KeyValuePair<string, object>(propName, prop.GetValue(this));
+			   var propValue = prop.GetCustomAttribute<P>().GetValue(prop.GetValue(this));
+
+			   return new KeyValuePair<string, object>(propName, propValue);
 			})
-			.Where(param => !excludeNulls || param.Value != null)
-			.ToDictionary(x => x.Key, x => x.Value);
+			.Where(kvp => !excludeNulls || kvp.Value != null)
+			.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
 		 return requestParameters;
 	  }

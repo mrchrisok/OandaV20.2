@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework;
+﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,14 +15,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <returns>A list of TradeData objects (or empty list, if no trades)</returns>
 	  public static async Task<List<Trade.Trade>> GetTradesAsync(string accountID, TradesParameters parameters = null)
 	  {
-		 //string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades";
-
-		 //var requestParams = ConvertToDictionary(parameters);
-		 //if (parameters?.ids.Count > 0)
-		 //requestParams.Add("ids", GetCommaSeparatedString(parameters.ids));
-
-		 //var response = await MakeRequestAsync<TradesResponse, TradesErrorResponse>(uri, "GET", requestParams, parameters.Headers);
-
 		 var request = new Request()
 		 {
 			Uri = $"{ServerUri(EServer.Account)}accounts/{accountID}/trades",
@@ -40,12 +32,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// <summary>
 		 /// Comma separated list of tradeIDs to retrieve
 		 /// </summary>
-		 [JsonIgnore]
+		 [Query(converter: typeof(ListToCsvConverter))]
 		 public List<string> ids { get; set; }
-
-		 [JsonProperty(PropertyName = "ids")]
-		 [Query]
-		 internal string idString => this?.ids?.Count > 0 ? GetCommaSeparatedString(ids) : null;
 
 		 /// <summary>
 		 /// The state to filter the requested Trades by. [default=OPEN]

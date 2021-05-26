@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework;
+﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -42,11 +42,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// <summary>
 		 /// List of instruments to query specifically.
 		 /// </summary>
-		 [JsonIgnore]
+		 [Query(converter: typeof(ListToCsvConverter))]
 		 public List<string> instruments { get; set; }
-
-		 [Query(Name = nameof(instruments))]
-		 internal string instrumentsCSV => this?.instruments?.Count > 0 ? GetCommaSeparatedString(instruments) : null;
 	  }
    }
 
