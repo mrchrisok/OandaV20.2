@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace OkonkwoOandaV20.Framework.JsonConverters
 {
-   public class StringDecimalConverter : JsonConverterBase
+   public class StringDecimalConverter : AbstractJsonConverter
    {
       public override bool CanRead => false;
 

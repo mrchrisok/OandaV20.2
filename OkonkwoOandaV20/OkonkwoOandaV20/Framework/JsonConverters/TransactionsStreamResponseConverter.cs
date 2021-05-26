@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace OkonkwoOandaV20.Framework.JsonConverters
 {
-   public class TransactionsStreamResponseConverter : JsonConverterBase
+   public class TransactionsStreamResponseConverter : AbstractJsonConverter
    {
 	  public override bool CanConvert(Type objectType)
 	  {

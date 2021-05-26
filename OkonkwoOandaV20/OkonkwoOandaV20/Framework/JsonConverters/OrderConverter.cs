@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.Framework.JsonConverters
 {
-   public class OrderConverter : JsonConverterBase
+   public class OrderConverter : AbstractJsonConverter
    {
 	  public override bool CanConvert(Type objectType)
 	  {
