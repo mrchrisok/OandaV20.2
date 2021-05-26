@@ -15,7 +15,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20Tests
@@ -263,7 +262,7 @@ namespace OkonkwoOandaV20Tests
 			marginRate = testMarginRate
 		 };
 
-		 m_LastTransactionTime = ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow, AcceptDatetimeFormat.RFC3339);
+		 m_LastTransactionTime = Utilities.ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow, AcceptDatetimeFormat.RFC3339);
 
 		 AccountConfigurationResponse response = null;
 
@@ -351,7 +350,7 @@ namespace OkonkwoOandaV20Tests
 
 		 // error test - future snapshot time
 		 var futureDateTime = DateTime.UtcNow.AddHours(1);
-		 string unavailableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
+		 string unavailableSnapshotTime = $"{Utilities.ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
 		 var parameters = new InstrumentOrderBookParameters()
 		 {
 			time = unavailableSnapshotTime,
@@ -365,7 +364,7 @@ namespace OkonkwoOandaV20Tests
 		 }
 
 		 // get the 0th hour (or previous) snapshot
-		 string availableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+		 string availableSnapshotTime = $"{Utilities.ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
 		 parameters.time = availableSnapshotTime;
 		 parameters.getLastTimeOnFailure = true;
 		 result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters);
@@ -384,7 +383,7 @@ namespace OkonkwoOandaV20Tests
 
 		 // error test - future snapshot time
 		 var futureDateTime = DateTime.UtcNow.AddHours(1);
-		 string unavailableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
+		 string unavailableSnapshotTime = $"{Utilities.ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
 		 var parameters = new InstrumentPositionBookParameters()
 		 {
 			time = unavailableSnapshotTime,
@@ -398,7 +397,7 @@ namespace OkonkwoOandaV20Tests
 		 }
 
 		 // get the 0th hour (or previous) snapshot
-		 string availableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+		 string availableSnapshotTime = $"{Utilities.ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
 		 parameters.time = availableSnapshotTime;
 		 parameters.getLastTimeOnFailure = true;
 		 result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters);
@@ -419,7 +418,7 @@ namespace OkonkwoOandaV20Tests
 		 if (await Utilities.IsMarketHaltedAsync())
 			throw new MarketHaltedException("OANDA Fx market is halted!");
 
-		 string expiry = ConvertDateTimeToAcceptDateFormat(DateTime.Now.AddMonths(1));
+		 string expiry = Utilities.ConvertDateTimeToAcceptDateFormat(DateTime.Now.AddMonths(1));
 		 decimal price = GetOandaPrice(m_TestInstrument) * (decimal)0.9;
 		 #region create new pending order
 		 var orderRequest1 = new MarketIfTouchedOrderRequest(GetOandaInstrument())
@@ -1149,23 +1148,6 @@ namespace OkonkwoOandaV20Tests
 	  #endregion
 
 	  #region Utilities
-	  /// <summary>
-	  /// Convert DateTime object to a string of the indicated format
-	  /// </summary>
-	  /// <param name="time">A DateTime object</param>
-	  /// <param name="format">Format type (RFC3339 or UNIX only</param>
-	  /// <returns>A date-time string</returns>
-	  private static string ConvertDateTimeToAcceptDateFormat(DateTime time, AcceptDatetimeFormat format = AcceptDatetimeFormat.RFC3339)
-	  {
-		 // look into doing this within the JsonSerializer so that objects can use DateTime instead of string
-
-		 if (format == AcceptDatetimeFormat.RFC3339)
-			return XmlConvert.ToString(time, "yyyy-MM-ddTHH:mm:ssZ");
-		 else if (format == AcceptDatetimeFormat.Unix)
-			return ((int)(time.Subtract(new DateTime(1970, 1, 1))).TotalSeconds).ToString();
-		 else
-			throw new ArgumentException($"The value ({(short)format}) of the format parameter is invalid.");
-	  }
 
 	  /// <summary>
 	  /// Reads the api key from a supplied file name
