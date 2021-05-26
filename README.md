@@ -2,7 +2,7 @@
 
 Spot Forex trading middleware that provides programmatic access to the OANDA© v20 REST Api.
 
-Written in C# 7.0
+Technologies: C# 7.0, .NETFramework 4.7.2
 
 Version 2 Improvements
 - Strongly typed parameters for all V20 api operations
