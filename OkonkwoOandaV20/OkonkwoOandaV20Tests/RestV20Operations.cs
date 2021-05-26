@@ -29,10 +29,10 @@ namespace OkonkwoOandaV20Tests
 	  // warning: do not rely on these
 	  // For best results, please create and use your own or your organization's Oanda Practice account
 
-	  static EEnvironment m_TestEnvironment = EEnvironment.Trade;
-	  static string m_TestToken = "c9e9494d79013cac1d34f0e4dcb590cd-977a37b80762fb48cdb3b0b2e832628a";
+	  static EEnvironment m_TestEnvironment = EEnvironment.Practice;
+	  static string m_TestToken = "d845d3f81613358410e3e5298aebdce1-111fcc1d52a6c625c42c05366a22a286";
 	  static short m_TokenAccounts = 2;
-	  static string m_TestAccount = "101-001-432582-062";
+	  static string m_TestAccount = "101-001-1913854-002";
 
 	  #endregion
 
@@ -1043,7 +1043,7 @@ namespace OkonkwoOandaV20Tests
 	  #endregion
 
 	  #region Stream
-	  static Semaphore _transactionThreadMgr;
+	  static Semaphore _transactionThreads;
 	  protected static Task Stream_GetStreamingTransactionsAsync()
 	  {
 		 // 07
@@ -1052,60 +1052,7 @@ namespace OkonkwoOandaV20Tests
 
 		 // in this unit test only 1 thread will transit this section
 		 // so a maximumCount of 10 threads is clearly more than adequate
-		 _transactionThreadMgr = new Semaphore(0, 100);
-
-		 // this is not awaited because StartSessionAsync only completes if
-		 // 1) StopSession() is called
-		 // 2) an exception occurs while processing the pricing stream
-		 session.StartSessionAsync();
-
-		 return Task.Run(() =>
-		 {
-			// block the thread here until it released by calling Release()
-			// the block is released automatically after 10secs if Release() is not called
-			// doing this to allow up to 10secs for a price to be received from the stream
-			bool success = _transactionThreadMgr.WaitOne(10000);
-
-			// this will set _shutdown to true in StreamSession.cs
-			// once _shutdown = true, the pricing stream is stopped and disposed
-			session.StopSession();
-
-			m_Results.Verify("07.0", success, "Transaction events stream is functioning.");
-		 });
-	  }
-
-	  static bool _gotTransaction = false;
-	  protected static void OnTransactionReceived(TransactionsStreamResponse data)
-	  {
-		 if (!_gotTransaction)
-		 {
-			if (!data.IsHeartbeat())
-			{
-			   // only testing first data message
-
-			   m_Results.Verify("07.1", data.transaction != null, "Transaction received");
-			   if (data.transaction != null)
-			   {
-				  m_Results.Verify("07.2", data.transaction.id != 0, "Transaction has id.");
-				  m_Results.Verify("07.3", data.transaction.accountID == AccountID, $"Transaction has correct accountID: ({AccountID}).");
-			   }
-
-			   _gotTransaction = true;
-			}
-		 }
-
-		 _transactionThreadMgr.Release();
-	  }
-
-	  static Semaphore _pricingSessionMgr;
-	  protected static async Task Stream_GetStreamingPricesAsync()
-	  {
-		 var session = new PricingSession(AccountID, m_OandaInstruments);
-		 session.DataReceived += OnPricingReceived;
-
-		 // in this unit test only 1 thread will transit this section
-		 // so a maximumCount of 10 threads is clearly more than adequate
-		 _pricingSessionMgr = new Semaphore(initialCount: 0, maximumCount: 100);
+		 _transactionThreads = new Semaphore(0, 100);
 
 		 // this is not awaited because StartSessionAsync only completes if
 		 // 1) StopSession() is called
@@ -1115,13 +1062,67 @@ namespace OkonkwoOandaV20Tests
 		 // block the thread here until it released by calling Release()
 		 // the block is released automatically after 10secs if Release() is not called
 		 // doing this to allow up to 10secs for a price to be received from the stream
-		 bool success = _pricingSessionMgr.WaitOne(10000);
+		 bool success = _transactionThreads.WaitOne(10000);
+		 m_Results.Verify("07.0", success, "Transaction events stream is functioning.");
+
+		 return Task.Run(() =>
+		 {
+			// wait until a transaction is received .. max 20secs
+			var autoStopTime = DateTime.UtcNow.AddSeconds(20);
+			while (!_gotTransaction || DateTime.UtcNow < autoStopTime) { }
+
+			// this will set _shutdown to true in StreamSession.cs
+			// once _shutdown = true, the pricing stream is stopped and disposed
+			session.StopSession();
+		 });
+	  }
+
+	  static bool _gotTransaction = false;
+	  protected static void OnTransactionReceived(TransactionsStreamResponse data)
+	  {
+		 if (!_gotTransaction && !data.IsHeartbeat())
+		 {
+			// only testing first data message
+
+			m_Results.Verify("07.1", data.transaction != null, "Transaction received");
+			if (data.transaction != null)
+			{
+			   m_Results.Verify("07.2", data.transaction.id != 0, "Transaction has id.");
+			   m_Results.Verify("07.3", data.transaction.accountID == AccountID, $"Transaction has correct accountID: ({AccountID}).");
+			}
+
+			_gotTransaction = true;
+		 }
+
+		 _transactionThreads.Release();
+	  }
+
+	  static Semaphore _pricingThreads;
+	  protected static Task Stream_GetStreamingPricesAsync()
+	  {
+		 var session = new PricingSession(AccountID, m_OandaInstruments);
+		 session.DataReceived += OnPricingReceived;
+
+		 // in this unit test only 1 thread will transit this section
+		 // so a maximumCount of 10 threads is clearly more than adequate
+		 _pricingThreads = new Semaphore(initialCount: 0, maximumCount: 100);
+
+		 // this is not awaited because StartSessionAsync only completes if
+		 // 1) StopSession() is called
+		 // 2) an exception occurs while processing the pricing stream
+		 session.StartSessionAsync();
+
+		 // block the thread here until it released by calling Release()
+		 // the block is released automatically after 10secs if Release() is not called
+		 // doing this to allow up to 10secs for a price to be received from the stream
+		 bool success = _pricingThreads.WaitOne(10000);
 
 		 // this will set _shutdown to true in StreamSession.cs
 		 // once _shutdown = true, the pricing stream is stopped and disposed
 		 session.StopSession();
 
 		 m_Results.Verify("18.0", success, "Pricing stream is functioning.");
+		 return Task.CompletedTask;
 	  }
 
 	  static bool _gotPrice = false;
@@ -1143,7 +1144,7 @@ namespace OkonkwoOandaV20Tests
 			   _gotPrice = true;
 			}
 		 }
-		 _pricingSessionMgr.Release();
+		 _pricingThreads.Release();
 	  }
 	  #endregion
 
@@ -1176,20 +1177,16 @@ namespace OkonkwoOandaV20Tests
 		 }
 		 catch (DirectoryNotFoundException)
 		 {
-			// warning: do not rely on these
-			//m_TestToken = "c9e9494d79013cac1d34f0e4dcb590cd-977a37b80762fb48cdb3b0b2e832628a";
-			//m_TestAccount = "101-001-1913854-002";
+			// directory not found
+		 }
+		 catch (FileNotFoundException)
+		 {
+			// file not found
 		 }
 		 catch (Exception ex)
 		 {
 			throw new Exception("Could not read api credentials.", ex);
 		 }
-
-		 // set this to the correct environment based on the account
-		 //m_TestEnvironment = EEnvironment.Practice;
-
-		 // set this to the correct number of v20 accounts associated with the token     
-		 //m_TokenAccounts = 2;
 
 		 Credentials.SetCredentials(m_TestEnvironment, m_TestToken, m_TestAccount);
 	  }
