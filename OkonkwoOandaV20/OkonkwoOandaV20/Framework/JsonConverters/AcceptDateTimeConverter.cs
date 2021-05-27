@@ -14,8 +14,6 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 
 	  private AcceptDatetimeFormat _acceptDateTimeFormat;
 
-	  public override bool CanRead => false;
-
 	  public override bool CanConvert(Type objectType)
 	  {
 		 return objectType == typeof(DateTime) || objectType == typeof(DateTime?);
