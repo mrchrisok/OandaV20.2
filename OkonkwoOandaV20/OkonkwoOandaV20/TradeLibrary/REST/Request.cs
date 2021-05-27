@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -37,7 +38,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  {
 		 get
 		 {
-			var headers = Parameters?.GetRequestParameters<HeaderAttribute>();
+			var headers = Parameters?.GetRequestParameters<HeaderAttribute>(TypeConverters);
 
 			return headers?.ToDictionary(x => x.Key, x => x.Value.ToString());
 		 }
@@ -50,7 +51,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  {
 		 get
 		 {
-			var queryProperties = Parameters?.GetRequestParameters<QueryAttribute>();
+			var queryProperties = Parameters?.GetRequestParameters<QueryAttribute>(TypeConverters);
 
 			return queryProperties?.ToDictionary(x => x.Key, x => x.Value.ToString());
 		 }
@@ -75,6 +76,28 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			}
 
 			return _cachedBody;
+		 }
+	  }
+
+	  /// <summary>
+	  /// The serializer settings used to serialize the request body.
+	  /// The same settings will be used to de-serialize the response.
+	  /// </summary>
+	  internal IList<ITypeConverter<string>> TypeConverters
+	  {
+		 get
+		 {
+			IList<ITypeConverter<string>> getConverters()
+			{
+			   if (Parameters?.AcceptDatetimeFormat.HasValue ?? false)
+			   {
+				  var acceptDateTimeToStringConverter = new AcceptDateTimeToStringConverter(Parameters.AcceptDatetimeFormat.Value);
+				  return new List<ITypeConverter<string>>() { acceptDateTimeToStringConverter };
+			   }
+			   return null;
+			}
+
+			return getConverters();
 		 }
 	  }
 

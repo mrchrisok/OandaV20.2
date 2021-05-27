@@ -1,4 +1,5 @@
 ﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
 	  #endregion
 
-	  internal virtual IDictionary<string, object> GetRequestParameters<P>(bool excludeNulls = true) where P : RequestAttribute
+	  internal virtual IDictionary<string, object> GetRequestParameters<P>(IList<ITypeConverter<string>> converters = null, bool excludeNulls = true)
+		 where P : RequestAttribute
 	  {
-		 var parametersProperties = GetObjectParameters<P>(this, excludeNulls);
+		 var parametersProperties = GetObjectParameters<P>(this, converters, excludeNulls);
 
 		 var order = this.GetType().GetProperties().Where(prop => prop.GetType() == typeof(OrderRequest)).FirstOrDefault();
 
 		 if (order != default)
 		 {
-			var orderParameters = GetObjectParameters<P>(order, excludeNulls);
+			var orderParameters = GetObjectParameters<P>(order, converters, excludeNulls);
 			foreach (var parameter in orderParameters.ToList())
 			{
 			   parametersProperties.Add(parameter.Key, parameter.Value);
@@ -33,7 +35,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 return parametersProperties;
 	  }
 
-	  private Dictionary<string, object> GetObjectParameters<P>(object obj, bool excludeNulls = true) where P : RequestAttribute
+	  private Dictionary<string, object> GetObjectParameters<P>(object obj, IList<ITypeConverter<string>> converters = null, bool excludeNulls = true)
+		 where P : RequestAttribute
 	  {
 		 var requestParameters = obj.GetType()
 			.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
@@ -42,7 +45,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			{
 			   var customName = prop.GetCustomAttribute<P>().Name;
 			   var propName = !string.IsNullOrWhiteSpace(customName) ? customName : prop.Name;
-			   var propValue = prop.GetCustomAttribute<P>().GetValue(prop.GetValue(this));
+			   var propValue = GetPropertyValue<P>(prop, converters);
 
 			   return new KeyValuePair<string, object>(propName, propValue);
 			})
@@ -50,6 +53,37 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
 		 return requestParameters;
+	  }
+
+	  private object GetPropertyValue<P>(PropertyInfo prop, IList<ITypeConverter<string>> converters)
+		 where P : RequestAttribute
+	  {
+		 var converter = converters?.FirstOrDefault(converter => converter.CanConvert(prop.GetType()));
+
+		 if (converter != null)
+		 {
+			return converter.ToOutput(prop.GetValue(this));
+		 }
+
+		 return prop.GetCustomAttribute<P>().GetValue(prop.GetValue(this));
+	  }
+
+	  /// <summary>
+	  /// The type converters used to write parameter values.
+	  /// </summary>
+	  internal List<ITypeConverter<string>> TypeConverters
+	  {
+		 get
+		 {
+			var converters = new List<ITypeConverter<string>>();
+
+			if (AcceptDatetimeFormat.HasValue)
+			{
+			   converters.Add(new AcceptDateTimeToStringConverter(AcceptDatetimeFormat.Value));
+			}
+
+			return converters;
+		 }
 	  }
    }
 }

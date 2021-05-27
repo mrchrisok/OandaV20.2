@@ -70,6 +70,7 @@
     <Compile Include="Framework\JsonConverters\TransactionsStreamResponseConverter.cs" />
     <Compile Include="Framework\MarketHaltedException.cs" />
     <Compile Include="Framework\PriceInformation.cs" />
+    <Compile Include="Framework\TypeConverters\AcceptDateTimeToStringConverter.cs" />
     <Compile Include="Framework\TypeConverters\ListToCsvConverter.cs" />
     <Compile Include="Framework\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
