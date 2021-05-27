@@ -1,4 +1,5 @@
 ﻿using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -106,7 +107,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 #endregion
 
 
-		 internal override IDictionary<string, object> GetRequestParameters<P>(bool excludeNulls = true)
+		 internal override IDictionary<string, object> GetRequestParameters<P>(IList<ITypeConverter<string>> converters = null, bool excludeNulls = true)
 		 {
 			if (typeof(P) == typeof(BodyAttribute))
 			{
@@ -122,7 +123,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 			   return result;
 			}
 
-			return base.GetRequestParameters<P>(excludeNulls);
+			return base.GetRequestParameters<P>(converters, excludeNulls);
 		 }
 	  }
 
