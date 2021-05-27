@@ -16,6 +16,11 @@ namespace OkonkwoOandaV20.Framework.TypeConverters
 
 	  private string _delimeter;
 
+	  public bool CanConvert(Type objectType)
+	  {
+		 return objectType == typeof(IList);
+	  }
+
 	  public string ToOutput(object input)
 	  {
 		 if (input == null)
