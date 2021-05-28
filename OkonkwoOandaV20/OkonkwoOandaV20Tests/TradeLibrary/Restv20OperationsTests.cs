@@ -3,10 +3,10 @@ using OkonkwoOandaV20.TradeLibrary.REST;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OkonkwoOandaV20Tests
+namespace OkonkwoOandaV20Tests.TradeLibrary
 {
    [TestClass]
-   public partial class Restv20Test : Restv20TestBase
+   public partial class Restv20OperationsTests : Restv20TestsBase
    {
 	  [TestInitialize]
 	  public void CheckIfAllApiOperationsHaveCompleted()
@@ -25,14 +25,6 @@ namespace OkonkwoOandaV20Tests
 	  }
 
 	  #endregion
-
-	  [TestMethod]
-	  public void test_Initialize_market_is_halted()
-	  {
-		 var marketIsHalted = m_Results.Items.FirstOrDefault(x => x.Key == "00.0").Value;
-
-		 Assert.IsFalse(marketIsHalted.Success, marketIsHalted.Success.ToString() + ": " + marketIsHalted.Details);
-	  }
 
 	  #region Account
 	  [TestMethod]

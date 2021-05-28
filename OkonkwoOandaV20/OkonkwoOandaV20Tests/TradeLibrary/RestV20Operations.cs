@@ -17,12 +17,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
-namespace OkonkwoOandaV20Tests
+namespace OkonkwoOandaV20Tests.TradeLibrary
 {
    /// <summary>
    /// http://developer.oanda.com/rest-live-v20/introduction/
    /// </summary>
-   public partial class Restv20Test
+   public partial class Restv20OperationsTests
    {
 	  #region Default Configuration
 
@@ -73,7 +73,10 @@ namespace OkonkwoOandaV20Tests
 			   await Account_GetAccountsListAsync(m_TokenAccounts);
 
 			   // second, check market status
-			   await Initialize_GetMarketStatusAsync();
+			   if (await Utilities.IsMarketHaltedAsync())
+			   {
+				  throw new MarketHaltedException("Unable to continue tests. OANDA Fx market is halted!");
+			   }
 
 			   // third, proceed with all other operations
 			   await Account_GetAccountDetailsAsync();
@@ -134,13 +137,6 @@ namespace OkonkwoOandaV20Tests
 		 {
 			m_ApiOperationsComplete = true;
 		 }
-	  }
-
-	  private static async Task Initialize_GetMarketStatusAsync()
-	  {
-		 bool marketIsHalted = await Utilities.IsMarketHaltedAsync();
-		 m_Results.Verify("00.0", marketIsHalted, "Market is halted.");
-		 if (marketIsHalted) throw new MarketHaltedException("Unable to continue tests. OANDA Fx market is halted!");
 	  }
 
 	  #region Account
@@ -262,7 +258,7 @@ namespace OkonkwoOandaV20Tests
 			marginRate = testMarginRate
 		 };
 
-		 m_LastTransactionTime = Utilities.ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow, AcceptDatetimeFormat.RFC3339);
+		 m_LastTransactionTime = Utilities.ConvertDateTimeUtcToAcceptDateFormat(DateTime.UtcNow, AcceptDatetimeFormat.RFC3339);
 
 		 AccountConfigurationResponse response = null;
 
@@ -350,7 +346,7 @@ namespace OkonkwoOandaV20Tests
 
 		 // error test - future snapshot time
 		 var futureDateTime = DateTime.UtcNow.AddHours(1);
-		 string unavailableSnapshotTime = $"{Utilities.ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
+		 string unavailableSnapshotTime = $"{Utilities.ConvertDateTimeUtcToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
 		 var parameters = new InstrumentOrderBookParameters()
 		 {
 			time = unavailableSnapshotTime,
@@ -364,7 +360,7 @@ namespace OkonkwoOandaV20Tests
 		 }
 
 		 // get the 0th hour (or previous) snapshot
-		 string availableSnapshotTime = $"{Utilities.ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+		 string availableSnapshotTime = $"{Utilities.ConvertDateTimeUtcToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
 		 parameters.time = availableSnapshotTime;
 		 parameters.getLastTimeOnFailure = true;
 		 result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters);
@@ -383,7 +379,7 @@ namespace OkonkwoOandaV20Tests
 
 		 // error test - future snapshot time
 		 var futureDateTime = DateTime.UtcNow.AddHours(1);
-		 string unavailableSnapshotTime = $"{Utilities.ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
+		 string unavailableSnapshotTime = $"{Utilities.ConvertDateTimeUtcToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
 		 var parameters = new InstrumentPositionBookParameters()
 		 {
 			time = unavailableSnapshotTime,
@@ -397,7 +393,7 @@ namespace OkonkwoOandaV20Tests
 		 }
 
 		 // get the 0th hour (or previous) snapshot
-		 string availableSnapshotTime = $"{Utilities.ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
+		 string availableSnapshotTime = $"{Utilities.ConvertDateTimeUtcToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
 		 parameters.time = availableSnapshotTime;
 		 parameters.getLastTimeOnFailure = true;
 		 result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters);
@@ -418,8 +414,9 @@ namespace OkonkwoOandaV20Tests
 		 if (await Utilities.IsMarketHaltedAsync())
 			throw new MarketHaltedException("OANDA Fx market is halted!");
 
-		 string expiry = Utilities.ConvertDateTimeToAcceptDateFormat(DateTime.Now.AddMonths(1));
+		 string expiry = Utilities.ConvertDateTimeUtcToAcceptDateFormat(DateTime.UtcNow.AddMonths(1));
 		 decimal price = GetOandaPrice(m_TestInstrument) * (decimal)0.9;
+
 		 #region create new pending order
 		 var orderRequest1 = new MarketIfTouchedOrderRequest(GetOandaInstrument())
 		 {
