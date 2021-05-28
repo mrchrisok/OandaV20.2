@@ -35,38 +35,53 @@ namespace OkonkwoOandaV20.Framework
 	  }
 
 	  /// <summary>
-	  /// Convert DateTime object to a string of the indicated format
+	  /// 
+	  /// </summary>
+	  private const string RFC3339Format = "yyyy-MM-ddTHH:mm:ss.fffffffZ";
+
+	  /// <summary>
+	  /// Convert DateTime (UTC only) object to a string of the indicated format.
 	  /// </summary>
 	  /// <param name="time">A DateTime object</param>
 	  /// <param name="format">Format type (RFC3339 or UNIX only)</param>
 	  /// <returns>A date-time string</returns>
-	  public static string ConvertDateTimeToAcceptDateFormat(DateTime time, AcceptDatetimeFormat format = AcceptDatetimeFormat.RFC3339)
+	  public static string ConvertDateTimeUtcToAcceptDateFormat(DateTime time, AcceptDatetimeFormat format = AcceptDatetimeFormat.RFC3339)
 	  {
+		 if (time.Kind != DateTimeKind.Utc)
+		 {
+			throw new ArgumentException($"The provided time must be in UTC format.");
+		 }
+
 		 if (format == AcceptDatetimeFormat.RFC3339)
-			return XmlConvert.ToString(time, "yyyy-MM-ddTHH:mm:ssZ");
+		 {
+			return XmlConvert.ToString(time, RFC3339Format);
+		 }
 		 else if (format == AcceptDatetimeFormat.Unix)
-			return ((int)time.Subtract(new DateTime(1970, 1, 1)).TotalSeconds).ToString();
+		 {
+			return time.Subtract(new DateTime(1970, 1, 1).ToUniversalTime()).TotalSeconds.ToString();
+		 }
 		 else
 			throw new ArgumentException($"The format parameter '{format}' is not supported.");
 	  }
 
 	  /// <summary>
-	  /// Convert formatted time string to DateTime
+	  /// Convert formatted time string to DateTime.
+	  /// The conversion is accurate within 1 milliSecond
 	  /// </summary>
 	  /// <param name="time">A formatted time string</param>
 	  /// <param name="format">Format type (RFC3339 or UNIX only)</param>
 	  /// <returns>A DateTime object. Utc only.</returns>
-	  public static DateTime ConvertAcceptDateFormatDateToDateTime(object time, AcceptDatetimeFormat format)
+	  public static DateTime ConvertAcceptDateFormatDateToDateTimeUtc(string time, AcceptDatetimeFormat format)
 	  {
 		 if (format == AcceptDatetimeFormat.RFC3339)
 		 {
-			var dateTime = DateTime.Parse((string)time).ToUniversalTime();
+			var dateTime = DateTime.ParseExact(time, RFC3339Format, null).ToUniversalTime();
 			return dateTime;
 		 }
 		 else if (format == AcceptDatetimeFormat.Unix)
 		 {
-			long timeSeconds = Convert.ToInt64(time);
-			var dateTime = DateTimeOffset.FromUnixTimeSeconds(timeSeconds).UtcDateTime;
+			var doubleTime = Convert.ToDouble(time);
+			var dateTime = new DateTime(1970, 1, 1).ToUniversalTime().Add(TimeSpan.FromSeconds(doubleTime));
 			return dateTime;
 		 }
 		 else
@@ -74,10 +89,12 @@ namespace OkonkwoOandaV20.Framework
 	  }
 
 	  /// <summary>
-	  /// Converts a list of strings into a comma-separated values list (csv)
+	  /// Converts a list of items into a delimiter-separated values list.
+	  /// The default delimiter is a comma which returns string of comma-separated values (csv).
 	  /// </summary>
-	  /// <param name="items">The list of strings to convert to csv</param>
-	  /// <returns>A csv string of the list items</returns>
+	  /// <param name="items">The list of items to convert to a delimited string</param>
+	  /// <param name="delimiter">The delimeter to use to build the delimited string.</param>
+	  /// <returns>A delimiter-separated string of the list items</returns>
 	  public static string ConvertListToDelimitedValues(System.Collections.IList items, string delimiter = ",")
 	  {
 		 var stringBuilder = new StringBuilder();

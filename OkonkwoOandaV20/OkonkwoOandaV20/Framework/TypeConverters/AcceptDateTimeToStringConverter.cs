@@ -17,6 +17,12 @@ namespace OkonkwoOandaV20.Framework.TypeConverters
 		 return objectType == typeof(DateTime) || objectType == typeof(DateTime?);
 	  }
 
+	  /// <summary>
+	  /// Converts a DateTime value to a formatted string.
+	  /// The converted value is accurate within 1 milliSecond.
+	  /// </summary>
+	  /// <param name="input">The DateTime to be converted to a string</param>
+	  /// <returns>A formatted string representation of the input(DateTime).</returns>
 	  public string ToOutput(object input)
 	  {
 		 if (input == null)
@@ -26,7 +32,7 @@ namespace OkonkwoOandaV20.Framework.TypeConverters
 
 		 if (input is DateTime dateTime)
 		 {
-			var output = Utilities.ConvertDateTimeToAcceptDateFormat(dateTime, _acceptDateTimeFormat);
+			var output = Utilities.ConvertDateTimeUtcToAcceptDateFormat(dateTime, _acceptDateTimeFormat);
 
 			return output;
 		 }

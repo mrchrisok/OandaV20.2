@@ -21,15 +21,15 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 
 	  public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 	  {
-		 var dateTimeValue = reader.Value;
-		 var dateTime = Utilities.ConvertAcceptDateFormatDateToDateTime(dateTimeValue, _acceptDateTimeFormat);
+		 var dateTimeValue = reader.Value.ToString();
+		 var dateTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(dateTimeValue, _acceptDateTimeFormat);
 
 		 return dateTime;
 	  }
 
 	  public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 	  {
-		 var convertedTime = Utilities.ConvertDateTimeToAcceptDateFormat((DateTime)value, _acceptDateTimeFormat);
+		 var convertedTime = Utilities.ConvertDateTimeUtcToAcceptDateFormat((DateTime)value, _acceptDateTimeFormat);
 
 		 writer.WriteValue(convertedTime);
 	  }
