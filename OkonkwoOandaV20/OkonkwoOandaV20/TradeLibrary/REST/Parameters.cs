@@ -1,6 +1,5 @@
 ﻿using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.TypeConverters;
-using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -16,29 +15,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
 	  #endregion
 
+	  /// <summary>
+	  /// Retrieves a collection request paramters.
+	  /// </summary>
+	  /// <typeparam name="P">The type of reqeust attributes to retrieve.</typeparam>
+	  /// <param name="converters">List of custom string converters to use for writing values.</param>
+	  /// <param name="excludeNulls">Flag that indicates if null values should be excluded</param>
+	  /// <returns></returns>
 	  internal virtual IDictionary<string, object> GetRequestParameters<P>(IList<ITypeConverter<string>> converters = null, bool excludeNulls = true)
 		 where P : RequestAttribute
 	  {
-		 var parametersProperties = GetObjectParameters<P>(this, converters, excludeNulls);
-
-		 var order = this.GetType().GetProperties().Where(prop => prop.GetType() == typeof(OrderRequest)).FirstOrDefault();
-
-		 if (order != default)
-		 {
-			var orderParameters = GetObjectParameters<P>(order, converters, excludeNulls);
-			foreach (var parameter in orderParameters.ToList())
-			{
-			   parametersProperties.Add(parameter.Key, parameter.Value);
-			}
-		 }
-
-		 return parametersProperties;
-	  }
-
-	  private Dictionary<string, object> GetObjectParameters<P>(object obj, IList<ITypeConverter<string>> converters = null, bool excludeNulls = true)
-		 where P : RequestAttribute
-	  {
-		 var requestParameters = obj.GetType()
+		 var requestParameters = this.GetType()
 			.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
 			.Where(prop => prop.GetCustomAttribute<P>() != null)
 			.Select(prop =>

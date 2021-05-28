@@ -8,11 +8,12 @@
    {
 	  /// <summary>
 	  /// If “UNIX” is specified, DateTime fields will be specified or returned in the “12345678.000000123” format.
+	  /// The returned value represents the number of seconds since the Unix Epoch, January 1st, 1970.
 	  /// </summary>
 	  Unix,
 
 	  /// <summary>
-	  /// If “RFC3339” is specified, DateTime will be specified or returned in “YYYY-MM-DDTHH:MM:SS.nnnnnnnnnZ” format.
+	  /// If “RFC3339” is specified, DateTime will be specified or returned in “yyyy-MM-ddTHH:mm:ss.fffffffZ” format.
 	  /// </summary>
 	  RFC3339
    }
