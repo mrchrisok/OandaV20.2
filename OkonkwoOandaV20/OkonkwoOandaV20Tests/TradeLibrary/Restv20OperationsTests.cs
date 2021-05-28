@@ -477,23 +477,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 Assert.IsTrue(clientConfiguredReturned.Success, clientConfiguredReturned.Success.ToString() + ": " + clientConfiguredReturned.Details);
 		 Assert.IsTrue(marketOrdersReturned.Success, marketOrdersReturned.Success.ToString() + ": " + marketOrdersReturned.Details);
 	  }
-	  #endregion
 
-	  #region Pricing
 	  [TestMethod]
-	  public void test_Pricing_get_prices_list()
-	  {
-		 var pricesReceived = m_Results.Items.FirstOrDefault(x => x.Key == "06.0").Value;
-		 var priceCountMatches = m_Results.Items.FirstOrDefault(x => x.Key == "06.1").Value;
-
-		 Assert.IsTrue(pricesReceived.Success, pricesReceived.Success.ToString() + ": " + pricesReceived.Details);
-		 Assert.IsTrue(priceCountMatches.Success, priceCountMatches.Success.ToString() + ": " + priceCountMatches.Details);
-	  }
-	  #endregion
-
-	  #region Stream
-	  [TestMethod]
-	  public void test_Stream_transaction_stream_functional()
+	  public void test_Transaction_transaction_stream_functional()
 	  {
 		 // 7
 		 var streamFunctional = m_Results.Items.FirstOrDefault(x => x.Key == "07.0").Value;
@@ -506,9 +492,21 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 Assert.IsTrue(dataHasId.Success, dataHasId.Success.ToString() + ": " + dataHasId.Details);
 		 Assert.IsTrue(dataHasAccountId.Success, dataHasAccountId.Success.ToString() + ": " + dataHasAccountId.Details);
 	  }
+	  #endregion
+
+	  #region Pricing
+	  [TestMethod]
+	  public void test_Pricing_get_prices_list()
+	  {
+		 var pricesReceived = m_Results.Items.FirstOrDefault(x => x.Key == "06.0").Value;
+		 var priceCountMatches = m_Results.Items.FirstOrDefault(x => x.Key == "06.1").Value;
+
+		 Assert.IsTrue(pricesReceived.Success, pricesReceived.Success.ToString() + ": " + pricesReceived.Details);
+		 Assert.IsTrue(priceCountMatches.Success, priceCountMatches.Success.ToString() + ": " + priceCountMatches.Details);
+	  }
 
 	  [TestMethod]
-	  public void test_Stream_pricing_stream_functional()
+	  public void test_Pricing_pricing_stream_functional()
 	  {
 		 // 18
 		 var streamFunctional = m_Results.Items.FirstOrDefault(x => x.Key == "18.0").Value;

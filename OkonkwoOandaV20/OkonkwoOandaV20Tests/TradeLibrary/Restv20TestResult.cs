@@ -13,12 +13,15 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
    public class Restv20TestResults
    {
 	  #region Declarations
+
 	  string m_LastMessage;
 	  Dictionary<string, Restv20TestResult> m_Results = new Dictionary<string, Restv20TestResult>();
 	  Dictionary<string, string> m_MutableMessages = new Dictionary<string, string>();
+
 	  #endregion
 
 	  #region Public properties and methods
+
 	  public ReadOnlyDictionary<string, Restv20TestResult> Items
 	  {
 		 get { return new ReadOnlyDictionary<string, Restv20TestResult>(m_Results); }
@@ -71,6 +74,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 m_LastMessage = message;
 		 m_MutableMessages.Add(DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss") + ':' + m_MutableMessages.Count, message);
 	  }
+
 	  #endregion
    }
 }

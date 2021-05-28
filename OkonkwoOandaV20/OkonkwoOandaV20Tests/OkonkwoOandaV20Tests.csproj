@@ -52,8 +52,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Framework\ListToCsvConverterTests.cs" />
-    <Compile Include="Framework\AcceptDateTimeToStringConverterTests.cs" />
+    <Compile Include="Framework\TypeConverters\ListToCsvConverterTests.cs" />
+    <Compile Include="Framework\TypeConverters\AcceptDateTimeToStringConverterTests.cs" />
     <Compile Include="Framework\UtilitiesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TradeLibrary\RestV20Operations.cs" />
@@ -67,7 +67,9 @@
       <Name>OkonkwoOandaV20</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Framework\JsonConverters\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

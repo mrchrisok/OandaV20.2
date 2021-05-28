@@ -5,7 +5,7 @@ using OkonkwoOandaV20.TradeLibrary.REST;
 using System;
 using System.Text.RegularExpressions;
 
-namespace OkonkwoOandaV20Tests.Framework
+namespace OkonkwoOandaV20Tests.Framework.TypeConverters
 {
    [TestClass]
    public class AcceptDateTimeToStringConverterTests
@@ -44,13 +44,14 @@ namespace OkonkwoOandaV20Tests.Framework
 	  public void method_ToOuput_RFC3339_returns_correct_value()
 	  {
 		 // arrange
-		 var datePattern = "([0-9]+)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
-		 var hourPattern = "([01][0-9]|2[0-3])";
-		 var minutePattern = "([0-5][0-9])";
-		 var secondsPattern = "([0-5][0-9]|60)(\\.[0-9]+)";
-		 var offsetPattern = "([\\+|\\-]([01][0-9]|2[0-3]):[0-5][0-9])";
+		 var rgxDate = "([0-9]+)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
+		 var rgxHour = "([01][0-9]|2[0-3])";
+		 var rgxMinute = "([0-5][0-9])";
+		 var rgxSeconds = "([0-5][0-9]|60)";
+		 var rgxMilliSeconds = "(\\.[0-9]+)";
+		 var rgxOffset = "([\\+|\\-]([01][0-9]|2[0-3]):[0-5][0-9])";
 
-		 var regexRFC3339 = new Regex($"^{datePattern}[Tt]{hourPattern}:{minutePattern}:{secondsPattern}?(([Zz])|{offsetPattern})$");
+		 var regexRFC3339 = new Regex($"^{rgxDate}[Tt]{rgxHour}:{rgxMinute}:{rgxSeconds}{rgxMilliSeconds}?(([Zz])|{rgxOffset})$");
 
 		 var acceptDateTimeFormat = AcceptDatetimeFormat.RFC3339;
 		 var converter = new AcceptDateTimeToStringConverter(acceptDateTimeFormat);
@@ -70,10 +71,10 @@ namespace OkonkwoOandaV20Tests.Framework
 	  public void method_ToOuput_Unix_returns_correct_value()
 	  {
 		 // arrange
-		 var secondsPattern = "([0-9]+)";
-		 var milliSecondsPattern = "([0-9]+)";
+		 var rgxSeconds = "([0-9]+)";
+		 var rgxMilliSeconds = "([0-9]+)";
 
-		 var regexUnix = new Regex($"^{secondsPattern}.{milliSecondsPattern}$");
+		 var regexUnix = new Regex($"^{rgxSeconds}.{rgxMilliSeconds}$");
 
 		 var acceptDateTimeFormat = AcceptDatetimeFormat.Unix;
 		 var converter = new AcceptDateTimeToStringConverter(acceptDateTimeFormat);

@@ -2,7 +2,7 @@
 using OkonkwoOandaV20.Framework.TypeConverters;
 using System.Collections.Generic;
 
-namespace OkonkwoOandaV20Tests.Framework
+namespace OkonkwoOandaV20Tests.Framework.TypeConverters
 {
    [TestClass]
    public class ListToCsvConverterTests

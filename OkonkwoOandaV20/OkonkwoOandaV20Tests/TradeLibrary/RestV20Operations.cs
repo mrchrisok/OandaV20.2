@@ -48,8 +48,6 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 	  static string m_LastTransactionTime;
 	  static decimal m_TestNumber;
 
-	  protected List<Price> _prices;
-
 	  #endregion
 
 	  static string AccountID { get { return Credentials.GetDefaultCredentials().DefaultAccountId; } }
