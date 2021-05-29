@@ -71,7 +71,7 @@ namespace OkonkwoOandaV20.Framework
 	  /// <param name="time">A formatted time string</param>
 	  /// <param name="format">Format type (RFC3339 or UNIX only)</param>
 	  /// <returns>A DateTime object. Utc only.</returns>
-	  public static DateTime ConvertAcceptDateFormatDateToDateTimeUtc(string time, AcceptDatetimeFormat format)
+	  public static DateTime ConvertAcceptDateFormatDateToDateTimeUtc(string time, AcceptDatetimeFormat format = AcceptDatetimeFormat.RFC3339)
 	  {
 		 if (format == AcceptDatetimeFormat.RFC3339)
 		 {
