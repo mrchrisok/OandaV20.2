@@ -57,7 +57,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// is fetched.
 		 /// </summary>
 		 [Query]
-		 public string time { get; set; }
+		 public DateTime? time { get; set; }
 
 		 /// <summary>
 		 /// Flag that indicates if the most recent PositionBook snapshot should be fetched if the
