@@ -3,6 +3,7 @@ using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.Framework.TypeConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -52,14 +53,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// [default=Account Creation Time]
 		 /// </summary>
 		 [Query]
-		 public string from { get; set; }
+		 public DateTime? from { get; set; }
 
 		 /// <summary>
 		 /// The ending time (inclusive) of the time range for the Transactions being queried. 
 		 /// [default=Request Time]
 		 /// </summary>
 		 [Query]
-		 public string to { get; set; }
+		 public DateTime? to { get; set; }
 
 		 /// <summary>
 		 /// The number of Transactions to include in each page of the results. [default=100, maximum=1000]
