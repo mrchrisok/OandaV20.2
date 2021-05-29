@@ -60,7 +60,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 public string time { get; set; }
 
 		 /// <summary>
-		 /// 
+		 /// Flag that indicates if the most recent OrderBook snapshot should be fetched if the
+		 /// snapshot specified by the 'time' parameter cannot be retrieved.
 		 /// </summary>
 		 [JsonIgnore]
 		 public bool getLastTimeOnFailure { get; set; }

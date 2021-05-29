@@ -2,6 +2,9 @@
 {
    public abstract class EntryOrderRejectTransaction : EntryOrderTransaction
    {
-      public string rejectReason { get; set; }
+	  /// <summary>
+	  /// The reason that the Reject Transaction was created
+	  /// </summary>
+	  public string rejectReason { get; set; }
    }
 }

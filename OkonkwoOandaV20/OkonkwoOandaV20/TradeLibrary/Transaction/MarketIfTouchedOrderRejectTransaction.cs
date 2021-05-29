@@ -2,7 +2,10 @@
 {
    public class MarketIfTouchedOrderRejectTransaction : PriceEntryOrderRejectTransaction
    {
-      public decimal? priceBound { get; set; }
+	  /// <summary>
+	  /// The worst market price that may be used to fill this MarketIfTouched 
+	  /// Order.
+	  /// </summary>
+	  public decimal? priceBound { get; set; }
    }
 }
- 
