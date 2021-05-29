@@ -4,27 +4,27 @@ using System.Collections.ObjectModel;
 
 namespace OkonkwoOandaV20Tests.TradeLibrary
 {
-   public class Restv20TestResult
+   public class Rest20TestResult
    {
 	  public bool Success { get; set; }
 	  public string Details { get; set; }
    }
 
-   public class Restv20TestResults
+   public class Rest20TestResults
    {
 	  #region Declarations
 
 	  string m_LastMessage;
-	  Dictionary<string, Restv20TestResult> m_Results = new Dictionary<string, Restv20TestResult>();
+	  Dictionary<string, Rest20TestResult> m_Results = new Dictionary<string, Rest20TestResult>();
 	  Dictionary<string, string> m_MutableMessages = new Dictionary<string, string>();
 
 	  #endregion
 
 	  #region Public properties and methods
 
-	  public ReadOnlyDictionary<string, Restv20TestResult> Items
+	  public ReadOnlyDictionary<string, Rest20TestResult> Items
 	  {
-		 get { return new ReadOnlyDictionary<string, Restv20TestResult>(m_Results); }
+		 get { return new ReadOnlyDictionary<string, Rest20TestResult>(m_Results); }
 	  }
 
 	  public ReadOnlyDictionary<string, string> Messages
@@ -55,7 +55,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 
 	  public bool Verify(string key, bool success, string testDescription)
 	  {
-		 m_Results.Add(key, new Restv20TestResult { Success = success, Details = testDescription });
+		 m_Results.Add(key, new Rest20TestResult { Success = success, Details = testDescription });
 		 if (!success)
 		 {
 			Add(key + ": " + success + ": " + testDescription); // add message
@@ -64,7 +64,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 	  }
 
 	  //------
-	  public void Add(string key, Restv20TestResult testResult)
+	  public void Add(string key, Rest20TestResult testResult)
 	  {
 		 m_Results.Add(key, testResult);
 	  }

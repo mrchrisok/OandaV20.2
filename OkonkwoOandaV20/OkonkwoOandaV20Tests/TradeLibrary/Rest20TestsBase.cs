@@ -19,42 +19,62 @@ using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20Tests.TradeLibrary
 {
-   /// <summary>
-   /// http://developer.oanda.com/rest-live-v20/introduction/
-   /// </summary>
-   public partial class Restv20OperationsTests
+   public abstract class Rest20TestsBase
    {
+	  static Rest20TestsBase()
+	  {
+		 m_Results = new Rest20TestResults();
+	  }
+
 	  #region Default Configuration
 
 	  // warning: do not rely on these
 	  // For best results, please create and use your own or your organization's Oanda Practice account
 
-	  static EEnvironment m_TestEnvironment = EEnvironment.Practice;
-	  static string m_TestToken = "d845d3f81613358410e3e5298aebdce1-111fcc1d52a6c625c42c05366a22a286";
-	  static short m_TokenAccounts = 2;
-	  static string m_TestAccount = "101-001-1913854-002";
+	  private static EEnvironment m_TestEnvironment = EEnvironment.Practice;
+	  private static string m_TestToken = "d845d3f81613358410e3e5298aebdce1-111fcc1d52a6c625c42c05366a22a286";
+	  private static short m_TokenAccounts = 2;
+	  private static string m_TestAccount = "101-001-1913854-002";
 
 	  #endregion
 
-	  #region Declarations
+	  #region Properties
 
-	  static bool m_ApiOperationsComplete = false;
-	  static string m_Currency = "USD";
-	  static string m_TestInstrument = InstrumentName.Currency.USDCHF;
-	  static List<Instrument> m_OandaInstruments;
-	  static List<Price> m_OandaPrices;
-	  static long m_FirstTransactionID;
-	  static long m_LastTransactionID;
-	  static string m_LastTransactionTime;
-	  static decimal m_TestNumber;
+	  private static bool m_ApiOperationsComplete = false;
+	  private static string m_Currency = "USD";
+	  private static string m_TestInstrument = InstrumentName.Currency.USDCHF;
+	  private static List<Instrument> m_OandaInstruments;
+	  private static List<Price> m_OandaPrices;
+	  private static long m_FirstTransactionID;
+	  private static long m_LastTransactionID;
+	  private static string m_LastTransactionTime;
+	  private static decimal m_TestNumber;
+	  private static bool m_TestInitialized;
+	  private static readonly Rest20TestResults m_Results;
+
+	  protected static Rest20TestResults Results { get { return m_Results; } }
+	  private static string AccountID { get { return Credentials.GetDefaultCredentials().DefaultAccountId; } }
 
 	  #endregion
 
-	  static string AccountID { get { return Credentials.GetDefaultCredentials().DefaultAccountId; } }
-
-	  [ClassInitialize]
-	  public static async void RunApiOperationsAsync(TestContext context)
+	  [TestInitialize]
+	  public async void CheckIfAllApiOperationsHaveCompleted()
 	  {
+		 if (!m_TestInitialized)
+		 {
+			await RunApiOperationsAsync();
+		 }
+
+		 while (!m_ApiOperationsComplete)
+		 {
+			Task.Delay(250).Wait();
+		 }
+	  }
+
+	  private static async Task RunApiOperationsAsync()
+	  {
+		 m_TestInitialized = true;
+
 		 try
 		 {
 			await SetApiCredentialsAsync();
