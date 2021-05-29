@@ -92,12 +92,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <summary>
 	  /// The starting time provided in the request.
 	  /// </summary>
-	  public string from { get; set; }
+	  public DateTime? from { get; set; }
 
 	  /// <summary>
 	  /// The ending time provided in the request.
 	  /// </summary>
-	  public string to { get; set; }
+	  public DateTime? to { get; set; }
 
 	  /// <summary>
 	  /// The pageSize provided in the requests

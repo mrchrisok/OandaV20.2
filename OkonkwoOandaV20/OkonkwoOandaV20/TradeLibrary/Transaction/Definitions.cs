@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
+using System;
 using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.TradeLibrary.Transaction
@@ -60,7 +61,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 	  /// <summary>
 	  /// The timestamp of the schedule step.
 	  /// </summary>
-	  public string timestamp { get; set; }
+	  public DateTime timestamp { get; set; }
 
 	  /// <summary>
 	  /// The amount of bid liquidity used at this step in the schedule.
@@ -433,7 +434,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 	  /// The date when the Trailing Stop Loss Order will be cancelled on if
 	  /// timeInForce is GTD.
 	  /// </summary>
-	  public string gtdTime { get; set; }
+	  public DateTime? gtdTime { get; set; }
 
 	  /// <summary>
 	  /// The Client Extensions to add to the Trailing Stop Loss Order when
