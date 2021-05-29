@@ -109,6 +109,7 @@
     <Compile Include="TradeLibrary\Order\LimitOrder.cs" />
     <Compile Include="TradeLibrary\Order\MarketIfTouchedOrder.cs" />
     <Compile Include="TradeLibrary\Order\MarketOrder.cs" />
+    <Compile Include="TradeLibrary\Order\IOrder.cs" />
     <Compile Include="TradeLibrary\Order\Order.cs" />
     <Compile Include="TradeLibrary\Order\PriceEntryOrder.cs" />
     <Compile Include="TradeLibrary\Order\REST\GetOrder.cs" />
