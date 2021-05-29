@@ -1,4 +1,5 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.TradeLibrary.Order
@@ -107,6 +108,6 @@ namespace OkonkwoOandaV20.TradeLibrary.Order
 	  /// Date/time when the Order was cancelled (only provided when the state of
 	  /// the Order is CANCELLED)
 	  /// </summary>
-	  public string cancelledTime { get; set; }
+	  public DateTime? cancelledTime { get; set; }
    }
 }
