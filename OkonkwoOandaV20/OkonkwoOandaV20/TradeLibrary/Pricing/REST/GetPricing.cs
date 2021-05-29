@@ -49,7 +49,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// and are filtered independently.
 		 /// </summary>
 		 [Query]
-		 public string since { get; set; }
+		 public DateTime? since { get; set; }
 
 		 /// <summary>
 		 /// Flag that enables the inclusion of the unitsAvailable field in the returned Price objects. [default=True]
@@ -87,7 +87,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <summary>
 	  /// The DateTime value to use for the “since” parameter in the next poll request.
 	  /// </summary>
-	  public string time;
+	  public DateTime? time;
    }
 
    /// <summary>
