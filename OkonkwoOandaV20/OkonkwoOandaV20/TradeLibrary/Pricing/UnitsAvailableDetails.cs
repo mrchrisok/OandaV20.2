@@ -6,14 +6,14 @@
    /// </summary>
    public class UnitsAvailableDetails
    {
-      /// <summary>
-      /// The units available for long Orders.
-      /// </summary>
-      public long @long { get; set; }
+	  /// <summary>
+	  /// The units available for long Orders.
+	  /// </summary>
+	  public decimal @long { get; set; }
 
-      /// <summary>
-      /// The units available for short Orders.
-      /// </summary>
-      public long @short { get; set; }
+	  /// <summary>
+	  /// The units available for short Orders.
+	  /// </summary>
+	  public decimal @short { get; set; }
    }
 }
