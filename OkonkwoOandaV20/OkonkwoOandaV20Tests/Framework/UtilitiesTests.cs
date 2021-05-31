@@ -10,7 +10,7 @@ namespace OkonkwoOandaV20Tests.Framework
    public class UtilitiesTests
    {
 	  [TestMethod]
-	  public void method_ConvertDateTimeUtcToAcceptDateFormat_fails_when_not_DateTimeUtc()
+	  public void failure_ConvertDateTimeUtcToAcceptDateFormat_fails_when_not_DateTimeUtc()
 	  {
 		 // arrange
 		 var acceptDateTimeFormat = AcceptDatetimeFormat.RFC3339;
@@ -33,7 +33,7 @@ namespace OkonkwoOandaV20Tests.Framework
 	  }
 
 	  [TestMethod]
-	  public void method_ConvertDateTimeUtcToAcceptDateFormat_returns_correct_Unix_value()
+	  public void success_ConvertDateTimeUtcToAcceptDateFormat_returns_correct_Unix_value()
 	  {
 		 // arrange
 		 var secondsPattern = "([0-9]+)";
@@ -53,7 +53,7 @@ namespace OkonkwoOandaV20Tests.Framework
 	  }
 
 	  [TestMethod]
-	  public void method_ConvertAcceptDateFormatDateToDateTimeUtc_restores_RFC3339_value()
+	  public void success_ConvertAcceptDateFormatDateToDateTimeUtc_restores_RFC3339_value()
 	  {
 		 // arrange
 		 var acceptDateTimeFormat = AcceptDatetimeFormat.RFC3339;
@@ -68,7 +68,7 @@ namespace OkonkwoOandaV20Tests.Framework
 	  }
 
 	  [TestMethod]
-	  public void method_ConvertDateTimeUtcToAcceptDateFormat_restores_Unix_value()
+	  public void success_ConvertDateTimeUtcToAcceptDateFormat_restores_Unix_value()
 	  {
 		 // arrange
 		 var acceptDateTimeFormat = AcceptDatetimeFormat.Unix;
@@ -79,11 +79,11 @@ namespace OkonkwoOandaV20Tests.Framework
 		 var restoredTestDateTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(acceptTestDateTime, acceptDateTimeFormat);
 
 		 // assert
-		 Assert.AreEqual(testDateTime.Date, restoredTestDateTime.Date);
-		 Assert.AreEqual(testDateTime.Hour, restoredTestDateTime.Hour);
-		 Assert.AreEqual(testDateTime.Minute, restoredTestDateTime.Minute);
-		 Assert.AreEqual(testDateTime.Second, restoredTestDateTime.Second);
-		 Assert.IsTrue(Math.Abs(testDateTime.Millisecond - restoredTestDateTime.Millisecond) <= 1);
+		 Assert.AreEqual(testDateTime.Date, restoredTestDateTime?.Date);
+		 Assert.AreEqual(testDateTime.Hour, restoredTestDateTime?.Hour);
+		 Assert.AreEqual(testDateTime.Minute, restoredTestDateTime?.Minute);
+		 Assert.AreEqual(testDateTime.Second, restoredTestDateTime?.Second);
+		 Assert.IsTrue(Math.Abs(testDateTime.Millisecond - restoredTestDateTime.Value.Millisecond) <= 1);
 	  }
    }
 }

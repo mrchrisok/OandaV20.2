@@ -58,12 +58,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 	  #endregion
 
 	  [TestInitialize]
-	  public async void CheckIfAllApiOperationsHaveCompleted()
+	  public void CheckIfAllApiOperationsHaveCompleted()
 	  {
-		 if (!m_TestInitialized)
-		 {
-			await RunApiOperationsAsync();
-		 }
+		 RunApiOperationsAsync().Wait();
 
 		 while (!m_ApiOperationsComplete)
 		 {
@@ -73,6 +70,11 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 
 	  private static async Task RunApiOperationsAsync()
 	  {
+		 if (m_TestInitialized)
+		 {
+			return;
+		 }
+
 		 m_TestInitialized = true;
 
 		 try
@@ -268,7 +270,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 string alias = summary.alias;
 		 decimal? marginRate = summary.marginRate;
 
-		 string testAlias = $"testAlias_{DateTime.UtcNow.ToString("yyyyMMddTHHmmssfffffffK")}";
+		 string testAlias = $"testAlias_{DateTime.UtcNow:yyyyMMddTHHmmssfffffffK}";
 		 decimal? testMarginRate = (decimal)(marginRate == null ? 0.5 : (((double)marginRate.Value == 0.5) ? 0.4 : 0.5));
 		 var parameters = new AccountConfigurationParameters()
 		 {
@@ -365,7 +367,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 // error test - future snapshot time
 		 var futureDateTime = DateTime.UtcNow.AddHours(1);
 		 string unavailableSnapshotTimeString = $"{Utilities.ConvertDateTimeUtcToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
-		 DateTime unavailabeSnapshotTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(unavailableSnapshotTimeString);
+		 DateTime? unavailabeSnapshotTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(unavailableSnapshotTimeString);
 		 var parameters = new InstrumentOrderBookParameters()
 		 {
 			time = unavailabeSnapshotTime,
@@ -380,7 +382,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 
 		 // get the 0th hour (or previous) snapshot
 		 string availableSnapshotTimeString = $"{Utilities.ConvertDateTimeUtcToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
-		 DateTime availableSnapshotTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(availableSnapshotTimeString);
+		 DateTime? availableSnapshotTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(availableSnapshotTimeString);
 		 parameters.time = availableSnapshotTime;
 		 parameters.getLastTimeOnFailure = true;
 		 result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters);
@@ -400,7 +402,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 // error test - future snapshot time
 		 var futureDateTime = DateTime.UtcNow.AddHours(1);
 		 string unavailableSnapshotTimeString = $"{Utilities.ConvertDateTimeUtcToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
-		 DateTime unavailableSnapshotTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(unavailableSnapshotTimeString);
+		 DateTime? unavailableSnapshotTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(unavailableSnapshotTimeString);
 		 var parameters = new InstrumentPositionBookParameters()
 		 {
 			time = unavailableSnapshotTime,
@@ -415,7 +417,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 
 		 // get the 0th hour (or previous) snapshot
 		 string availableSnapshotTimeString = $"{Utilities.ConvertDateTimeUtcToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
-		 DateTime availableSnapshotTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(availableSnapshotTimeString);
+		 DateTime? availableSnapshotTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(availableSnapshotTimeString);
 		 parameters.time = availableSnapshotTime;
 		 parameters.getLastTimeOnFailure = true;
 		 result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters);
@@ -985,20 +987,33 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 	  private static async Task Transaction_GetTransactionsByDateRangeAsync()
 	  {
 		 // 09
+		 var attemptsRemaining = 3;
+		 var transactionType = TransactionType.OrderFill;
 		 var parameters = new TransactionsParameters()
 		 {
 			from = m_LastTransactionTime,
-			type = new List<string>(new[] { TransactionType.ClientConfigure })
+			type = new List<string>(new[] { transactionType })
 		 };
 
-		 List<ITransaction> results = await Rest20.GetTransactionsAsync(AccountID, parameters);
+		 List<ITransaction> results = null;
+
+		 while (attemptsRemaining >= 0)
+		 {
+			attemptsRemaining--;
+			results = await Rest20.GetTransactionsAsync(AccountID, parameters);
+
+			if (results?.Count > 0) break;
+
+			await Task.Delay(250);
+		 }
+
 
 		 m_Results.Verify("09.0",
 			results != null, $"Transactions info received.");
 		 m_Results.Verify("09.1",
-			results.Where(x => x.type == TransactionType.ClientConfigure).Count() > 0, "Client configure transactions returned.");
+			results.Where(x => x.type == transactionType).Count() > 0, $"{transactionType} transactions returned.");
 		 m_Results.Verify("09.2",
-			results.Where(x => x.type != TransactionType.ClientConfigure).Count() > 0, "Non-client configure transactions returned.");
+			results.Where(x => x.type != transactionType).Count() > 0, $"Non {transactionType} transactions returned.");
 	  }
 
 	  private static async Task Transaction_GetTransactionAsync()

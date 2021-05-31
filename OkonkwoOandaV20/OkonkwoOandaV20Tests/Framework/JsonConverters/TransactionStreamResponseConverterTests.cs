@@ -1,13 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.REST;
-using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 {
@@ -15,26 +11,16 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
    public class TransactionStreamResponseConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_IStreamResponse_success()
+	  public void method_CanConvert_type_TransactionsStreamResponse_success()
 	  {
 		 // arrange
 		 var converter = new TransactionsStreamResponseConverter();
-		 var iStreamResponseTypes = typeof(IStreamResponse).Assembly.DefinedTypes
-			.Where(type => type.ImplementedInterfaces.Contains(typeof(IStreamResponse)));
-		 var cannotConvertTypeList = new List<string>();
 
 		 // act
-		 foreach (var type in iStreamResponseTypes)
-		 {
-			if (!converter.CanConvert(type))
-			{
-			   cannotConvertTypeList.Add(type.FullName);
-			}
-		 }
-		 var cannotConvertTypeNames = Utilities.ConvertListToDelimitedValues(cannotConvertTypeList);
+		 var canConvert = converter.CanConvert(typeof(TransactionsStreamResponse));
 
 		 // assert
-		 Assert.IsTrue(cannotConvertTypeList.Count == 0, $"Cannot convert types: {cannotConvertTypeNames}");
+		 Assert.IsTrue(canConvert);
 	  }
 
 	  [TestMethod]

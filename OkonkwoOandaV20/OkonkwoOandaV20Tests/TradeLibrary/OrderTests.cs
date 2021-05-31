@@ -14,8 +14,8 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var orderCreated = Results.Items.FirstOrDefault(x => x.Key == "11.0").Value;
 		 var orderTypeIsCorrect = Results.Items.FirstOrDefault(x => x.Key == "11.1").Value;
 
-		 Assert.IsTrue(orderCreated.Success, orderCreated.Success.ToString() + ": " + orderCreated.Details);
-		 Assert.IsTrue(orderTypeIsCorrect.Success, orderTypeIsCorrect.Success.ToString() + ": " + orderTypeIsCorrect.Details);
+		 Assert.IsTrue(orderCreated.Success, $"{orderCreated.Success}: {orderCreated.Details}");
+		 Assert.IsTrue(orderTypeIsCorrect.Success, $"{orderTypeIsCorrect.Success}: {orderTypeIsCorrect.Details}");
 	  }
 
 	  [TestMethod]
@@ -25,8 +25,8 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var testOrderTypeReturned = Results.Items.FirstOrDefault(x => x.Key == "11.3").Value;
 		 var allOrdersByIDRetrieved = Results.Items.FirstOrDefault(x => x.Key == "11.29").Value;
 
-		 Assert.IsTrue(allOrdersRetrieved.Success, allOrdersRetrieved.Success.ToString() + ": " + allOrdersRetrieved.Details);
-		 Assert.IsTrue(testOrderTypeReturned.Success, testOrderTypeReturned.Success.ToString() + ": " + testOrderTypeReturned.Details);
+		 Assert.IsTrue(allOrdersRetrieved.Success, $"{allOrdersRetrieved.Success}: {allOrdersRetrieved.Details}");
+		 Assert.IsTrue(testOrderTypeReturned.Success, $"{testOrderTypeReturned.Success}: {testOrderTypeReturned.Details}");
 		 Assert.IsTrue(allOrdersByIDRetrieved.Success, $"11.29,{allOrdersByIDRetrieved.Success}: { allOrdersByIDRetrieved.Details}");
 	  }
 
@@ -37,9 +37,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var onlyPendingOrderRetrieved = Results.Items.FirstOrDefault(x => x.Key == "11.5").Value;
 		 var testPendingOrderRetrieved = Results.Items.FirstOrDefault(x => x.Key == "11.6").Value;
 
-		 Assert.IsTrue(pendingOrdersRetrieved.Success, pendingOrdersRetrieved.Success.ToString() + ": " + pendingOrdersRetrieved.Details);
-		 Assert.IsTrue(onlyPendingOrderRetrieved.Success, onlyPendingOrderRetrieved.Success.ToString() + ": " + onlyPendingOrderRetrieved.Details);
-		 Assert.IsTrue(testPendingOrderRetrieved.Success, testPendingOrderRetrieved.Success.ToString() + ": " + testPendingOrderRetrieved.Details);
+		 Assert.IsTrue(pendingOrdersRetrieved.Success, $"{pendingOrdersRetrieved.Success}: {pendingOrdersRetrieved.Details}");
+		 Assert.IsTrue(onlyPendingOrderRetrieved.Success, $"{onlyPendingOrderRetrieved.Success}: {onlyPendingOrderRetrieved.Details}");
+		 Assert.IsTrue(testPendingOrderRetrieved.Success, $"{testPendingOrderRetrieved.Success}: {testPendingOrderRetrieved.Details}");
 	  }
 
 	  [TestMethod]
@@ -49,9 +49,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var clientExtensionsRetrieved = Results.Items.FirstOrDefault(x => x.Key == "11.8").Value;
 		 var tradeExtensionsRetrieved = Results.Items.FirstOrDefault(x => x.Key == "11.9").Value;
 
-		 Assert.IsTrue(orderDetailsRetrieved.Success, orderDetailsRetrieved.Success.ToString() + ": " + orderDetailsRetrieved.Details);
-		 Assert.IsTrue(clientExtensionsRetrieved.Success, clientExtensionsRetrieved.Success.ToString() + ": " + clientExtensionsRetrieved.Details);
-		 Assert.IsTrue(tradeExtensionsRetrieved.Success, tradeExtensionsRetrieved.Success.ToString() + ": " + tradeExtensionsRetrieved.Details);
+		 Assert.IsTrue(orderDetailsRetrieved.Success, $"{orderDetailsRetrieved.Success}: {orderDetailsRetrieved.Details}");
+		 Assert.IsTrue(clientExtensionsRetrieved.Success, $"{clientExtensionsRetrieved.Success}: {clientExtensionsRetrieved.Details}");
+		 Assert.IsTrue(tradeExtensionsRetrieved.Success, $"{tradeExtensionsRetrieved.Success}: {tradeExtensionsRetrieved.Details}");
 	  }
 
 	  [TestMethod]
@@ -62,10 +62,10 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var clientExtensionCommentCorrect = Results.Items.FirstOrDefault(x => x.Key == "11.12").Value;
 		 var tradeExtensionCommentCorrect = Results.Items.FirstOrDefault(x => x.Key == "11.13").Value;
 
-		 Assert.IsTrue(extensionsUpdated.Success, extensionsUpdated.Success.ToString() + ": " + extensionsUpdated.Details);
-		 Assert.IsTrue(extensionsOrderCorrect.Success, extensionsOrderCorrect.Success.ToString() + ": " + extensionsOrderCorrect.Details);
-		 Assert.IsTrue(clientExtensionCommentCorrect.Success, clientExtensionCommentCorrect.Success.ToString() + ": " + clientExtensionCommentCorrect.Details);
-		 Assert.IsTrue(tradeExtensionCommentCorrect.Success, tradeExtensionCommentCorrect.Success.ToString() + ": " + tradeExtensionCommentCorrect.Details);
+		 Assert.IsTrue(extensionsUpdated.Success, $"{extensionsUpdated.Success}: {extensionsUpdated.Details}");
+		 Assert.IsTrue(extensionsOrderCorrect.Success, $"{extensionsOrderCorrect.Success}: {extensionsOrderCorrect.Details}");
+		 Assert.IsTrue(clientExtensionCommentCorrect.Success, $"{clientExtensionCommentCorrect.Success}: {clientExtensionCommentCorrect.Details}");
+		 Assert.IsTrue(tradeExtensionCommentCorrect.Success, $"{tradeExtensionCommentCorrect.Success}: {tradeExtensionCommentCorrect.Details}");
 	  }
 
 	  [TestMethod]
@@ -75,9 +75,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var orderWasReplaced = Results.Items.FirstOrDefault(x => x.Key == "11.15").Value;
 		 var newOrderDetailsCorrect = Results.Items.FirstOrDefault(x => x.Key == "11.16").Value;
 
-		 Assert.IsTrue(orderWasCancelled.Success, orderWasCancelled.Success.ToString() + ": " + orderWasCancelled.Details);
-		 Assert.IsTrue(orderWasReplaced.Success, orderWasReplaced.Success.ToString() + ": " + orderWasReplaced.Details);
-		 Assert.IsTrue(newOrderDetailsCorrect.Success, newOrderDetailsCorrect.Success.ToString() + ": " + newOrderDetailsCorrect.Details);
+		 Assert.IsTrue(orderWasCancelled.Success, $"{orderWasCancelled.Success}: {orderWasCancelled.Details}");
+		 Assert.IsTrue(orderWasReplaced.Success, $"{orderWasReplaced.Success}: {orderWasReplaced.Details}");
+		 Assert.IsTrue(newOrderDetailsCorrect.Success, $"{newOrderDetailsCorrect.Success}: {newOrderDetailsCorrect.Details}");
 	  }
 
 	  [TestMethod]
@@ -86,8 +86,8 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var cancelledOrderReturned = Results.Items.FirstOrDefault(x => x.Key == "11.17").Value;
 		 var orderWasCancelled = Results.Items.FirstOrDefault(x => x.Key == "11.18").Value;
 
-		 Assert.IsTrue(cancelledOrderReturned.Success, cancelledOrderReturned.Success.ToString() + ": " + cancelledOrderReturned.Details);
-		 Assert.IsTrue(orderWasCancelled.Success, orderWasCancelled.Success.ToString() + ": " + orderWasCancelled.Details);
+		 Assert.IsTrue(cancelledOrderReturned.Success, $"{cancelledOrderReturned.Success}: {cancelledOrderReturned.Details}");
+		 Assert.IsTrue(orderWasCancelled.Success, $"{orderWasCancelled.Success}: {orderWasCancelled.Details}");
 	  }
 
 	  [TestMethod]
@@ -104,16 +104,16 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var newOrderStopLossIsCorrect = Results.Items.FirstOrDefault(x => x.Key == "11.27").Value;
 		 var newOrderTakeProfitIsCorrect = Results.Items.FirstOrDefault(x => x.Key == "11.28").Value;
 
-		 Assert.IsTrue(orderWasCreated.Success, orderWasCreated.Success.ToString() + ": " + orderWasCreated.Details);
-		 Assert.IsTrue(orderTypeIsCorrect.Success, orderTypeIsCorrect.Success.ToString() + ": " + orderTypeIsCorrect.Details);
+		 Assert.IsTrue(orderWasCreated.Success, $"{orderWasCreated.Success}: {orderWasCreated.Details}");
+		 Assert.IsTrue(orderTypeIsCorrect.Success, $"{orderTypeIsCorrect.Success}: {orderTypeIsCorrect.Details}");
 		 Assert.IsTrue(orderHasStopLoss.Success, $"11.21,{orderHasStopLoss.Success}: {orderHasStopLoss.Details}");
-		 Assert.IsTrue(orderHasTakeProfit.Success, orderHasTakeProfit.Success.ToString() + ": " + orderHasTakeProfit.Details);
-		 Assert.IsTrue(orderWasCancelled.Success, orderWasCancelled.Success.ToString() + ": " + orderWasCancelled.Details);
-		 Assert.IsTrue(cancelledOrderHasCorrectReason.Success, cancelledOrderHasCorrectReason.Success.ToString() + ": " + cancelledOrderHasCorrectReason.Details);
-		 Assert.IsTrue(newOrderWasCreated.Success, newOrderWasCreated.Success.ToString() + ": " + newOrderWasCreated.Details);
-		 Assert.IsTrue(newOrderReasonIsCorrect.Success, newOrderReasonIsCorrect.Success.ToString() + ": " + newOrderReasonIsCorrect.Details);
-		 Assert.IsTrue(newOrderStopLossIsCorrect.Success, newOrderStopLossIsCorrect.Success.ToString() + ": " + newOrderStopLossIsCorrect.Details);
-		 Assert.IsTrue(newOrderTakeProfitIsCorrect.Success, newOrderTakeProfitIsCorrect.Success.ToString() + ": " + newOrderTakeProfitIsCorrect.Details);
+		 Assert.IsTrue(orderHasTakeProfit.Success, $"{orderHasTakeProfit.Success}: {orderHasTakeProfit.Details}");
+		 Assert.IsTrue(orderWasCancelled.Success, $"{orderWasCancelled.Success}: {orderWasCancelled.Details}");
+		 Assert.IsTrue(cancelledOrderHasCorrectReason.Success, $"{cancelledOrderHasCorrectReason.Success}: {cancelledOrderHasCorrectReason.Details}");
+		 Assert.IsTrue(newOrderWasCreated.Success, $"{newOrderWasCreated.Success}: {newOrderWasCreated.Details}");
+		 Assert.IsTrue(newOrderReasonIsCorrect.Success, $"{newOrderReasonIsCorrect.Success}: {newOrderReasonIsCorrect.Details}");
+		 Assert.IsTrue(newOrderStopLossIsCorrect.Success, $"{newOrderStopLossIsCorrect.Success}: {newOrderStopLossIsCorrect.Details}");
+		 Assert.IsTrue(newOrderTakeProfitIsCorrect.Success, $"{newOrderTakeProfitIsCorrect.Success}: {newOrderTakeProfitIsCorrect.Details}");
 	  }
 
 	  [TestMethod]
@@ -124,10 +124,10 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var caughtOrderCancelReplaceError = Results.Items.FirstOrDefault(x => x.Key == "11.E2").Value;
 		 var caughtOrderCancelError = Results.Items.FirstOrDefault(x => x.Key == "11.E3").Value;
 
-		 Assert.IsTrue(caughtOrderPostError.Success, caughtOrderPostError.Success.ToString() + ": " + caughtOrderPostError.Details);
-		 Assert.IsTrue(caughtOrderClientExtensionsModifyError.Success, caughtOrderClientExtensionsModifyError.Success.ToString() + ": " + caughtOrderClientExtensionsModifyError.Details);
-		 Assert.IsTrue(caughtOrderCancelReplaceError.Success, caughtOrderCancelReplaceError.Success.ToString() + ": " + caughtOrderCancelReplaceError.Details);
-		 Assert.IsTrue(caughtOrderCancelError.Success, caughtOrderCancelError.Success.ToString() + ": " + caughtOrderCancelError.Details);
+		 Assert.IsTrue(caughtOrderPostError.Success, $"{caughtOrderPostError.Success}: {caughtOrderPostError.Details}");
+		 Assert.IsTrue(caughtOrderClientExtensionsModifyError.Success, $"{caughtOrderClientExtensionsModifyError.Success}: {caughtOrderClientExtensionsModifyError.Details}");
+		 Assert.IsTrue(caughtOrderCancelReplaceError.Success, $"{caughtOrderCancelReplaceError.Success}: {caughtOrderCancelReplaceError.Details}");
+		 Assert.IsTrue(caughtOrderCancelError.Success, $"{caughtOrderCancelError.Success}: {caughtOrderCancelError.Details}");
 	  }
 
 	  #endregion
