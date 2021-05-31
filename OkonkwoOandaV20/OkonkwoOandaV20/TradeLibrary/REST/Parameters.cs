@@ -42,17 +42,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 return requestParameters;
 	  }
 
-	  private object GetPropertyValue<P>(PropertyInfo prop, IList<ITypeConverter<string>> converters)
+	  private object GetPropertyValue<P>(PropertyInfo propInfo, IList<ITypeConverter<string>> converters)
 		 where P : RequestAttribute
 	  {
-		 var converter = converters?.FirstOrDefault(converter => converter.CanConvert(prop.GetType()));
+		 var converter = converters?.FirstOrDefault(converter => converter.CanConvert(propInfo.PropertyType));
 
 		 if (converter != null)
 		 {
-			return converter.ToOutput(prop.GetValue(this));
+			return converter.ToOutput(propInfo.GetValue(this));
 		 }
 
-		 return prop.GetCustomAttribute<P>().GetValue(prop.GetValue(this));
+		 return propInfo.GetCustomAttribute<P>().GetValue(propInfo.GetValue(this));
 	  }
 
 	  /// <summary>
