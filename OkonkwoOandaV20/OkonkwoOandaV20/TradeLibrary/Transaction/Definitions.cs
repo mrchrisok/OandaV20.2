@@ -357,7 +357,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 		 priceInformation = new PriceInformation()
 		 {
 			instrument = instrument,
-			priceProperties = new List<string>() { "price" }
+			priceProperties = new List<string>() { nameof(price) }
 		 };
 	  }
 
@@ -376,7 +376,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 		 priceInformation = new PriceInformation()
 		 {
 			instrument = instrument,
-			priceProperties = new List<string>() { "price" }
+			priceProperties = new List<string>() { nameof(price), nameof(distance) }
 		 };
 	  }
 
@@ -411,7 +411,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 		 priceInformation = new PriceInformation()
 		 {
 			instrument = instrument,
-			priceProperties = new List<string>() { "distance" }
+			priceProperties = new List<string>() { nameof(distance) }
 		 };
 	  }
 

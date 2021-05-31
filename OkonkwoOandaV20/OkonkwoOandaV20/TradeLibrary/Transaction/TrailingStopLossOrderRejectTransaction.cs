@@ -6,11 +6,10 @@
    /// </summary>
    public class TrailingStopLossOrderRejectTransaction : ExitOrderRejectTransaction
    {
-      /// <summary>
-      /// The price distance (in price units) specified for the TrailingStopLoss 
-      /// Order.
-      /// </summary>
-      public decimal distance { get; set; }
+	  /// <summary>
+	  /// The price distance (in price units) specified for the TrailingStopLoss 
+	  /// Order.
+	  /// </summary>
+	  public decimal distance { get; set; }
    }
 }
- 

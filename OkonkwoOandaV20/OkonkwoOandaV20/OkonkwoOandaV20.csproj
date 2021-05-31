@@ -64,7 +64,7 @@
     <Compile Include="Framework\JsonConverters\AbstractJsonConverter.cs" />
     <Compile Include="Framework\JsonConverters\PriceObjectConverter.cs" />
     <Compile Include="Framework\JsonConverters\OrderConverter.cs" />
-    <Compile Include="Framework\JsonConverters\PricingStreamrResponseConverter.cs" />
+    <Compile Include="Framework\JsonConverters\PricingStreamResponseConverter.cs" />
     <Compile Include="Framework\JsonConverters\AcceptDateTimeConverter.cs" />
     <Compile Include="Framework\JsonConverters\StringDecimalConverter.cs" />
     <Compile Include="Framework\JsonConverters\TransactionConverter.cs" />

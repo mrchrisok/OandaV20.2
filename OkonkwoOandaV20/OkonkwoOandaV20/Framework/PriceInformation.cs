@@ -16,6 +16,11 @@ namespace OkonkwoOandaV20.Framework
 	  /// <summary>
 	  /// The PriceObject properties that indicate the threshold price for order execution
 	  /// </summary>
-	  public List<string> priceProperties { get; set; }
+	  public List<string> priceProperties { get; set; } = new List<string>();
+
+	  /// <summary>
+	  /// The PriceObject properties that indicate the threshold units for order execution
+	  /// </summary>
+	  public List<string> unitsProperties { get; set; } = new List<string>();
    }
 }

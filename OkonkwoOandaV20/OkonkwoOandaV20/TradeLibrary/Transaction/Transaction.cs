@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 
 namespace OkonkwoOandaV20.TradeLibrary.Transaction
 {
@@ -16,7 +18,17 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 	  /// The Type of the Transaction.
 	  /// Valid values are specified in the TransactionType class
 	  /// </summary>
-	  public string type { get; set; }
+	  public virtual string type
+	  {
+		 get
+		 {
+			var thisTypeName = this.GetType().Name.Replace("Transaction", "");
+			var thisTransactionType = _transactionTypeConstants.FirstOrDefault(constant => constant.Name == thisTypeName);
+			var thisTransactionTypeName = thisTransactionType?.GetRawConstantValue().ToString() ?? string.Empty;
+			return thisTransactionTypeName;
+		 }
+	  }
+	  private static FieldInfo[] _transactionTypeConstants = typeof(TransactionType).GetFields();
 
 	  /// <summary>
 	  /// The date/time when the Transaction was created.
@@ -56,7 +68,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 	  /// The Type of the Transaction.
 	  /// Valid values are specified in the TransactionType class
 	  /// </summary>
-	  string type { get; set; }
+	  string type { get; }
 
 	  /// <summary>
 	  /// The date/time when the Transaction was created.

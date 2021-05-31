@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OkonkwoOandaV20.TradeLibrary.REST;
 using System;
 
@@ -21,6 +22,12 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 
 	  public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 	  {
+		 var jsonToken = JToken.Load(reader);
+		 if (jsonToken.Type == JTokenType.Null)
+		 {
+			return null;
+		 }
+
 		 var dateTimeValue = reader.Value.ToString();
 		 var dateTime = Utilities.ConvertAcceptDateFormatDateToDateTimeUtc(dateTimeValue, _acceptDateTimeFormat);
 

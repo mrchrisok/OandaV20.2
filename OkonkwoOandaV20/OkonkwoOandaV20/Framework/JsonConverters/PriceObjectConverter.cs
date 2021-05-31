@@ -13,7 +13,7 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
    {
 	  public override bool CanConvert(Type objectType)
 	  {
-		 return objectType == typeof(IHasPrices);
+		 return objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IHasPrices));
 	  }
 
 	  public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -24,6 +24,8 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 		 var priceObject = value as IHasPrices;
 		 var priceProperties = priceObject.priceInformation.priceProperties;
 		 var pricePrecision = Math.Abs(priceObject.priceInformation.instrument.displayPrecision);
+		 var unitsProperties = priceObject.priceInformation.unitsProperties;
+		 var unitsPrecision = Math.Abs(priceObject.priceInformation.instrument.tradeUnitsPrecision);
 
 		 foreach (PropertyInfo property in type.GetRuntimeProperties())
 		 {
@@ -43,6 +45,13 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 
 				  jo.Add(property.Name, JToken.FromObject(formattedPrice));
 			   }
+			   else if (unitsProperties.Contains(property.Name))
+			   {
+				  decimal units = Convert.ToDecimal(propertyValue ?? 0);
+				  string formattedUnits = units.ToString("F" + unitsPrecision, CultureInfo.InvariantCulture);
+
+				  jo.Add(property.Name, JToken.FromObject(formattedUnits));
+			   }
 			   else
 				  jo.Add(property.Name, JToken.FromObject(propertyValue, serializer));
 			}
@@ -55,7 +64,11 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 	  {
 		 var jsonToken = JToken.Load(reader);
 
-		 if (jsonToken.Type == JTokenType.Array)
+		 if (jsonToken.Type == JTokenType.Null)
+		 {
+			return null;
+		 }
+		 else if (jsonToken.Type == JTokenType.Array)
 		 {
 			var priceObjects = new List<IHasPrices>();
 
