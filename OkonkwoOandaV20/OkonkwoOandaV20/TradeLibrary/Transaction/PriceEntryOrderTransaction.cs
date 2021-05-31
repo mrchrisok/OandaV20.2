@@ -1,4 +1,6 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.Transaction
+﻿using System;
+
+namespace OkonkwoOandaV20.TradeLibrary.Transaction
 {
    public abstract class PriceEntryOrderTransaction : EntryOrderTransaction
    {
@@ -13,7 +15,7 @@
       /// The date/time when the Entry Order will be cancelled if its timeInForce is
       /// “GTD”.
       /// </summary>
-      public string gtdTime { get; set; }
+      public DateTime? gtdTime { get; set; }
 
       /// <summary>
       /// Specification of which price component should be used when determining if

@@ -1,4 +1,5 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.TradeLibrary.Trade
@@ -7,7 +8,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Trade
    {
 	  public string instrument { get; set; }
 	  public decimal price { get; set; }
-	  public string openTime { get; set; }
+	  public DateTime openTime { get; set; }
 	  public string state { get; set; }
 	  public decimal initialUnits { get; set; }
 	  public decimal initialMarginRequired { get; set; }
@@ -16,7 +17,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Trade
 	  public decimal averageClosePrice { get; set; }
 	  public List<long> closingTransactionIDs { get; set; }
 	  public decimal financing { get; set; }
-	  public string closeTime { get; set; }
+	  public DateTime? closeTime { get; set; }
 	  public ClientExtensions clientExtensions { get; set; }
    }
 }

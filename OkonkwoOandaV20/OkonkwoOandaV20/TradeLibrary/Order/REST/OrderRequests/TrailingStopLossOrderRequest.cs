@@ -8,6 +8,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequests
 		 : base(oandaInstrument)
 	  {
 		 type = OrderType.TrailingStopLoss;
+
+		 priceInformation.priceProperties.Add(nameof(distance));
 	  }
 
 	  /// <summary>

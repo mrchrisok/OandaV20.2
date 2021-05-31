@@ -1,4 +1,6 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.Transaction
+﻿using System;
+
+namespace OkonkwoOandaV20.TradeLibrary.Transaction
 {
    public abstract class ExitOrderRejectTransaction : RejectTransaction
    {
@@ -23,7 +25,7 @@
 	  /// The date/time when the Exit Order will be cancelled if its
 	  /// timeInForce is “GTD”.
 	  /// </summary>
-	  public string gtdTime { get; set; }
+	  public DateTime? gtdTime { get; set; }
 
 	  /// <summary>
 	  /// Specification of which price component should be used when determining if

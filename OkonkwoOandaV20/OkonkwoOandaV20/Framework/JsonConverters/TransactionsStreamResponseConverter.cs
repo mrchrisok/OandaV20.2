@@ -2,11 +2,8 @@
 using Newtonsoft.Json.Linq;
 using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.REST;
-using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
-using System.Linq;
-using System.Reflection;
 
 namespace OkonkwoOandaV20.Framework.JsonConverters
 {
@@ -14,7 +11,7 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
    {
 	  public override bool CanConvert(Type objectType)
 	  {
-		 bool canConvert = objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IStreamResponse));
+		 bool canConvert = objectType == typeof(TransactionsStreamResponse);
 		 return canConvert;
 	  }
 
@@ -24,7 +21,11 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
 
 		 var jsonToken = JToken.Load(reader);
 
-		 if (jsonToken.Type == JTokenType.Object)
+		 if (jsonToken.Type == JTokenType.Null)
+		 {
+			return null;
+		 }
+		 else if (jsonToken.Type == JTokenType.Object)
 		 {
 			bool isHeartbeat = jsonToken["type"].Value<string>() == "HEARTBEAT";
 

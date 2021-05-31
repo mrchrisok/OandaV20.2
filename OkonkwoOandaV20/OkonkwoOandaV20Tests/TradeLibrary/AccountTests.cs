@@ -12,7 +12,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 	  {
 		 var accountsRetrieved = Results.Items.FirstOrDefault(x => x.Key == "01.0").Value;
 
-		 Assert.IsTrue(accountsRetrieved.Success, accountsRetrieved.Success.ToString() + ": " + accountsRetrieved.Details);
+		 Assert.IsTrue(accountsRetrieved.Success, $"{accountsRetrieved.Success}: {accountsRetrieved.Details}");
 	  }
 
 	  [TestMethod]
@@ -21,7 +21,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 string key = "01.1";
 		 var result = Results.Items.FirstOrDefault(x => x.Key == key).Value;
 
-		 Assert.IsTrue(result.Success, result.Success.ToString() + ": " + result.Details);
+		 Assert.IsTrue(result.Success, $"{result.Success}: {result.Details}");
 	  }
 
 	  [TestMethod]
@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var results = Results.Items.Where(x => x.Key.StartsWith(key) && x.Key != "01.0" && x.Key != "01.1");
 		 var failure = results.FirstOrDefault(x => x.Value.Success == false);
 
-		 string message = failure.Key != null ? failure.Value.Success.ToString() + ": " + failure.Value.Details : "";
+		 string message = failure.Key != null ? $"{failure.Value.Success}: {failure.Value.Details}" : "";
 
 		 Assert.IsTrue(failure.Key == null, failure.Key + ": " + message);
 	  }
@@ -71,9 +71,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var instrumentTypeCorrect = Results.Items.FirstOrDefault(x => x.Key == "03.1").Value;
 		 var instrumentNameCorrect = Results.Items.FirstOrDefault(x => x.Key == "03.2").Value;
 
-		 Assert.IsTrue(instrumentReceived.Success, instrumentReceived.Success.ToString() + ": " + instrumentReceived.Details);
-		 Assert.IsTrue(instrumentTypeCorrect.Success, instrumentTypeCorrect.Success.ToString() + ": " + instrumentTypeCorrect.Details);
-		 Assert.IsTrue(instrumentNameCorrect.Success, instrumentNameCorrect.Success.ToString() + ": " + instrumentNameCorrect.Details);
+		 Assert.IsTrue(instrumentReceived.Success, $"{instrumentReceived.Success}: {instrumentReceived.Details}");
+		 Assert.IsTrue(instrumentTypeCorrect.Success, $"{instrumentTypeCorrect.Success}: {instrumentTypeCorrect.Details}");
+		 Assert.IsTrue(instrumentNameCorrect.Success, $"{instrumentNameCorrect.Success}: {instrumentNameCorrect.Details}");
 	  }
 
 	  [TestMethod]
@@ -84,9 +84,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var accountIdIsCorrect = Results.Items.FirstOrDefault(x => x.Key == "04.1").Value;
 		 var currencyIsCorrect = Results.Items.FirstOrDefault(x => x.Key == "04.2").Value;
 
-		 Assert.IsTrue(summaryRetrieved.Success, summaryRetrieved.Success.ToString() + ": " + summaryRetrieved.Details);
-		 Assert.IsTrue(accountIdIsCorrect.Success, accountIdIsCorrect.Success.ToString() + ": " + accountIdIsCorrect.Details);
-		 Assert.IsTrue(currencyIsCorrect.Success, currencyIsCorrect.Success.ToString() + ": " + currencyIsCorrect.Details);
+		 Assert.IsTrue(summaryRetrieved.Success, $"{summaryRetrieved.Success}: {summaryRetrieved.Details}");
+		 Assert.IsTrue(accountIdIsCorrect.Success, $"{accountIdIsCorrect.Success}: {accountIdIsCorrect.Details}");
+		 Assert.IsTrue(currencyIsCorrect.Success, $"{currencyIsCorrect.Success}: {currencyIsCorrect.Details}");
 	  }
 
 	  [TestMethod]
@@ -99,11 +99,11 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var aliasReverted = Results.Items.FirstOrDefault(x => x.Key == "05.3").Value;
 		 var marginRateReverted = Results.Items.FirstOrDefault(x => x.Key == "05.4").Value;
 
-		 Assert.IsTrue(configRetrieved.Success, configRetrieved.Success.ToString() + ": " + configRetrieved.Details);
-		 Assert.IsTrue(aliasChanged.Success, aliasChanged.Success.ToString() + ": " + aliasChanged.Details);
-		 Assert.IsTrue(marginRateChanged.Success, marginRateChanged.Success.ToString() + ": " + marginRateChanged.Details);
-		 Assert.IsTrue(aliasReverted.Success, aliasReverted.Success.ToString() + ": " + aliasReverted.Details);
-		 Assert.IsTrue(marginRateReverted.Success, marginRateReverted.Success.ToString() + ": " + marginRateReverted.Details);
+		 Assert.IsTrue(configRetrieved.Success, $"{configRetrieved.Success}: {configRetrieved.Details}");
+		 Assert.IsTrue(aliasChanged.Success, $"{aliasChanged.Success}: {aliasChanged.Details}");
+		 Assert.IsTrue(marginRateChanged.Success, $"{marginRateChanged.Success}: {marginRateChanged.Details}");
+		 Assert.IsTrue(aliasReverted.Success, $"{aliasReverted.Success}: {aliasReverted.Details}");
+		 Assert.IsTrue(marginRateReverted.Success, $"{marginRateReverted.Success}: {marginRateReverted.Details}");
 	  }
 
 	  [TestMethod]
@@ -116,12 +116,12 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var positionsReceived = Results.Items.FirstOrDefault(x => x.Key == "17.4").Value;
 		 var accountHasMargin = Results.Items.FirstOrDefault(x => x.Key == "17.5").Value;
 
-		 Assert.IsTrue(changesRetrieved.Success, changesRetrieved.Success.ToString() + ": " + changesRetrieved.Details);
-		 Assert.IsTrue(ordersFilledReceived.Success, ordersFilledReceived.Success.ToString() + ": " + ordersFilledReceived.Details);
-		 Assert.IsTrue(ordersCancelledReceived.Success, ordersCancelledReceived.Success.ToString() + ": " + ordersCancelledReceived.Details);
-		 Assert.IsTrue(tradesClosedReceived.Success, tradesClosedReceived.Success.ToString() + ": " + tradesClosedReceived.Details);
-		 Assert.IsTrue(positionsReceived.Success, positionsReceived.Success.ToString() + ": " + positionsReceived.Details);
-		 Assert.IsTrue(accountHasMargin.Success, accountHasMargin.Success.ToString() + ": " + accountHasMargin.Details);
+		 Assert.IsTrue(changesRetrieved.Success, $"{changesRetrieved.Success}: {changesRetrieved.Details}");
+		 Assert.IsTrue(ordersFilledReceived.Success, $"{ordersFilledReceived.Success}: {ordersFilledReceived.Details}");
+		 Assert.IsTrue(ordersCancelledReceived.Success, $"{ordersCancelledReceived.Success}: {ordersCancelledReceived.Details}");
+		 Assert.IsTrue(tradesClosedReceived.Success, $"{tradesClosedReceived.Success}: {tradesClosedReceived.Details}");
+		 Assert.IsTrue(positionsReceived.Success, $"{positionsReceived.Success}: {positionsReceived.Details}");
+		 Assert.IsTrue(accountHasMargin.Success, $"{accountHasMargin.Success}: {accountHasMargin.Details}");
 	  }
 
 	  [TestMethod]
@@ -129,7 +129,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 	  {
 		 var caughtAccountConfigurationError = Results.Items.FirstOrDefault(x => x.Key == "05.E0").Value;
 
-		 Assert.IsTrue(caughtAccountConfigurationError.Success, caughtAccountConfigurationError.Success.ToString() + ": " + caughtAccountConfigurationError.Details);
+		 Assert.IsTrue(caughtAccountConfigurationError.Success, $"{caughtAccountConfigurationError.Success}: {caughtAccountConfigurationError.Details}");
 	  }
 
 	  #endregion

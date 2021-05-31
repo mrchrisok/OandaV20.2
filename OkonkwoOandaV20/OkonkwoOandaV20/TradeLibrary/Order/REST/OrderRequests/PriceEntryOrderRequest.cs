@@ -1,4 +1,5 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Order;
+using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequests
 {
@@ -18,7 +19,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequests
 	  /// The date/time when the MarketIfTouched Order will be cancelled if its
 	  /// timeInForce is “GTD”.
 	  /// </summary>
-	  public string gtdTime { get; set; }
+	  public DateTime? gtdTime { get; set; }
 
 	  /// <summary>
 	  /// Specification of which price component should be used when determining if

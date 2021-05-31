@@ -14,8 +14,8 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var marketOrderCreated = Results.Items.FirstOrDefault(x => x.Key == "13.0").Value;
 		 var marketOrderFilled = Results.Items.FirstOrDefault(x => x.Key == "13.1").Value;
 
-		 Assert.IsTrue(marketOrderCreated.Success, marketOrderCreated.Success.ToString() + ": " + marketOrderCreated.Details);
-		 Assert.IsTrue(marketOrderFilled.Success, marketOrderFilled.Success.ToString() + ": " + marketOrderFilled.Details);
+		 Assert.IsTrue(marketOrderCreated.Success, $"{marketOrderCreated.Success}: {marketOrderCreated.Details}");
+		 Assert.IsTrue(marketOrderFilled.Success, $"{marketOrderFilled.Success}: {marketOrderFilled.Details}");
 	  }
 
 	  [TestMethod]
@@ -24,8 +24,8 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var allTradesRetrieved = Results.Items.FirstOrDefault(x => x.Key == "13.2").Value;
 		 var openTradesRetrieved = Results.Items.FirstOrDefault(x => x.Key == "13.3").Value;
 
-		 Assert.IsTrue(allTradesRetrieved.Success, allTradesRetrieved.Success.ToString() + ": " + allTradesRetrieved.Details);
-		 Assert.IsTrue(openTradesRetrieved.Success, openTradesRetrieved.Success.ToString() + ": " + openTradesRetrieved.Details);
+		 Assert.IsTrue(allTradesRetrieved.Success, $"{allTradesRetrieved.Success}: {allTradesRetrieved.Details}");
+		 Assert.IsTrue(openTradesRetrieved.Success, $"{openTradesRetrieved.Success}: {openTradesRetrieved.Details}");
 	  }
 
 	  [TestMethod]
@@ -33,7 +33,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 	  {
 		 var detailsRetrieved = Results.Items.FirstOrDefault(x => x.Key == "13.4").Value;
 
-		 Assert.IsTrue(detailsRetrieved.Success, detailsRetrieved.Success.ToString() + ": " + detailsRetrieved.Details);
+		 Assert.IsTrue(detailsRetrieved.Success, $"{detailsRetrieved.Success}: {detailsRetrieved.Details}");
 	  }
 
 	  [TestMethod]
@@ -43,9 +43,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var extensionsTradeCorrect = Results.Items.FirstOrDefault(x => x.Key == "13.6").Value;
 		 var tradeExtensionCommentCorrect = Results.Items.FirstOrDefault(x => x.Key == "13.7").Value;
 
-		 Assert.IsTrue(extensionsUpdated.Success, extensionsUpdated.Success.ToString() + ": " + extensionsUpdated.Details);
-		 Assert.IsTrue(extensionsTradeCorrect.Success, extensionsTradeCorrect.Success.ToString() + ": " + extensionsTradeCorrect.Details);
-		 Assert.IsTrue(tradeExtensionCommentCorrect.Success, tradeExtensionCommentCorrect.Success.ToString() + ": " + tradeExtensionCommentCorrect.Details);
+		 Assert.IsTrue(extensionsUpdated.Success, $"{extensionsUpdated.Success}: {extensionsUpdated.Details}");
+		 Assert.IsTrue(extensionsTradeCorrect.Success, $"{extensionsTradeCorrect.Success}: {extensionsTradeCorrect.Details}");
+		 Assert.IsTrue(tradeExtensionCommentCorrect.Success, $"{tradeExtensionCommentCorrect.Success}: {tradeExtensionCommentCorrect.Details}");
 	  }
 
 	  [TestMethod]
@@ -62,15 +62,15 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var stopLossCancelled = Results.Items.FirstOrDefault(x => x.Key == "13.15").Value;
 		 var trailingStopLossCancelled = Results.Items.FirstOrDefault(x => x.Key == "13.16").Value;
 
-		 Assert.IsTrue(takeProfitPatched.Success, takeProfitPatched.Success.ToString() + ": " + takeProfitPatched.Details);
+		 Assert.IsTrue(takeProfitPatched.Success, $"{takeProfitPatched.Success}: {takeProfitPatched.Details}");
 		 Assert.IsTrue(takeProfitPriceCorrect.Success, $"13.9,{takeProfitPriceCorrect.Success}: {takeProfitPriceCorrect.Details}");
-		 Assert.IsTrue(stopLossPatched.Success, stopLossPatched.Success.ToString() + ": " + stopLossPatched.Details);
-		 Assert.IsTrue(stopLossPriceCorrect.Success, stopLossPriceCorrect.Success.ToString() + ": " + stopLossPriceCorrect.Details);
-		 Assert.IsTrue(trailingStopLossPatched.Success, trailingStopLossPatched.Success.ToString() + ": " + trailingStopLossPatched.Details);
-		 Assert.IsTrue(trailingStopLossDistanceCorrect.Success, trailingStopLossDistanceCorrect.Success.ToString() + ": " + trailingStopLossDistanceCorrect.Details);
-		 Assert.IsTrue(takeProfitCancelled.Success, takeProfitCancelled.Success.ToString() + ": " + takeProfitCancelled.Details);
-		 Assert.IsTrue(stopLossCancelled.Success, stopLossCancelled.Success.ToString() + ": " + stopLossCancelled.Details);
-		 Assert.IsTrue(trailingStopLossCancelled.Success, trailingStopLossCancelled.Success.ToString() + ": " + trailingStopLossCancelled.Details);
+		 Assert.IsTrue(stopLossPatched.Success, $"{stopLossPatched.Success}: {stopLossPatched.Details}");
+		 Assert.IsTrue(stopLossPriceCorrect.Success, $"{stopLossPriceCorrect.Success}: {stopLossPriceCorrect.Details}");
+		 Assert.IsTrue(trailingStopLossPatched.Success, $"{trailingStopLossPatched.Success}: {trailingStopLossPatched.Details}");
+		 Assert.IsTrue(trailingStopLossDistanceCorrect.Success, $"{trailingStopLossDistanceCorrect.Success}: {trailingStopLossDistanceCorrect.Details}");
+		 Assert.IsTrue(takeProfitCancelled.Success, $"{takeProfitCancelled.Success}: {takeProfitCancelled.Details}");
+		 Assert.IsTrue(stopLossCancelled.Success, $"{stopLossCancelled.Success}: {stopLossCancelled.Details}");
+		 Assert.IsTrue(trailingStopLossCancelled.Success, $"{trailingStopLossCancelled.Success}: {trailingStopLossCancelled.Details}");
 	  }
 
 	  [TestMethod]
@@ -82,11 +82,11 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var tradeCloseUnitsCorrect = Results.Items.FirstOrDefault(x => x.Key == "13.20").Value;
 		 var tradeCloseHasPrice = Results.Items.FirstOrDefault(x => x.Key == "13.21").Value;
 
-		 Assert.IsTrue(tradeClosed.Success, tradeClosed.Success.ToString() + ": " + tradeClosed.Details);
-		 Assert.IsTrue(tradeCloseHasTime.Success, tradeCloseHasTime.Success.ToString() + ": " + tradeCloseHasTime.Details);
-		 Assert.IsTrue(tradeCloseHasInstrument.Success, tradeCloseHasInstrument.Success.ToString() + ": " + tradeCloseHasInstrument.Details);
-		 Assert.IsTrue(tradeCloseUnitsCorrect.Success, tradeCloseUnitsCorrect.Success.ToString() + ": " + tradeCloseUnitsCorrect.Details);
-		 Assert.IsTrue(tradeCloseHasPrice.Success, tradeCloseHasPrice.Success.ToString() + ": " + tradeCloseHasPrice.Details);
+		 Assert.IsTrue(tradeClosed.Success, $"{tradeClosed.Success}: {tradeClosed.Details}");
+		 Assert.IsTrue(tradeCloseHasTime.Success, $"{tradeCloseHasTime.Success}: {tradeCloseHasTime.Details}");
+		 Assert.IsTrue(tradeCloseHasInstrument.Success, $"{tradeCloseHasInstrument.Success}: {tradeCloseHasInstrument.Details}");
+		 Assert.IsTrue(tradeCloseUnitsCorrect.Success, $"{tradeCloseUnitsCorrect.Success}: {tradeCloseUnitsCorrect.Details}");
+		 Assert.IsTrue(tradeCloseHasPrice.Success, $"{tradeCloseHasPrice.Success}: {tradeCloseHasPrice.Details}");
 	  }
 
 	  [TestMethod]
@@ -96,9 +96,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var caughtTradePatchExitOrdersError = Results.Items.FirstOrDefault(x => x.Key == "13.E1").Value;
 		 var caughtTradeCloseError = Results.Items.FirstOrDefault(x => x.Key == "13.E2").Value;
 
-		 Assert.IsTrue(caughtTradeClientExtensionsModifyError.Success, caughtTradeClientExtensionsModifyError.Success.ToString() + ": " + caughtTradeClientExtensionsModifyError.Details);
-		 Assert.IsTrue(caughtTradePatchExitOrdersError.Success, caughtTradePatchExitOrdersError.Success.ToString() + ": " + caughtTradePatchExitOrdersError.Details);
-		 Assert.IsTrue(caughtTradeCloseError.Success, caughtTradeCloseError.Success.ToString() + ": " + caughtTradeCloseError.Details);
+		 Assert.IsTrue(caughtTradeClientExtensionsModifyError.Success, $"{caughtTradeClientExtensionsModifyError.Success}: {caughtTradeClientExtensionsModifyError.Details}");
+		 Assert.IsTrue(caughtTradePatchExitOrdersError.Success, $"{caughtTradePatchExitOrdersError.Success}: {caughtTradePatchExitOrdersError.Details}");
+		 Assert.IsTrue(caughtTradeCloseError.Success, $"{caughtTradeCloseError.Success}: {caughtTradeCloseError.Details}");
 	  }
 
 	  #endregion

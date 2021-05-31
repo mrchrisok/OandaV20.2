@@ -18,7 +18,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequests
 		 priceInformation = new PriceInformation()
 		 {
 			instrument = oandaInstrument,
-			priceProperties = new List<string>() { "price", "priceBound" }
+			priceProperties = new List<string>() { nameof(price), nameof(priceBound) },
+			unitsProperties = new List<string>() { nameof(units) }
 		 };
 	  }
 

@@ -1,4 +1,6 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.Account
+﻿using System;
+
+namespace OkonkwoOandaV20.TradeLibrary.Account
 {
    /// <summary>
    /// http://developer.oanda.com/rest-live-v20/account-df/#AccountSummary
@@ -33,7 +35,7 @@
 	  /// <summary>
 	  /// The date/time when the Account was created.
 	  /// </summary>
-	  public string createdTime { get; set; }
+	  public DateTime createdTime { get; set; }
 
 	  /// <summary>
 	  /// The current guaranteed Stop Loss Order mode of the Account.
@@ -53,7 +55,7 @@
 	  /// <summary>
 	  /// The date/time that the Account’s resettablePL was last reset.
 	  /// </summary>
-	  public string resettablePLTime { get; set; }
+	  public DateTime? resettablePLTime { get; set; }
 
 	  /// <summary>
 	  /// The total amount of financing paid/collected over the lifetime of the Account.
@@ -82,7 +84,7 @@
 	  /// The date/time when the Account entered a margin call state. Only provided
 	  /// if the Account is in a margin call.
 	  /// </summary>
-	  public string marginCallEnterTime { get; set; }
+	  public DateTime? marginCallEnterTime { get; set; }
 
 	  /// <summary>
 	  /// The number of times that the Account’s current margin call was extended.
@@ -92,7 +94,7 @@
 	  /// <summary>
 	  /// The date/time of the Account’s last margin call extension.
 	  /// </summary>
-	  public string lastMarginCallExtensionTime { get; set; }
+	  public DateTime? lastMarginCallExtensionTime { get; set; }
 
 	  /// <summary>
 	  /// The number of Trades currently open in the Account.

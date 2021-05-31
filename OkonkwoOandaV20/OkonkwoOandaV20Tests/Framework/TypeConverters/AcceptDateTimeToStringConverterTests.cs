@@ -87,11 +87,11 @@ namespace OkonkwoOandaV20Tests.Framework.TypeConverters
 
 		 // assert
 		 Assert.IsTrue(convertedToCorrectFormat);
-		 Assert.AreEqual(testDateTime.Date, restoredTestDateTime.Date);
-		 Assert.AreEqual(testDateTime.Hour, restoredTestDateTime.Hour);
-		 Assert.AreEqual(testDateTime.Minute, restoredTestDateTime.Minute);
-		 Assert.AreEqual(testDateTime.Second, restoredTestDateTime.Second);
-		 Assert.IsTrue(Math.Abs(testDateTime.Millisecond - restoredTestDateTime.Millisecond) <= 1);
+		 Assert.AreEqual(testDateTime.Date, restoredTestDateTime.Value.Date);
+		 Assert.AreEqual(testDateTime.Hour, restoredTestDateTime.Value.Hour);
+		 Assert.AreEqual(testDateTime.Minute, restoredTestDateTime.Value.Minute);
+		 Assert.AreEqual(testDateTime.Second, restoredTestDateTime.Value.Second);
+		 Assert.IsTrue(Math.Abs(testDateTime.Millisecond - restoredTestDateTime.Value.Millisecond) <= 1);
 	  }
    }
 }

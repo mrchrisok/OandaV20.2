@@ -15,8 +15,8 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var allPositionsRetrieved = Results.Items.FirstOrDefault(x => x.Key == "14.2").Value;
 		 var openPositionsRetrieved = Results.Items.FirstOrDefault(x => x.Key == "14.3").Value;
 
-		 Assert.IsTrue(allPositionsRetrieved.Success, allPositionsRetrieved.Success.ToString() + ": " + allPositionsRetrieved.Details);
-		 Assert.IsTrue(openPositionsRetrieved.Success, openPositionsRetrieved.Success.ToString() + ": " + openPositionsRetrieved.Details);
+		 Assert.IsTrue(allPositionsRetrieved.Success, $"{allPositionsRetrieved.Success}: {allPositionsRetrieved.Details}");
+		 Assert.IsTrue(openPositionsRetrieved.Success, $"{openPositionsRetrieved.Success}: {openPositionsRetrieved.Details}");
 	  }
 
 	  [TestMethod]
@@ -27,10 +27,10 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var positionHasAvgPrice = Results.Items.FirstOrDefault(x => x.Key == "14.6").Value;
 		 var positionHasInstrument = Results.Items.FirstOrDefault(x => x.Key == "14.7").Value;
 
-		 Assert.IsTrue(postionHasDirection.Success, postionHasDirection.Success.ToString() + ": " + postionHasDirection.Details);
-		 Assert.IsTrue(positionHasUnits.Success, positionHasUnits.Success.ToString() + ": " + positionHasUnits.Details);
-		 Assert.IsTrue(positionHasAvgPrice.Success, positionHasAvgPrice.Success.ToString() + ": " + positionHasAvgPrice.Details);
-		 Assert.IsTrue(positionHasInstrument.Success, positionHasInstrument.Success.ToString() + ": " + positionHasInstrument.Details);
+		 Assert.IsTrue(postionHasDirection.Success, $"{postionHasDirection.Success}: {postionHasDirection.Details}");
+		 Assert.IsTrue(positionHasUnits.Success, $"{positionHasUnits.Success}: {positionHasUnits.Details}");
+		 Assert.IsTrue(positionHasAvgPrice.Success, $"{positionHasAvgPrice.Success}: {positionHasAvgPrice.Details}");
+		 Assert.IsTrue(positionHasInstrument.Success, $"{positionHasInstrument.Success}: {positionHasInstrument.Details}");
 	  }
 
 	  [TestMethod]
@@ -41,10 +41,10 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var positionHasAvgPrice = Results.Items.FirstOrDefault(x => x.Key == "14.10").Value;
 		 var positionHasInstrument = Results.Items.FirstOrDefault(x => x.Key == "14.11").Value;
 
-		 Assert.IsTrue(postionHasDirection.Success, postionHasDirection.Success.ToString() + ": " + postionHasDirection.Details);
+		 Assert.IsTrue(postionHasDirection.Success, $"{postionHasDirection.Success}: {postionHasDirection.Details}");
 		 Assert.IsTrue(positionHasUnits.Success, $"14.9,{positionHasUnits.Success}: {positionHasUnits.Details}");
-		 Assert.IsTrue(positionHasAvgPrice.Success, positionHasAvgPrice.Success.ToString() + ": " + positionHasAvgPrice.Details);
-		 Assert.IsTrue(positionHasInstrument.Success, positionHasInstrument.Success.ToString() + ": " + positionHasInstrument.Details);
+		 Assert.IsTrue(positionHasAvgPrice.Success, $"{positionHasAvgPrice.Success}: {positionHasAvgPrice.Details}");
+		 Assert.IsTrue(positionHasInstrument.Success, $"{positionHasInstrument.Success}: {positionHasInstrument.Details}");
 	  }
 
 	  [TestMethod]
@@ -54,9 +54,9 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 		 var closeOrderFilled = Results.Items.FirstOrDefault(x => x.Key == "14.13").Value;
 		 var closeUnitsCorrect = Results.Items.FirstOrDefault(x => x.Key == "14.14").Value;
 
-		 Assert.IsTrue(closeOrderCreated.Success, closeOrderCreated.Success.ToString() + ": " + closeOrderCreated.Details);
-		 Assert.IsTrue(closeOrderFilled.Success, closeOrderFilled.Success.ToString() + ": " + closeOrderFilled.Details);
-		 Assert.IsTrue(closeUnitsCorrect.Success, closeUnitsCorrect.Success.ToString() + ": " + closeUnitsCorrect.Details);
+		 Assert.IsTrue(closeOrderCreated.Success, $"{closeOrderCreated.Success}: {closeOrderCreated.Details}");
+		 Assert.IsTrue(closeOrderFilled.Success, $"{closeOrderFilled.Success}: {closeOrderFilled.Details}");
+		 Assert.IsTrue(closeUnitsCorrect.Success, $"{closeUnitsCorrect.Success}: {closeUnitsCorrect.Details}");
 	  }
 
 	  [TestMethod]
@@ -64,7 +64,7 @@ namespace OkonkwoOandaV20Tests.TradeLibrary
 	  {
 		 var caughtPositionCloseError = Results.Items.FirstOrDefault(x => x.Key == "14.E0").Value;
 
-		 Assert.IsTrue(caughtPositionCloseError.Success, caughtPositionCloseError.Success.ToString() + ": " + caughtPositionCloseError.Details);
+		 Assert.IsTrue(caughtPositionCloseError.Success, $"{caughtPositionCloseError.Success}: {caughtPositionCloseError.Details}");
 	  }
 
 	  #endregion

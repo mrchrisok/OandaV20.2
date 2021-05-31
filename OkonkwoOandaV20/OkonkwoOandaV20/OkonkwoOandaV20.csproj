@@ -64,7 +64,7 @@
     <Compile Include="Framework\JsonConverters\AbstractJsonConverter.cs" />
     <Compile Include="Framework\JsonConverters\PriceObjectConverter.cs" />
     <Compile Include="Framework\JsonConverters\OrderConverter.cs" />
-    <Compile Include="Framework\JsonConverters\PricingStreamrResponseConverter.cs" />
+    <Compile Include="Framework\JsonConverters\PricingStreamResponseConverter.cs" />
     <Compile Include="Framework\JsonConverters\AcceptDateTimeConverter.cs" />
     <Compile Include="Framework\JsonConverters\StringDecimalConverter.cs" />
     <Compile Include="Framework\JsonConverters\TransactionConverter.cs" />
@@ -109,6 +109,7 @@
     <Compile Include="TradeLibrary\Order\LimitOrder.cs" />
     <Compile Include="TradeLibrary\Order\MarketIfTouchedOrder.cs" />
     <Compile Include="TradeLibrary\Order\MarketOrder.cs" />
+    <Compile Include="TradeLibrary\Order\IOrder.cs" />
     <Compile Include="TradeLibrary\Order\Order.cs" />
     <Compile Include="TradeLibrary\Order\PriceEntryOrder.cs" />
     <Compile Include="TradeLibrary\Order\REST\GetOrder.cs" />

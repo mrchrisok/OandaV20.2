@@ -4,6 +4,8 @@ using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.Order;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace OkonkwoOandaV20.Framework.JsonConverters
 {
@@ -11,14 +13,19 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
    {
 	  public override bool CanConvert(Type objectType)
 	  {
-		 return objectType == typeof(IOrder);
+		 return objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IEnumerable<IOrder>))
+			|| objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IOrder));
 	  }
 
 	  public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 	  {
 		 var jsonToken = JToken.Load(reader);
 
-		 if (jsonToken.Type == JTokenType.Array)
+		 if (jsonToken.Type == JTokenType.Null)
+		 {
+			return null;
+		 }
+		 else if (jsonToken.Type == JTokenType.Array)
 		 {
 			var orders = new List<IOrder>();
 

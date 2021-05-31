@@ -1,4 +1,6 @@
-﻿namespace OkonkwoOandaV20.TradeLibrary.Transaction
+﻿using System;
+
+namespace OkonkwoOandaV20.TradeLibrary.Transaction
 {
    /// <summary>
    /// The base specification for trade/position Exit Orders. Exit orders reduce or close open trades/positions.
@@ -25,7 +27,7 @@
       /// <summary>
       /// The date/time when the Order will be cancelled if its timeInForce is “GTD”.
       /// </summary>
-      public string gtdTime { get; set; }
+      public DateTime? gtdTime { get; set; }
 
       /// <summary>
       /// Specification of which price component should be used when determining if an Order should be triggered and filled. 

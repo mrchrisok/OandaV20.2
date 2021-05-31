@@ -1,5 +1,6 @@
 ﻿using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -68,13 +69,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 /// The start of the time range to fetch candlesticks for.
 		 /// </summary>
 		 [Query]
-		 public string from { get; set; }
+		 public DateTime? from { get; set; }
 
 		 /// <summary>
 		 /// The end of the time range to fetch candlesticks for.
 		 /// </summary>
 		 [Query]
-		 public string to { get; set; }
+		 public DateTime? to { get; set; }
 
 		 /// <summary>
 		 /// A flag that controls whether the candlestick is “smoothed” or not. A smoothed 
