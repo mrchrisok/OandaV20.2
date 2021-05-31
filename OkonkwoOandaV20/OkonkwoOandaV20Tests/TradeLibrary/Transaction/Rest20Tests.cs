@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
-namespace OkonkwoOandaV20Tests.TradeLibrary
+namespace OkonkwoOandaV20Tests.TradeLibrary.Transaction
 {
    [TestClass]
-   public class TransactionTests : Rest20TestsBase
+   public class Rest20Tests : Rest20TestsBase
    {
 	  #region Transaction
 

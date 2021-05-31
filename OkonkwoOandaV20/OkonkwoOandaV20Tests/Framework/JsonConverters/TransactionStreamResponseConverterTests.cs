@@ -1,0 +1,132 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.Framework.JsonConverters;
+using OkonkwoOandaV20.TradeLibrary.REST;
+using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace OkonkwoOandaV20Tests.Framework.JsonConverters
+{
+   [TestClass]
+   public class TransactionStreamResponseConverterTests
+   {
+	  [TestMethod]
+	  public void method_CanConvert_type_IStreamResponse_success()
+	  {
+		 // arrange
+		 var converter = new TransactionsStreamResponseConverter();
+		 var iStreamResponseTypes = typeof(IStreamResponse).Assembly.DefinedTypes
+			.Where(type => type.ImplementedInterfaces.Contains(typeof(IStreamResponse)));
+		 var cannotConvertTypeList = new List<string>();
+
+		 // act
+		 foreach (var type in iStreamResponseTypes)
+		 {
+			if (!converter.CanConvert(type))
+			{
+			   cannotConvertTypeList.Add(type.FullName);
+			}
+		 }
+		 var cannotConvertTypeNames = Utilities.ConvertListToDelimitedValues(cannotConvertTypeList);
+
+		 // assert
+		 Assert.IsTrue(cannotConvertTypeList.Count == 0, $"Cannot convert types: {cannotConvertTypeNames}");
+	  }
+
+	  [TestMethod]
+	  public void method_ReadJson_hydrates_ITransaction_object_success()
+	  {
+		 // arrange
+		 var transaction = new LimitOrderTransaction()
+		 {
+			id = 1,
+			//type = TransactionType.LimitOrder,
+			time = DateTime.UtcNow,
+			userID = 123,
+			accountID = "fakeAccountID",
+			batchID = 123,
+			requestID = "fakeRequestID",
+			//
+			instrument = "EUR_USD",
+			price = (decimal)125.25,
+			timeInForce = "GTD",
+			triggerCondition = "DEFAULT"
+		 };
+		 var heartbeat = new TransactionsHeartbeat()
+		 {
+			type = "HEARTBEAT",
+			lastTransactionID = 123,
+			time = DateTime.UtcNow
+		 };
+
+		 var jsonTransaction = JsonConvert.SerializeObject(transaction);
+		 var textReader = new System.IO.StringReader(jsonTransaction);
+
+		 var reader = new JsonTextReader(textReader);
+		 var objectType = typeof(LimitOrderTransaction);
+		 object existingValue = null;
+		 var serializer = new JsonSerializer();
+		 var converter = new TransactionsStreamResponseConverter();
+
+		 //act
+		 var readJsonResult = converter.ReadJson(reader, objectType, existingValue, serializer);
+
+		 //assert
+		 if (readJsonResult is TransactionsStreamResponse transactionResponse)
+		 {
+			Assert.IsFalse(transactionResponse.IsHeartbeat());
+			Assert.AreEqual(transaction.id, transactionResponse.transaction.id);
+			Assert.AreEqual(transaction.type, transactionResponse.transaction.type);
+			Assert.AreEqual(transaction.time, transactionResponse.transaction.time);
+			Assert.AreEqual(transaction.userID, transactionResponse.transaction.userID);
+			Assert.AreEqual(transaction.accountID, transactionResponse.transaction.accountID);
+			Assert.AreEqual(transaction.batchID, transactionResponse.transaction.batchID);
+			Assert.AreEqual(transaction.requestID, transactionResponse.transaction.requestID);
+		 }
+		 else
+		 {
+			Assert.Fail($"ReadJson result type '{readJsonResult.GetType().FullName}' is incorrect.");
+		 }
+	  }
+
+	  [TestMethod]
+	  public void method_ReadJson_hydrates_Hearbeat_object_success()
+	  {
+		 // arrange
+		 var heartbeat = new TransactionsHeartbeat()
+		 {
+			type = "HEARTBEAT",
+			lastTransactionID = 123,
+			time = DateTime.UtcNow
+		 };
+
+		 var jsonHeartbeat = JsonConvert.SerializeObject(heartbeat);
+		 var textReader = new System.IO.StringReader(jsonHeartbeat);
+
+		 var reader = new JsonTextReader(textReader);
+		 var objectType = typeof(LimitOrderTransaction);
+		 object existingValue = null;
+		 var serializer = new JsonSerializer();
+		 var converter = new TransactionsStreamResponseConverter();
+
+		 //act
+		 var readJsonResult = converter.ReadJson(reader, objectType, existingValue, serializer);
+
+		 //assert
+		 if (readJsonResult is TransactionsStreamResponse transactionResponse)
+		 {
+			Assert.IsTrue(transactionResponse.IsHeartbeat());
+			Assert.AreEqual(heartbeat.type, transactionResponse.heartbeat.type);
+			Assert.AreEqual(heartbeat.time, transactionResponse.heartbeat.time);
+		 }
+		 else
+		 {
+			Assert.Fail($"ReadJson result type '{readJsonResult.GetType().FullName}' is incorrect.");
+		 }
+	  }
+   }
+}
