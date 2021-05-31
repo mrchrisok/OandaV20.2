@@ -1,6 +1,7 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.REST;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -37,7 +38,8 @@ namespace OkonkwoOandaV20.Framework
 	  /// <summary>
 	  /// 
 	  /// </summary>
-	  private const string RFC3339Format = "yyyy-MM-ddTHH:mm:ss.fffffffZ";
+	  private const string DefaultRFC3339Format = "yyyy-MM-ddTHH:mm:ss.fffffffZ";
+	  private const string OandaRFC3339Format = "yyyy-MM-ddTHH:mm:ss.fffffffffZ";
 
 	  /// <summary>
 	  /// Convert DateTime (UTC only) object to a string of the indicated format.
@@ -54,7 +56,7 @@ namespace OkonkwoOandaV20.Framework
 
 		 if (format == AcceptDatetimeFormat.RFC3339)
 		 {
-			return XmlConvert.ToString(time, RFC3339Format);
+			return XmlConvert.ToString(time, DefaultRFC3339Format);
 		 }
 		 else if (format == AcceptDatetimeFormat.Unix)
 		 {
@@ -66,23 +68,43 @@ namespace OkonkwoOandaV20.Framework
 
 	  /// <summary>
 	  /// Convert formatted time string to DateTime.
-	  /// The conversion is accurate within 1 milliSecond
+	  /// The conversion is accurate within 1 milliSecond.
+	  /// Null will be returned if the time parameter is not convertible to a time.
 	  /// </summary>
 	  /// <param name="time">A formatted time string</param>
 	  /// <param name="format">Format type (RFC3339 or UNIX only)</param>
-	  /// <returns>A DateTime object. Utc only.</returns>
-	  public static DateTime ConvertAcceptDateFormatDateToDateTimeUtc(string time, AcceptDatetimeFormat format = AcceptDatetimeFormat.RFC3339)
+	  /// <returns>A DateTime object (Utc only) or null if the time.</returns>
+	  public static DateTime? ConvertAcceptDateFormatDateToDateTimeUtc(string time, AcceptDatetimeFormat format = AcceptDatetimeFormat.RFC3339)
 	  {
 		 if (format == AcceptDatetimeFormat.RFC3339)
 		 {
-			var dateTime = DateTime.ParseExact(time, RFC3339Format, null).ToUniversalTime();
-			return dateTime;
+			if (DateTime.TryParseExact(time, OandaRFC3339Format, null, DateTimeStyles.AssumeUniversal, out DateTime oandaDateTime))
+			{
+			   return oandaDateTime.ToUniversalTime();
+			}
+			if (DateTime.TryParseExact(time, DefaultRFC3339Format, null, DateTimeStyles.AssumeUniversal, out DateTime defaultDateTime))
+			{
+			   return defaultDateTime.ToUniversalTime();
+			}
+			if (DateTime.TryParse(time, out DateTime dateTime))
+			{
+			   return dateTime.ToUniversalTime();
+			}
+
+			return null;
 		 }
 		 else if (format == AcceptDatetimeFormat.Unix)
 		 {
-			var doubleTime = Convert.ToDouble(time);
-			var dateTime = new DateTime(1970, 1, 1).ToUniversalTime().Add(TimeSpan.FromSeconds(doubleTime));
-			return dateTime;
+			try
+			{
+			   var doubleTime = Convert.ToDouble(time);
+			   var dateTime = new DateTime(1970, 1, 1).ToUniversalTime().Add(TimeSpan.FromSeconds(doubleTime));
+			   return dateTime;
+			}
+			catch
+			{
+			   return null;
+			}
 		 }
 		 else
 			throw new ArgumentException($"The format parameter '{format}' is not supported.");
