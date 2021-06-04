@@ -1,6 +1,8 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.REST;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
+using System.Linq;
+using System.Reflection;
 
 namespace OkonkwoOandaV20.TradeLibrary.Order
 {
@@ -10,7 +12,18 @@ namespace OkonkwoOandaV20.TradeLibrary.Order
 	  /// The type of the Order.
 	  /// Valid values are specified in the OrderType class.
 	  /// </summary>
-	  public string type { get; set; }
+	  public virtual string type
+	  {
+		 get
+		 {
+			var thisTypeName = this.GetType().Name.Replace("Order", "");
+			var thisTransactionTypeField = _orderTypeFields.FirstOrDefault(constant => constant.Name == thisTypeName);
+			var thisTransactionType = thisTransactionTypeField?.GetRawConstantValue().ToString() ?? string.Empty;
+			return thisTransactionType;
+		 }
+	  }
+	  private static readonly FieldInfo[] _orderTypeFields =
+		 typeof(OrderType).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 
 	  /// <summary>
 	  /// The Order’s identifier, unique within the Order’s Account.

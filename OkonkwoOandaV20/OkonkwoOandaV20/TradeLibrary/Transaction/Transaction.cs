@@ -28,7 +28,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
 			return thisTransactionTypeName;
 		 }
 	  }
-	  private static FieldInfo[] _transactionTypeConstants = typeof(TransactionType).GetFields();
+	  private static readonly FieldInfo[] _transactionTypeConstants = typeof(TransactionType).GetFields();
 
 	  /// <summary>
 	  /// The date/time when the Transaction was created.
