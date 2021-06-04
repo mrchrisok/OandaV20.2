@@ -1,5 +1,8 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Order;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace OkonkwoOandaV20.Framework.Factories
 {
@@ -17,25 +20,25 @@ namespace OkonkwoOandaV20.Framework.Factories
 		 return orders;
 	  }
 
-	  public static IOrder Create(string type)
+	  private static readonly FieldInfo[] _orderTypeFields =
+		 typeof(OrderType).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+
+	  private static readonly IEnumerable<Type> _orderTypes =
+		 typeof(IOrder).Assembly.GetTypes().Where(type => type.GetInterfaces().Contains(typeof(IOrder)));
+
+	  /// <summary>
+	  /// Constructs an instance of an IOrder that matches the supplied type name.
+	  /// </summary>
+	  /// <param name="typeName">The type of the IOrder to construct.</param>
+	  /// <returns>An IOrder object or null.</returns>
+	  public static IOrder Create(string typeName)
 	  {
-		 IOrder order;
+		 var thisOrderTypeField = _orderTypeFields.FirstOrDefault(field => field.GetRawConstantValue().ToString() == typeName);
+		 var transactionTypeName = $"{thisOrderTypeField.Name}Order";
+		 var transactionType = _orderTypes.FirstOrDefault(type => type.Name == transactionTypeName);
+		 var typeInstance = Activator.CreateInstance(transactionType ?? typeof(Order));
 
-		 switch (type)
-		 {
-			case OrderType.Limit: order = new LimitOrder(); break;
-			case OrderType.Market: order = new MarketOrder(); break;
-			case OrderType.MarketIfTouched: order = new MarketIfTouchedOrder(); break;
-			case OrderType.Stop: order = new StopOrder(); break;
-			case OrderType.StopLoss: order = new StopLossOrder(); break;
-			case OrderType.TakeProfit: order = new TakeProfitOrder(); break;
-			case OrderType.TrailingStopLoss: order = new TrailingStopLossOrder(); break;
-			default: order = new Order(); break;
-		 }
-
-		 order.type = type;
-
-		 return order;
+		 return typeInstance as IOrder;
 	  }
    }
 }

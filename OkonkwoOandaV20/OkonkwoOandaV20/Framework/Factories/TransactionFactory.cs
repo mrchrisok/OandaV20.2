@@ -20,11 +20,16 @@ namespace OkonkwoOandaV20.Framework.Factories
 		 return transactions;
 	  }
 
-	  private static FieldInfo[] _transactionTypeFields = typeof(TransactionType).GetFields();
+	  private static readonly FieldInfo[] _transactionTypeFields = typeof(TransactionType).GetFields();
 
-	  private static IEnumerable<Type> _transactionTypes = typeof(ITransaction).Assembly.GetTypes()
+	  private static readonly IEnumerable<Type> _transactionTypes = typeof(ITransaction).Assembly.GetTypes()
 		 .Where(type => type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(ITransaction)));
 
+	  /// <summary>
+	  /// Constructs an instance of an ITransaction that matches the supplied type name.
+	  /// </summary>
+	  /// <param name="typeName">The type of the ITransaction to construct.</param>
+	  /// <returns>An ITransaction object or null.</returns>
 	  public static ITransaction Create(string typeName)
 	  {
 		 var thisTransactionTypeField = _transactionTypeFields.FirstOrDefault(field => field.GetRawConstantValue().ToString() == typeName);
