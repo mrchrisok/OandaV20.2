@@ -51,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OkonkwoOandaV20\OkonkwoOandaV20.csproj">
-      <Project>{f99777ec-5a25-421c-bb14-f451511cbc48}</Project>
+      <Project>{87A5A780-B46F-478D-8E24-B9D3F77CCBAF}</Project>
       <Name>OkonkwoOandaV20</Name>
     </ProjectReference>
   </ItemGroup>

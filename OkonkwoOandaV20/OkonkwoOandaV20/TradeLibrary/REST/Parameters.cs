@@ -45,11 +45,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  private object GetPropertyValue<P>(PropertyInfo propInfo, IList<ITypeConverter<string>> converters)
 		 where P : RequestAttribute
 	  {
-		 var converter = converters?.FirstOrDefault(converter => converter.CanConvert(propInfo.PropertyType));
+		 var typeConverter = converters?.FirstOrDefault(converter => converter.CanConvert(propInfo.PropertyType));
 
-		 if (converter != null)
+		 if (typeConverter != null)
 		 {
-			return converter.ToOutput(propInfo.GetValue(this));
+			return typeConverter.ToOutput(propInfo.GetValue(this));
 		 }
 
 		 return propInfo.GetCustomAttribute<P>().GetValue(propInfo.GetValue(this));

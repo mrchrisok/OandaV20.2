@@ -80,13 +80,13 @@
     <Compile Include="TradeLibrary\Rest20TestResult.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OkonkwoOandaV20\OkonkwoOandaV20.csproj">
-      <Project>{f99777ec-5a25-421c-bb14-f451511cbc48}</Project>
-      <Name>OkonkwoOandaV20</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\OkonkwoOandaV20\OkonkwoOandaV20.csproj">
+      <Project>{87A5A780-B46F-478D-8E24-B9D3F77CCBAF}</Project>
+      <Name>OkonkwoOandaV20</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
