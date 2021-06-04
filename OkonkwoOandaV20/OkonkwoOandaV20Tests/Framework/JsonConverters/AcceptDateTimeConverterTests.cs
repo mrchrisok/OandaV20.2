@@ -12,7 +12,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
    public class AcceptDateTimeConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_DateTime_success()
+	  public void success_CanConvert_type_DateTime()
 	  {
 		 //arrange
 		 var acceptDateTimeFormat = AcceptDatetimeFormat.RFC3339;
@@ -28,7 +28,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_WriteJson_writes_DateTime_success()
+	  public void success_WriteJson_writes_DateTime()
 	  {
 		 // arrange
 		 var stringBuilder = new StringBuilder();

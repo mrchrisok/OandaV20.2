@@ -11,7 +11,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
    public class TransactionStreamResponseConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_TransactionsStreamResponse_success()
+	  public void success_CanConvert_type_TransactionsStreamResponse()
 	  {
 		 // arrange
 		 var converter = new TransactionsStreamResponseConverter();
@@ -24,7 +24,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_ITransaction_object_success()
+	  public void success_ReadJson_hydrates_ITransaction_object()
 	  {
 		 // arrange
 		 var transaction = new LimitOrderTransaction()
@@ -80,7 +80,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_Hearbeat_object_success()
+	  public void success_ReadJson_hydrates_Hearbeat_object()
 	  {
 		 // arrange
 		 var heartbeat = new TransactionsHeartbeat()

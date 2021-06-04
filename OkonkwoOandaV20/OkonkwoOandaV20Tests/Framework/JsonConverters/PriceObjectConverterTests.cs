@@ -15,7 +15,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
    public class PriceObjectConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_IHasPrices_success()
+	  public void success_CanConvert_type_IHasPrices()
 	  {
 		 // arrange
 		 var converter = new PriceObjectConverter();
@@ -38,7 +38,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_IHasPrices_object_success()
+	  public void success_ReadJson_hydrates_IHasPrices_object()
 	  {
 		 // arrange
 		 var converter = new PriceObjectConverter();
@@ -82,7 +82,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_WriteJson_writes_IHasPrices_success()
+	  public void success_WriteJson_writes_IHasPrices()
 	  {
 		 // arrange
 		 var instrument = new Instrument()

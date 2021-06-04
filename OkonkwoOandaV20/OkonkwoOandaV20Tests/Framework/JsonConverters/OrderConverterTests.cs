@@ -13,7 +13,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
    public class OrderConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_IOrder_success()
+	  public void success_CanConvert_type_IOrder()
 	  {
 		 // arrange
 		 var converter = new OrderConverter();
@@ -39,14 +39,14 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_IOrder_object_success()
+	  public void success_ReadJson_hydrates_IOrder_object()
 	  {
 		 // arrange
 		 var converter = new OrderConverter();
 		 var order = new LimitOrder()
 		 {
 			id = 1,
-			type = OrderType.Limit,
+			//type = OrderType.Limit,
 			instrument = "EUR_USD",
 			price = (decimal)125.25,
 			units = (decimal)25.6,
@@ -83,14 +83,14 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_IOrder_list_success()
+	  public void success_ReadJson_hydrates_IOrder_list()
 	  {
 		 // arrange
 		 var converter = new OrderConverter();
 		 var order = new LimitOrder()
 		 {
 			id = 1,
-			type = OrderType.Limit,
+			//type = OrderType.Limit,
 			instrument = "EUR_USD",
 			price = (decimal)125.25,
 			units = (decimal)25.6,

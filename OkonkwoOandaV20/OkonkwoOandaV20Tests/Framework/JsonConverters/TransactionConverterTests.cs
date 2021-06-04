@@ -13,7 +13,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
    public class TransactionConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_ITransaction_success()
+	  public void success_CanConvert_type_ITransaction()
 	  {
 		 // arrange
 		 var limitOrderTansaction = new LimitOrderTransaction()
@@ -45,7 +45,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_ITransaction_object_success()
+	  public void success_ReadJson_hydrates_ITransaction_object()
 	  {
 		 // arrange
 		 var converter = new TransactionConverter();
@@ -100,7 +100,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_ITransaction_list_success()
+	  public void success_ReadJson_hydrates_ITransaction_list()
 	  {
 		 // arrange
 		 var converter = new TransactionConverter();

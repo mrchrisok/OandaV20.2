@@ -9,7 +9,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
    public class StringDecimalConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_decimal_success()
+	  public void success_CanConvert_type_decimal()
 	  {
 		 //arrange
 		 var converter = new StringDecimalConverter();
@@ -24,7 +24,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_WriteJson_writes_decmial_success()
+	  public void success_WriteJson_writes_decmial()
 	  {
 		 // arrange
 		 var stringBuilder = new StringBuilder();

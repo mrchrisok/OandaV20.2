@@ -11,7 +11,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
    public class PricingStreamResponseConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_PricingStreamResponse_success()
+	  public void success_CanConvert_type_PricingStreamResponse()
 	  {
 		 // arrange
 		 var converter = new PricingStreamResponseConverter();
@@ -24,7 +24,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_PricingStreamResponse_success()
+	  public void success_ReadJson_hydrates_PricingStreamResponse()
 	  {
 		 // arrange
 		 var price = new Price()
@@ -61,7 +61,7 @@ namespace OkonkwoOandaV20Tests.Framework.JsonConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ReadJson_hydrates_Hearbeat_object_success()
+	  public void success_ReadJson_hydrates_Hearbeat_object()
 	  {
 		 // arrange
 		 var heartbeat = new PricingHeartbeat()

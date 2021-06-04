@@ -11,7 +11,7 @@ namespace OkonkwoOandaV20Tests.Framework.TypeConverters
    public class AcceptDateTimeToStringConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_DateTime_success()
+	  public void success_CanConvert_type_DateTime()
 	  {
 		 // arrange
 		 var acceptDateTimeFormat = AcceptDatetimeFormat.RFC3339;
@@ -27,7 +27,7 @@ namespace OkonkwoOandaV20Tests.Framework.TypeConverters
 	  }
 
 	  [TestMethod]
-	  public void method_CanConvert_type_not_DateTime_failure()
+	  public void failure_CanConvert_type_not_DateTime()
 	  {
 		 // arrange
 		 var acceptDateTimeFormat = AcceptDatetimeFormat.RFC3339;
@@ -41,7 +41,7 @@ namespace OkonkwoOandaV20Tests.Framework.TypeConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ToOuput_RFC3339_returns_correct_value()
+	  public void success_ToOuput_RFC3339_returns_correct_value()
 	  {
 		 // arrange
 		 var rgxDate = "([0-9]+)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
@@ -68,7 +68,7 @@ namespace OkonkwoOandaV20Tests.Framework.TypeConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ToOuput_Unix_returns_correct_value()
+	  public void success_ToOuput_Unix_returns_correct_value()
 	  {
 		 // arrange
 		 var rgxSeconds = "([0-9]+)";

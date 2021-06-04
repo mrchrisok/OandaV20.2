@@ -8,7 +8,7 @@ namespace OkonkwoOandaV20Tests.Framework.TypeConverters
    public class ListToCsvConverterTests
    {
 	  [TestMethod]
-	  public void method_CanConvert_type_IList_success()
+	  public void success_Can_Convert_type_IList()
 	  {
 		 // arrange
 		 var delimiter = ",";
@@ -22,7 +22,7 @@ namespace OkonkwoOandaV20Tests.Framework.TypeConverters
 	  }
 
 	  [TestMethod]
-	  public void method_CanConvert_type_not_IList_failure()
+	  public void failure_can_convert_type_not_IList()
 	  {
 		 // arrange
 		 var delimiter = ",";
@@ -36,7 +36,7 @@ namespace OkonkwoOandaV20Tests.Framework.TypeConverters
 	  }
 
 	  [TestMethod]
-	  public void method_ToOuput_List_string_returns_correct_value()
+	  public void success_ToOuput_List_string_returns_correct_value()
 	  {
 		 // arrange
 		 var delimiter = ',';
