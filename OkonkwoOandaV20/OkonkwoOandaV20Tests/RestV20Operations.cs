@@ -7,7 +7,7 @@ using OkonkwoOandaV20.TradeLibrary.Order;
 using OkonkwoOandaV20.TradeLibrary.Position;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using OkonkwoOandaV20.TradeLibrary.REST;
-using OkonkwoOandaV20.TradeLibrary.REST.OrderRequest;
+using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;

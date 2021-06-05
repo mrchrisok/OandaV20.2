@@ -1,7 +1,7 @@
 ﻿using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.REST;
-using OkonkwoOandaV20.TradeLibrary.REST.OrderRequest;
+using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
