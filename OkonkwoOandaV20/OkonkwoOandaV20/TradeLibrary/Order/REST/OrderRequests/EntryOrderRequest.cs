@@ -5,10 +5,10 @@ using OkonkwoOandaV20.TradeLibrary.Order;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 
-namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequest
+namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequests
 {
    [JsonConverter(typeof(PriceObjectConverter))]
-   public abstract class EntryOrderRequest : Request, IOrderRequest, IHasPrices
+   public abstract class EntryOrderRequest : OrderRequest
    {
 	  public EntryOrderRequest(Instrument.Instrument oandaInstrument)
 	  {
@@ -18,14 +18,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequest
 		 priceInformation = new PriceInformation()
 		 {
 			instrument = oandaInstrument,
-			priceProperties = new List<string>() { "price", "priceBound" }
+			priceProperties = new List<string>() { nameof(price), nameof(priceBound) },
+			unitsProperties = new List<string>() { nameof(units) }
 		 };
 	  }
-
-	  /// <summary>
-	  /// The type of the Order.
-	  /// </summary>
-	  public string type { get; set; }
 
 	  /// <summary> 
 	  /// The Order's instrument.
@@ -65,12 +61,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequest
 	  public string positionFill { get; set; }
 
 	  /// <summary>
-	  /// The client extensions of the Order. Do not set, modify, or delete
-	  /// clientExtensions if your account is associated with MT4.
-	  /// </summary>
-	  public ClientExtensions clientExtensions { get; set; }
-
-	  /// <summary>
 	  /// TakeProfitDetails specifies the details of a Take Profit Order to be
 	  /// created on behalf of a client. This may happen when an Order is filled
 	  /// that opens a Trade requiring a Take Profit, or when a Trade’s dependent
@@ -100,11 +90,5 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequest
 	  /// tradeClientExtensions if your account is associated with MT4.
 	  /// </summary>
 	  public ClientExtensions tradeClientExtensions { get; set; }
-
-	  /// <summary>
-	  /// The ORder's price metadata.
-	  /// </summary>
-	  [JsonIgnore]
-	  public PriceInformation priceInformation { get; set; }
    }
 }

@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -41,7 +38,6 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
@@ -102,17 +98,18 @@
     <Compile Include="TradeLibrary\Order\REST\GetOrder.cs" />
     <Compile Include="TradeLibrary\Order\REST\GetOrders.cs" />
     <Compile Include="TradeLibrary\Order\REST\GetPendingOrders.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\EntryOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\ExitOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\IOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\LimitOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\MarketIfTouchedOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\MarketOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\PriceEntryOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\StopLossOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\StopOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\TakeProfitOrderRequest.cs" />
-    <Compile Include="TradeLibrary\Order\REST\OrderRequest\TrailingStopLossOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\EntryOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\ExitOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\OrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\IOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\LimitOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\MarketIfTouchedOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\MarketOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\PriceEntryOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\StopLossOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\StopOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\TakeProfitOrderRequest.cs" />
+    <Compile Include="TradeLibrary\Order\REST\OrderRequests\TrailingStopLossOrderRequest.cs" />
     <Compile Include="TradeLibrary\Order\REST\PostOrder.cs" />
     <Compile Include="TradeLibrary\Order\REST\PutOrderCancel.cs" />
     <Compile Include="TradeLibrary\Order\REST\PutOrderClientExtensions.cs" />
