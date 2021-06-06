@@ -1,7 +1,7 @@
 ﻿using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.REST;
-using OkonkwoOandaV20.TradeLibrary.REST.OrderRequest;
+using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,171 +11,171 @@ using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20App
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            WriteNewLine("Hello trader! Welcome to OkonkwoOandaV20.2");
+   class Program
+   {
+	  static void Main(string[] args)
+	  {
+		 WriteNewLine("Hello trader! Welcome to OkonkwoOandaV20.2");
 
-            SetApiCredentials();
+		 SetApiCredentials();
 
-            StartTransactionsStream();
+		 StartTransactionsStream();
 
-            PutOnATrade().Wait();
+		 PutOnATrade().Wait();
 
-            StopTransactionsStream();
+		 StopTransactionsStream();
 
-            Console.ReadKey();
-        }
+		 Console.ReadKey();
+	  }
 
-        static string AccountID { get; set; }
-        const string INSTRUMENT = InstrumentName.Currency.EURUSD;
+	  static string AccountID { get; set; }
+	  const string INSTRUMENT = InstrumentName.Currency.EURUSD;
 
-        static void SetApiCredentials()
-        {
-            WriteNewLine("Setting your V20 credentials ...");
+	  static void SetApiCredentials()
+	  {
+		 WriteNewLine("Setting your V20 credentials ...");
 
-            AccountID = "101-001-1913854-002";
-            var environment = EEnvironment.Practice;
-            var token = "d74f1d18196cdf2dd8f1cb443743effa-93ce3fd1b9820eaac5b93784ec044b85";
+		 AccountID = "101-001-1913854-002";
+		 var environment = EEnvironment.Practice;
+		 var token = "d74f1d18196cdf2dd8f1cb443743effa-93ce3fd1b9820eaac5b93784ec044b85";
 
-            Credentials.SetCredentials(environment, token, AccountID);
+		 Credentials.SetCredentials(environment, token, AccountID);
 
-            WriteNewLine("Nice! Credentials are set.");
-        }
+		 WriteNewLine("Nice! Credentials are set.");
+	  }
 
-        #region trading
-        static private async Task PutOnATrade()
-        {
-            WriteNewLine("Checking to see if EUR_USD is open for trading ...");
+	  #region trading
+	  static private async Task PutOnATrade()
+	  {
+		 WriteNewLine("Checking to see if EUR_USD is open for trading ...");
 
-            // first, check the market status for EUR_USD
-            // if it is tradeable, we'll try to make some money :)
-            if (!(await Utilities.IsMarketHalted(INSTRUMENT)))
-            {
-                WriteNewLine("EUR_USD is open and rockin', so let's start trading!");
+		 // first, check the market status for EUR_USD
+		 // if it is tradeable, we'll try to make some money :)
+		 if (!(await Utilities.IsMarketHalted(INSTRUMENT)))
+		 {
+			WriteNewLine("EUR_USD is open and rockin', so let's start trading!");
 
-                long? tradeID = await PlaceMarketOrder();
+			long? tradeID = await PlaceMarketOrder();
 
-                if (tradeID.HasValue)
-                {
-                    // we have an open trade.
-                    // give it some time to make money :)
-                    await Task.Delay(10000);
+			if (tradeID.HasValue)
+			{
+			   // we have an open trade.
+			   // give it some time to make money :)
+			   await Task.Delay(10000);
 
-                    WriteNewLine("Okay, we've waited 10 seconds. Closing trade now ...");
+			   WriteNewLine("Okay, we've waited 10 seconds. Closing trade now ...");
 
-                    // now, let' close the trade and collect our profits! .. hopefully
-                    TradeCloseResponse closeResponse = null;
-                    try
-                    {
-                        var parameters = new TradeCloseParameters() { units = "ALL" };
-                        closeResponse = await Rest20.PutTradeCloseAsync(AccountID, tradeID.Value, parameters);
-                    }
-                    catch
-                    {
-                        WriteNewLine("Oops. The trade can't be closed. Something went wrong. :(");
-                    }
+			   // now, let' close the trade and collect our profits! .. hopefully
+			   TradeCloseResponse closeResponse = null;
+			   try
+			   {
+				  var parameters = new TradeCloseParameters() { units = "ALL" };
+				  closeResponse = await Rest20.PutTradeCloseAsync(AccountID, tradeID.Value, parameters);
+			   }
+			   catch
+			   {
+				  WriteNewLine("Oops. The trade can't be closed. Something went wrong. :(");
+			   }
 
-                    if (closeResponse != null)
-                    {
-                        WriteNewLine("Nice! The trade is closed.");
+			   if (closeResponse != null)
+			   {
+				  WriteNewLine("Nice! The trade is closed.");
 
-                        var profit = closeResponse.orderFillTransaction.pl;
-                        WriteNewLine($"Our profit was USD {profit}");
+				  var profit = closeResponse.orderFillTransaction.pl;
+				  WriteNewLine($"Our profit was USD {profit}");
 
-                        if (profit > 0)
-                            WriteNewLine($"Nice work! You are an awesome trader.");
-                        else
-                        {
-                            WriteNewLine($"Looks like you need to learn some money-making strategies. :(");
-                            WriteNewLine($"Keep studying, learning, but most of all .. keep trading!!");
-                        }
-                    }
-                }
-                else
-                {
-                    WriteNewLine($"Looks like something went awry with the trade. you need to learn some money-making strategies. :(");
-                }
-            }
-            else
-            {
-                WriteNewLine("Sorry, Oanda markets are closed or Euro market is not tradeable.");
-                WriteNewLine("Try again another time.");
-            }
-        }
+				  if (profit > 0)
+					 WriteNewLine($"Nice work! You are an awesome trader.");
+				  else
+				  {
+					 WriteNewLine($"Looks like you need to learn some money-making strategies. :(");
+					 WriteNewLine($"Keep studying, learning, but most of all .. keep trading!!");
+				  }
+			   }
+			}
+			else
+			{
+			   WriteNewLine($"Looks like something went awry with the trade. you need to learn some money-making strategies. :(");
+			}
+		 }
+		 else
+		 {
+			WriteNewLine("Sorry, Oanda markets are closed or Euro market is not tradeable.");
+			WriteNewLine("Try again another time.");
+		 }
+	  }
 
-        static async Task<long?> PlaceMarketOrder(string side = "buy")
-        {
-            WriteNewLine("Creating a EUR_USD market BUY order ...");
+	  static async Task<long?> PlaceMarketOrder(string side = "buy")
+	  {
+		 WriteNewLine("Creating a EUR_USD market BUY order ...");
 
-            var parameters = new AccountInstrumentsParameters() { instruments = new List<string>(){ INSTRUMENT } };
-            var oandaInstrument = (await Rest20.GetAccountInstrumentsAsync(AccountID, parameters)).First();
-            long orderUnits = side == "buy" ? 10 : -10;
-        
-            var request = new MarketOrderRequest(oandaInstrument)
-            {
-                units = orderUnits
-            };
+		 var parameters = new AccountInstrumentsParameters() { instruments = new List<string>() { INSTRUMENT } };
+		 var oandaInstrument = (await Rest20.GetAccountInstrumentsAsync(AccountID, parameters)).First();
+		 decimal orderUnits = side == "buy" ? 10 : -10;
 
-            PostOrderResponse response = null;
-            try
-            {
-                response = await Rest20.PostOrderAsync(AccountID, request);
-                WriteNewLine("Congrats! You've put on a trade! Let it run! :)");
-            }
-            catch (Exception ex)
-            {
-                var errorResponse = ErrorResponseFactory.Create(ex.Message);
+		 var request = new MarketOrderRequest(oandaInstrument)
+		 {
+			units = orderUnits
+		 };
 
-                WriteNewLine("Oops. Order creation failed.");
-                WriteNewLine($"The failure message is: {errorResponse.errorMessage}.");
-                WriteNewLine("Try again later.");
-            }
+		 PostOrderResponse response = null;
+		 try
+		 {
+			response = await Rest20.PostOrderAsync(AccountID, request);
+			WriteNewLine("Congrats! You've put on a trade! Let it run! :)");
+		 }
+		 catch (Exception ex)
+		 {
+			var errorResponse = ErrorResponseFactory.Create(ex.Message);
 
-            return response?.orderFillTransaction?.tradeOpened?.tradeID;
-        }
-        #endregion
+			WriteNewLine("Oops. Order creation failed.");
+			WriteNewLine($"The failure message is: {errorResponse.errorMessage}.");
+			WriteNewLine("Try again later.");
+		 }
 
-        #region transactions stream
-        static Semaphore _transactionReceived;
-        static TransactionsSession _transactionsSession;
+		 return response?.orderFillTransaction?.tradeOpened?.tradeID;
+	  }
+	  #endregion
 
-        static void StartTransactionsStream()
-        {
-            WriteNewLine("Starting transactions stream ...");
+	  #region transactions stream
+	  static Semaphore _transactionReceived;
+	  static TransactionsSession _transactionsSession;
 
-            _transactionsSession = new TransactionsSession(AccountID);
-            _transactionReceived = new Semaphore(0, 100);
-            _transactionsSession.DataReceived += OnTransactionReceived;
+	  static void StartTransactionsStream()
+	  {
+		 WriteNewLine("Starting transactions stream ...");
 
-            _transactionsSession.StartSession();
+		 _transactionsSession = new TransactionsSession(AccountID);
+		 _transactionReceived = new Semaphore(0, 100);
+		 _transactionsSession.DataReceived += OnTransactionReceived;
 
-            bool success = _transactionReceived.WaitOne(10000);
+		 _transactionsSession.StartSession();
 
-            if (success)
-                WriteNewLine("Good news!. Transactions stream is functioning.");
-            else
-                WriteNewLine("Bad news!. Transactions stream is not functioning.");
-        }
+		 bool success = _transactionReceived.WaitOne(10000);
 
-        protected static void OnTransactionReceived(TransactionsStreamResponse data)
-        {
-            if (!data.IsHeartbeat())
-                WriteNewLine("V20 notification - New account transaction: " + data.transaction.type);
+		 if (success)
+			WriteNewLine("Good news!. Transactions stream is functioning.");
+		 else
+			WriteNewLine("Bad news!. Transactions stream is not functioning.");
+	  }
 
-            _transactionReceived.Release();
-        }
+	  protected static void OnTransactionReceived(TransactionsStreamResponse data)
+	  {
+		 if (!data.IsHeartbeat())
+			WriteNewLine("V20 notification - New account transaction: " + data.transaction.type);
 
-        static void StopTransactionsStream()
-        {
-            _transactionsSession.StopSession();
-        }
-        #endregion
+		 _transactionReceived.Release();
+	  }
 
-        static void WriteNewLine(string message)
-        {
-            Console.WriteLine($"\n{message}");
-        }
-    }
+	  static void StopTransactionsStream()
+	  {
+		 _transactionsSession.StopSession();
+	  }
+	  #endregion
+
+	  static void WriteNewLine(string message)
+	  {
+		 Console.WriteLine($"\n{message}");
+	  }
+   }
 }
