@@ -1,6 +1,6 @@
 ﻿# OANDAV20.2
 
-Spot Forex trading SDK that provides programmatic access to the OANDA© v20 REST Api.
+.NET library that enables Forex trading via OANDA© v20.
 
 Technologies
 - C# 7.0
