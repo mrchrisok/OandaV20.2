@@ -31,9 +31,9 @@ namespace OkonkwoOandaV20Tests
 	  // For best results, please create and use your own or your organization's Oanda Practice account
 
 	  static EEnvironment m_TestEnvironment = EEnvironment.Practice;
-	  static string m_TestToken = "d845d3f81613358410e3e5298aebdce1-111fcc1d52a6c625c42c05366a22a286";
+	  static string m_TestToken = "test_token";
 	  static short m_TokenAccounts = 2;
-	  static string m_TestAccount = "101-001-1913854-002";
+	  static string m_TestAccount = "test_account";
 
 	  #endregion
 
@@ -1097,7 +1097,7 @@ namespace OkonkwoOandaV20Tests
 	  /// <returns></returns>
 	  private static async Task SetApiCredentials(string fileName = null)
 	  {
-		 fileName = fileName ?? @"C:\Users\Osita\SourceCode\GitHub\OandaV20\oandaPracticeApiCredentials.txt";
+		 fileName = fileName ?? @"C:\Users\mrchr\source\assets\OANDAV20\oandaPracticeApiCredentials.txt";
 
 		 try
 		 {
