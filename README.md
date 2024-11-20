@@ -13,7 +13,7 @@ Version 2 Improvements
 
 To get the repo, run: git clone https://github.com/mrchrisok/OANDAV20.2.git
 
-To install the Nuget package, run: Install-Package OkonkwoOandaV20 -version 2.####.####.#
+To install the Nuget package, run: Install-Package OkonkwoOandaV20 -version 2.#.#.#
 
 For documentation, usage and examples, see: http://developer.oanda.com/rest-live-v20/introduction
 
