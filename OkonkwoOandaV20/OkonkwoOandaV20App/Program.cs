@@ -1,4 +1,7 @@
-﻿using OkonkwoOandaV20.Framework;
+﻿using Azure.Core;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.REST;
 using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
@@ -31,18 +34,23 @@ namespace OkonkwoOandaV20App
       static string AccountID { get; set; }
       const string INSTRUMENT = InstrumentName.Currency.EURUSD;
 
-      static void SetApiCredentials()
+      /// <summary>
+      /// Reads the api key from a supplied file name
+      /// </summary>
+      /// <returns></returns>
+      private static void SetApiCredentials()
       {
-         WriteNewLine("Setting your V20 credentials ...");
+         var keyVaultUri = $"https://marketminerkvdev.vault.azure.net/";
+         var keyVaultClient = new SecretClient(new Uri(keyVaultUri), Utilities.GetAzureCredential());
+         var keyVaultSecret = keyVaultClient.GetSecret("OandaCredentials");
+         var keyVaultValue = keyVaultSecret.Value?.Value;
+         //
 
-         AccountID = "101-001-1913854-002";
-         var environment = EEnvironment.Practice;
-         var token = "d74f1d18196cdf2dd8f1cb443743effa-93ce3fd1b9820eaac5b93784ec044b85";
+         var environment = (EEnvironment)Enum.Parse(typeof(EEnvironment), keyVaultValue.Split('~')[0]);
+         var accessToken = keyVaultValue.Split('~')[1];
+         AccountID = keyVaultValue.Split('~')[2];
 
-         Rest20.InitializeAsync(credentials: (environment, token, AccountID)).Wait();
-         //Credentials.SetCredentials(environment, token, AccountID);
-
-         WriteNewLine("Nice! Credentials are set.");
+         Rest20.InitializeAsync(credentials: (environment, accessToken, AccountID)).Wait();
       }
 
       #region trading

@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
+﻿using Azure.Security.KeyVault.Secrets;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.Factories;
@@ -14,9 +12,7 @@ using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -61,9 +57,7 @@ namespace OkonkwoOandaV20Tests
       {
          try
          {
-            var credentials = await GetApiCredentials();
-
-            if (!await Rest20.InitializeAsync(credentials: credentials))
+            if (!await Rest20.InitializeAsync(credentials: await GetApiCredentials()))
             {
                throw new Exception("Exception: RestV20Test - Rest20 initialization failed.");
             }
@@ -129,7 +123,7 @@ namespace OkonkwoOandaV20Tests
 
       private static async Task Initialize_GetMarketStatus()
       {
-         bool marketIsHalted = await Utilities.IsMarketHalted(AccountID);
+         bool marketIsHalted = await Utilities.IsMarketHalted();
          m_Results.Verify("00.0", marketIsHalted, "Market is halted.");
          if (marketIsHalted) throw new MarketHaltedException("Unable to continue tests. OANDA Fx market is halted!");
       }
@@ -401,8 +395,8 @@ namespace OkonkwoOandaV20Tests
       /// <returns></returns>
       private static async Task Order_RunOrderOperations()
       {
-         if (await Utilities.IsMarketHalted(AccountID))
-            throw new MarketHaltedException("OANDA Fx market is halted!");
+         if (await Utilities.IsMarketHalted())
+            throw new MarketHaltedException("OANDA FX market is halted!");
 
          string expiry = ConvertDateTimeToAcceptDateFormat(DateTime.Now.AddMonths(1));
          decimal price = GetOandaPrice(m_TestInstrument) * (decimal)0.9;
@@ -638,7 +632,7 @@ namespace OkonkwoOandaV20Tests
       {
          // I'm fine with a throw here
          // To each his/her own on doing something different.
-         if (await Utilities.IsMarketHalted(AccountID))
+         if (await Utilities.IsMarketHalted())
             throw new MarketHaltedException("OANDA Fx market is halted!");
 
          if (closeAllTrades)
@@ -814,7 +808,7 @@ namespace OkonkwoOandaV20Tests
          //m_Results.Verify("13.15", result.stopLossOrderCancelTransaction != null, "Stop loss cancelled.");
          m_Results.Verify("13.16", result.trailingStopLossOrderCancelTransaction != null, "Trailing stop loss cancelled.");
 
-         if (await Utilities.IsMarketHalted(AccountID))
+         if (await Utilities.IsMarketHalted())
             throw new MarketHaltedException("OANDA Fx market is halted!");
 
          // error test - close open trade
@@ -844,7 +838,7 @@ namespace OkonkwoOandaV20Tests
       /// <returns></returns>
       private static async Task Position_RunPositionOperations()
       {
-         if (await Utilities.IsMarketHalted(AccountID))
+         if (await Utilities.IsMarketHalted())
             throw new MarketHaltedException("OANDA Fx market is halted!");
 
          short units = 1;
@@ -1084,10 +1078,10 @@ namespace OkonkwoOandaV20Tests
       /// </summary>
       /// <returns></returns>
       private static Task<(EEnvironment environment, string accessToken, string accountId)>
-         GetApiCredentials(string fileName = null)
+         GetApiCredentials()
       {
          var keyVaultUri = $"https://marketminerkvdev.vault.azure.net/";
-         var keyVaultClient = new SecretClient(new Uri(keyVaultUri), GetAzureCredential());
+         var keyVaultClient = new SecretClient(new Uri(keyVaultUri), Utilities.GetAzureCredential());
          var keyVaultSecret = keyVaultClient.GetSecret("OandaCredentials");
          var keyVaultValue = keyVaultSecret.Value?.Value;
          //
@@ -1098,15 +1092,6 @@ namespace OkonkwoOandaV20Tests
          m_TokenAccounts = 2;
 
          return Task.FromResult((m_TestEnvironment, m_TestToken, m_TestAccount));
-      }
-
-      private static TokenCredential GetAzureCredential(bool isLocalEnvironment = true)
-      {
-         var credentialOptions = new DefaultAzureCredentialOptions
-         {
-            ExcludeManagedIdentityCredential = isLocalEnvironment
-         };
-         return new DefaultAzureCredential(credentialOptions);
       }
 
       private static Instrument GetOandaInstrument(string instrument = null)

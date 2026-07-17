@@ -57,7 +57,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          private static Credentials m_Credentials;
 
          public string AccessToken { get; set; }
-         private string AccountId { get; set; }
+         public string AccountId { get; set; }
          private EEnvironment Environment { get; set; }
 
          public static Credentials GetCredentials()
