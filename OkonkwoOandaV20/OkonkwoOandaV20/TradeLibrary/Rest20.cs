@@ -66,8 +66,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
 
             Converters = new List<JsonConverter> {
-               new TransactionConverter(),
-               new OrderConverter(), new PriceObjectConverter(), new StringDecimalConverter(),
+               new TransactionConverter(), new OrderConverter(), new PriceObjectConverter(),
                new PricingStreamResponseConverter(), new TransactionsStreamResponseConverter()
             }
          };
