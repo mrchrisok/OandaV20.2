@@ -20,7 +20,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders";
 
 		 var order = new Dictionary<string, IOrderRequest> { { "order", request } };
-		 var body = ConvertToJSON(order);
+		 var body = ConvertObjectToJson(order);
 
 		 var response = await MakeRequestWithJSONBody<PostOrderResponse, PostOrderErrorResponse>("POST", body, uri);
 

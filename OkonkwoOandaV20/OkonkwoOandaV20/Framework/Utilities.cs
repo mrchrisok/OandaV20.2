@@ -12,12 +12,13 @@ namespace OkonkwoOandaV20.Framework
       /// </summary>
       /// <param name="instrument">Instrument to check if halted. Default is EUR_USD.</param>
       /// <returns>True if trading is halted, false if trading is not halted.</returns>
-      public static async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD, bool throwIfHalted = false)
+      public static async Task<bool> IsMarketHalted(string accountId
+         , string instrument = InstrumentName.Currency.EURUSD, bool throwIfHalted = false)
       {
-         var accountID = Credentials.GetDefaultCredentials().DefaultAccountId;
+         //var accountID = Credentials.GetCredentials().AccountId;
          var parameters = new PricingParameters() { instruments = new List<string>() { instrument } };
 
-         var prices = await Rest20.GetPricingAsync(accountID, parameters);
+         var prices = await Rest20.GetPricingAsync(accountId, parameters);
 
          bool isTradeable = false, hasBids = false, hasAsks = false;
 

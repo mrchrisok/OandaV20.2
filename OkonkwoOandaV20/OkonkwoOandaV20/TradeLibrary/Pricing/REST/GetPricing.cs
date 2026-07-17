@@ -27,8 +27,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          string instrumentsCSV = GetCommaSeparatedString(parameters.instruments);
          requestParams.Add("instruments", instrumentsCSV);
 
-         //requestParams.Add("instruments", Uri.EscapeDataString(instrumentsCSV));
-
          var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(uri, "GET", requestParams);
 
          return response.prices ?? new List<Price>();

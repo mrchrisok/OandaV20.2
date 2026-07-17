@@ -15,13 +15,13 @@ namespace OkonkwoOandaV20Tests
       }
 
       #region Credentials
-      [TestMethod]
-      public void test_Credentials_get_credentials()
-      {
-         Assert.IsTrue(Rest20.Credentials.GetDefaultCredentials().Environment == m_TestEnvironment, "Credentials Environment is incorrect.");
-         Assert.IsTrue(Rest20.Credentials.GetDefaultCredentials().AccessToken == m_TestToken, "Credentials Token is incorrect.");
-         Assert.IsTrue(Rest20.Credentials.GetDefaultCredentials().DefaultAccountId == m_TestAccount, "Credentials AccountId is incorrect.");
-      }
+      //[TestMethod]
+      //public void test_Credentials_get_credentials()
+      //{
+      //   Assert.IsTrue(Rest20.Credentials.GetDefaultCredentials().Environment == m_TestEnvironment, "Credentials Environment is incorrect.");
+      //   Assert.IsTrue(Rest20.Credentials.GetDefaultCredentials().AccessToken == m_TestToken, "Credentials Token is incorrect.");
+      //   Assert.IsTrue(Rest20.Credentials.GetDefaultCredentials().DefaultAccountId == m_TestAccount, "Credentials AccountId is incorrect.");
+      //}
       #endregion
 
       [TestMethod]

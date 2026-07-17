@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// </summary>
    public class OrderResponse : Response
    {
-      [JsonConverter(typeof(OrderConverter))]
+      //[JsonConverter(typeof(OrderConverter))]
       public IOrder order { get; set; }
    }
 

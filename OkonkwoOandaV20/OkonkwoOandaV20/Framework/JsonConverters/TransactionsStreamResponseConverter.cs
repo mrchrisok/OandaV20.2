@@ -14,8 +14,8 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
    {
       public override bool CanConvert(Type objectType)
       {
-         bool canConvert = objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IStreamResponse));
-         return canConvert;
+         return objectType == typeof(TransactionsStreamResponse)
+            && objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IStreamResponse));
       }
 
       public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
