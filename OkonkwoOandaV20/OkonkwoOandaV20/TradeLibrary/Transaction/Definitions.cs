@@ -347,7 +347,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
    }
 
    #region price object
-   [JsonConverter(typeof(PriceObjectConverter))]
+   //[JsonConverter(typeof(PriceObjectConverter))]
    public class TakeProfitDetails : PriceObject
    {
       public TakeProfitDetails() { }
@@ -366,7 +366,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public decimal price { get; set; }
    }
 
-   [JsonConverter(typeof(PriceObjectConverter))]
+   //[JsonConverter(typeof(PriceObjectConverter))]
    public class StopLossDetails : PriceObject
    {
       public StopLossDetails() { }
@@ -401,7 +401,7 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       public bool guaranteed { get; set; }
    }
 
-   [JsonConverter(typeof(PriceObjectConverter))]
+   //[JsonConverter(typeof(PriceObjectConverter))]
    public class TrailingStopLossDetails : PriceObject
    {
       public TrailingStopLossDetails() { }

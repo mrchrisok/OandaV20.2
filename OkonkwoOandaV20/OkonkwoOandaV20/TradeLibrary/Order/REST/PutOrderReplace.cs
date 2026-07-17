@@ -24,7 +24,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 		 string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier;
 
 		 var order = new Dictionary<string, IOrderRequest> { { "order", request } };
-		 var body = ConvertToJSON(order);
+		 var body = ConvertObjectToJson(order);
 
 		 var response = await MakeRequestWithJSONBody<OrderReplaceResponse, OrderReplaceErrorResponse>("PUT", body, uri);
 
@@ -45,7 +45,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <summary>
 	  /// The Transaction that created the replacing Order as requested.
 	  /// </summary>
-	  [JsonConverter(typeof(TransactionConverter))]
+	  //[JsonConverter(typeof(TransactionConverter))]
 	  public ITransaction orderCreateTransaction { get; set; }
 
 	  /// <summary>
@@ -59,7 +59,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// replacing Order was partially filled immediately and is configured to be
 	  /// reissued for its remaining units.
 	  /// </summary>
-	  [JsonConverter(typeof(TransactionConverter))]
+	  //[JsonConverter(typeof(TransactionConverter))]
 	  public ITransaction orderReissueTransaction { get; set; }
 
 	  /// <summary>
@@ -67,7 +67,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// the replacing Order was paritially filled immediately and was configured
 	  /// to be reissued, however the reissue was rejected.
 	  /// </summary>
-	  [JsonConverter(typeof(TransactionConverter))]
+	  //[JsonConverter(typeof(TransactionConverter))]
 	  public ITransaction orderReissueRejectTransaction { get; set; }
 
 	  /// <summary>
@@ -85,7 +85,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 	  /// <summary>
 	  /// The Transaction that rejected the creation of the replacing Order
 	  /// </summary>
-	  [JsonConverter(typeof(TransactionConverter))]
+	  //[JsonConverter(typeof(TransactionConverter))]
 	  public ITransaction orderRejectTransaction { get; set; }
    }
 }

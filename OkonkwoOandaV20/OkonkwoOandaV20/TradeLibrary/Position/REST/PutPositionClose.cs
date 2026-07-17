@@ -17,7 +17,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument + "/close";
 
-         var requestBody = ConvertToJSON(parameters);
+         var requestBody = ConvertObjectToJson(parameters);
 
          var response = await MakeRequestWithJSONBody<PositionCloseResponse, PositionCloseErrorResponse>("PUT", requestBody, uri);
 

@@ -32,7 +32,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// The details of the Transaction requested
       /// </summary>
-      [JsonConverter(typeof(TransactionConverter))]
+      //[JsonConverter(typeof(TransactionConverter))]
       public ITransaction transaction { get; set; }
    }
 
