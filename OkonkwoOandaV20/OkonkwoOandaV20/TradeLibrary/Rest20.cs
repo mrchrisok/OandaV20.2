@@ -45,9 +45,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             _requestClient = requestClient ?? new HttpClient();
             _streamsClient = streamsClient ?? new HttpClient() { Timeout = Timeout.InfiniteTimeSpan };
 
-            JsonSerializerSettingsRequest = jsonSettingsRequest ?? GetJsonSerializerSettings("Request");
-            JsonSerializerSettingsResponse = jsonSettingsResponse ?? GetJsonSerializerSettings("Response");
-            JsonConverters = jsonConverters ?? GetJsonConverters();
+            JsonConverters = GetJsonConverters(jsonConverters);
+            JsonSettingsRequest = GetJsonSerializerSettings("Request", jsonSettingsRequest);
+            JsonSettingsResponse = GetJsonSerializerSettings("Response", jsonSettingsResponse);
 
             if (credentials.HasValue)
             {
@@ -60,9 +60,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return Task.FromResult(_initialized);
       }
 
-      private static JsonSerializerSettings GetJsonSerializerSettings(string httpAction)
+      public static JsonSerializerSettings GetJsonSerializerSettings(string httpAction
+         , JsonSerializerSettings jsonSettings = null)
       {
-         // add logic here for httpAction if needed
+         jsonSettings = jsonSettings ?? new JsonSerializerSettings();
+         var jsonConverters = new List<JsonConverter>(JsonConverters);
+         jsonConverters.AddRange(jsonSettings.Converters);
+         //
 
          return new JsonSerializerSettings()
          {
@@ -70,14 +74,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore,
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            Converters = GetJsonConverters()
-
+            Converters = JsonConverters
          };
       }
 
-      private static IList<JsonConverter> GetJsonConverters()
+      private static IList<JsonConverter> GetJsonConverters(IList<JsonConverter> jsonConverters = null)
       {
-         return new List<JsonConverter> {
+         jsonConverters = jsonConverters ?? new List<JsonConverter>();
+
+         return new List<JsonConverter>(jsonConverters) {
             new TransactionConverter(), new OrderConverter(), new PriceObjectConverter(),
             new PricingStreamResponseConverter(), new TransactionsStreamResponseConverter()
          };
@@ -94,12 +99,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// JsonSerializerSettings for request to TradeStation
       /// </summary>
-      public static JsonSerializerSettings JsonSerializerSettingsRequest { get; private set; }
+      public static JsonSerializerSettings JsonSettingsRequest { get; private set; }
 
       /// <summary>
       /// JsonSerializerSettings for response from TradeStation
       /// </summary>
-      public static JsonSerializerSettings JsonSerializerSettingsResponse { get; private set; }
+      public static JsonSerializerSettings JsonSettingsResponse { get; private set; }
 
       /// <summary>
       /// JsonConverters for request/response from TradeStation
@@ -233,7 +238,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
                var stream = GetResponseStream(response);
                var reader = new StreamReader(stream);
                var json = reader.ReadToEnd();
-               var result = JsonConvert.DeserializeObject<T>(json, JsonSerializerSettingsResponse);
+               var result = JsonConvert.DeserializeObject<T>(json, JsonSettingsResponse);
                return result;
             }
          }
@@ -290,7 +295,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          var nullHandling = ignoreNulls ? NullValueHandling.Ignore : NullValueHandling.Include;
 
-         var settings = new JsonSerializerSettings(JsonSerializerSettingsRequest)
+         var settings = new JsonSerializerSettings(JsonSettingsRequest)
          {
             NullValueHandling = nullHandling,
          };
