@@ -49,7 +49,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
                while (!reader.EndOfStream && !_shutdown)
                {
                   string line = reader.ReadLine();
-                  var data = JsonConvert.DeserializeObject<T>(line, Rest20.JsonSerializerSettings);
+                  var data = JsonConvert.DeserializeObject<T>(line, Rest20.JsonSerializerSettingsResponse);
 
                   OnSessionStatusChanged(!_shutdown, null);
 
