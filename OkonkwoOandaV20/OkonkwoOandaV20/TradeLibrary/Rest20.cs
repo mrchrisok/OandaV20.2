@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Resources.ResXFileRef;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -35,7 +36,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="authorizeApplication"></param>
       /// <returns>True, if initialization was successful. False if not successful.</returns>
       public static Task<bool> InitializeAsync(HttpClient requestClient = null, HttpClient streamsClient = null
-         , JsonSerializerSettings jsonSerializerSettings = null, (EEnvironment environment
+         , JsonSerializerSettings jsonSettingsRequest = null, JsonSerializerSettings jsonSettingsResponse = null
+         , IList<JsonConverter> jsonConverters = null, (EEnvironment environment
          , string accessToken, string accountId)? credentials = null)
       {
          if (!_initialized)
@@ -43,7 +45,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             _requestClient = requestClient ?? new HttpClient();
             _streamsClient = streamsClient ?? new HttpClient() { Timeout = Timeout.InfiniteTimeSpan };
 
-            JsonSerializerSettings = jsonSerializerSettings ?? GetJsonSerializerSettings();
+            JsonSerializerSettingsRequest = jsonSettingsRequest ?? GetJsonSerializerSettings("Request");
+            JsonSerializerSettingsResponse = jsonSettingsResponse ?? GetJsonSerializerSettings("Response");
+            JsonConverters = jsonConverters ?? GetJsonConverters();
 
             if (credentials.HasValue)
             {
@@ -56,19 +60,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return Task.FromResult(_initialized);
       }
 
-      private static JsonSerializerSettings GetJsonSerializerSettings()
+      private static JsonSerializerSettings GetJsonSerializerSettings(string httpAction)
       {
+         // add logic here for httpAction if needed
+
          return new JsonSerializerSettings()
          {
             TypeNameHandling = TypeNameHandling.None,
             NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore,
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            Converters = GetJsonConverters()
 
-            Converters = new List<JsonConverter> {
-               new TransactionConverter(), new OrderConverter(), new PriceObjectConverter(),
-               new PricingStreamResponseConverter(), new TransactionsStreamResponseConverter()
-            }
+         };
+      }
+
+      private static IList<JsonConverter> GetJsonConverters()
+      {
+         return new List<JsonConverter> {
+            new TransactionConverter(), new OrderConverter(), new PriceObjectConverter(),
+            new PricingStreamResponseConverter(), new TransactionsStreamResponseConverter()
          };
       }
 
@@ -79,7 +90,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       private static bool _initialized = false;
       private static HttpClient _requestClient;
       private static HttpClient _streamsClient;
-      public static JsonSerializerSettings JsonSerializerSettings { get; private set; }
+
+      /// <summary>
+      /// JsonSerializerSettings for request to TradeStation
+      /// </summary>
+      public static JsonSerializerSettings JsonSerializerSettingsRequest { get; private set; }
+
+      /// <summary>
+      /// JsonSerializerSettings for response from TradeStation
+      /// </summary>
+      public static JsonSerializerSettings JsonSerializerSettingsResponse { get; private set; }
+
+      /// <summary>
+      /// JsonConverters for request/response from TradeStation
+      /// </summary>
+      public static IList<JsonConverter> JsonConverters { get; private set; }
 
       /// <summary>
       /// The time of the last request made to an Oanda V20 service
@@ -208,7 +233,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
                var stream = GetResponseStream(response);
                var reader = new StreamReader(stream);
                var json = reader.ReadToEnd();
-               var result = JsonConvert.DeserializeObject<T>(json, JsonSerializerSettings);
+               var result = JsonConvert.DeserializeObject<T>(json, JsonSerializerSettingsResponse);
                return result;
             }
          }
@@ -265,7 +290,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          var nullHandling = ignoreNulls ? NullValueHandling.Ignore : NullValueHandling.Include;
 
-         var settings = new JsonSerializerSettings(JsonSerializerSettings)
+         var settings = new JsonSerializerSettings(JsonSerializerSettingsRequest)
          {
             NullValueHandling = nullHandling,
          };
