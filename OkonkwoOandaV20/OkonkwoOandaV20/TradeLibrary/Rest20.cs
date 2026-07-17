@@ -53,7 +53,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             _initialized = true;
          }
 
-         return Task.FromResult(true);
+         return Task.FromResult(_initialized);
       }
 
       private static JsonSerializerSettings GetJsonSerializerSettings()
