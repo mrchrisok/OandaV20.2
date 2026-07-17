@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
@@ -9,7 +10,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
    public abstract class StreamSession<T> where T : IStreamResponse
    {
       protected readonly string _accountID;
-      protected WebResponse _response;
+      protected HttpResponseMessage _response;
       protected bool _shutdown;
 
       public delegate void DataHandler(T data);
@@ -31,41 +32,40 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
          _accountID = accountID;
       }
 
-      protected abstract Task<WebResponse> GetSession();
+      protected abstract Task<HttpResponseMessage> GetSession();
 
       public virtual async Task StartSession()
       {
          _shutdown = false;
-         _response = await GetSession();
 
-         await Task.Run(() =>
+         try
          {
-            try
+            _response = await GetSession();
+
+            using (_response)
+            using (var stream = await _response.Content.ReadAsStreamAsync())
+            using (var reader = new StreamReader(stream))
             {
-               using (_response)
+               while (!reader.EndOfStream && !_shutdown)
                {
-                  StreamReader reader = new StreamReader(_response.GetResponseStream());
-                  while (!_shutdown)
-                  {
-                     string line = reader.ReadLine();
-                     var data = JsonConvert.DeserializeObject<T>(line);
+                  string line = reader.ReadLine();
+                  var data = JsonConvert.DeserializeObject<T>(line, Rest20.JsonSerializerSettings);
 
-                     OnSessionStatusChanged(!_shutdown, null);
+                  OnSessionStatusChanged(!_shutdown, null);
 
-                     OnDataReceived(data);
-                  }
+                  OnDataReceived(data);
                }
             }
-            catch (Exception e)
-            {
-               _shutdown = true;
-               throw e;
-            }
-            finally
-            {
-               _response = null;
-            }
-         });
+         }
+         catch (Exception e)
+         {
+            _shutdown = true;
+            throw e;
+         }
+         finally
+         {
+            _response = null;
+         }
       }
 
       public void StopSession()

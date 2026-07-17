@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
-using OkonkwoOandaV20.TradeLibrary.Transaction;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -16,34 +18,35 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">the account ID you want to stream on</param>
       /// <returns>the WebResponse object that can be used to retrieve the events as they stream</returns>
-      public static async Task<WebResponse> GetTransactionsStream(string accountID)
+      public static async Task<HttpResponseMessage> GetTransactionsStream(string accountID)
       {
          string uri = ServerUri(EServer.TransactionsStream) + "accounts/" + accountID + "/transactions/stream";
 
-         HttpWebRequest request = WebRequest.CreateHttp(uri);
-         request.Method = "GET";
-         request.Headers[HttpRequestHeader.Authorization] = "Bearer " + AccessToken;
+         var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
+         //
+         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
+         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
 
          try
          {
-            WebResponse response = await request.GetResponseAsync();
+            HttpResponseMessage response = await _streamsClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             return response;
          }
-         catch (WebException ex)
+         catch (HttpRequestException ex)
          {
-            var response = (HttpWebResponse)ex.Response;
-            var stream = new StreamReader(response.GetResponseStream());
-            var result = stream.ReadToEnd();
-            throw new Exception(result);
+            throw ex;
          }
       }
    }
+
 
    /// <summary>
    /// Events are authorized transactions posted to the subject account.
    /// http://developer.oanda.com/rest-live-v20/transaction-ep/#collapse_endpoint_6
    /// </summary>
-   [JsonConverter(typeof(TransactionsStreamResponseConverter))]
+   //[JsonConverter(typeof(TransactionsStreamResponseConverter))]
    public class TransactionsStreamResponse : StreamResponse
    {
       /// <summary>
@@ -66,7 +69,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
       }
 
-      protected override async Task<WebResponse> GetSession()
+      protected override async Task<HttpResponseMessage> GetSession()
       {
          return await Rest20.GetTransactionsStream(_accountID);
       }

@@ -17,7 +17,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders";
 
-         var requestBody = ConvertToJSON(parameters.GetAsDictionary());
+         var requestBody = ConvertObjectToJson(parameters.GetAsDictionary());
 
          return await MakeRequestWithJSONBody<TradeOrdersResponse, TradeOrdersErrorResponse>("PUT", requestBody, uri);
       }

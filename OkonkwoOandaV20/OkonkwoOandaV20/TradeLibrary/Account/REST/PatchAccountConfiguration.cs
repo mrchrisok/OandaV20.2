@@ -29,13 +29,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// <summary>
          /// Client-defined alias (name) for the Account
          /// </summary>
-         [DataMember(EmitDefaultValue = false)]
+         [JsonProperty(NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
          public string alias { get; set; }
 
          /// <summary>
          /// The margin rate the Account should be set to.
          /// </summary>
-         [DataMember(EmitDefaultValue = false)]
+         [JsonProperty(NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
          [JsonConverter(typeof(StringDecimalConverter))]
          public decimal? marginRate { get; set; }
       }

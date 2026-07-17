@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -24,30 +26,31 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID"></param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>The WebResponse object that can be used to retrieve the prices as they stream</returns>
-      public static async Task<WebResponse> GetPricingStream(string accountID, PricingStreamParameters parameters)
+      public static async Task<HttpResponseMessage> GetPricingStream(string accountID, PricingStreamParameters parameters)
       {
          var instruments = Uri.EscapeDataString(GetCommaSeparatedString(parameters.instruments));
 
          string uri = ServerUri(EServer.PricingStream) + "accounts/" + accountID + "/pricing/stream";
          uri += "?instruments=" + instruments + "&snapshot=" + parameters.snapshot.ToString();
 
-         HttpWebRequest request = WebRequest.CreateHttp(uri);
-         request.Method = "GET";
-         request.Headers[HttpRequestHeader.Authorization] = "Bearer " + AccessToken;
+         var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
+         //
+         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
+         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
 
          try
          {
-            WebResponse response = await request.GetResponseAsync();
+            HttpResponseMessage response = await _streamsClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             return response;
          }
-         catch (WebException ex)
+         catch (HttpRequestException ex)
          {
-            var response = (HttpWebResponse)ex.Response;
-            var stream = new StreamReader(response.GetResponseStream());
-            var result = stream.ReadToEnd();
-            throw new Exception(result);
+            throw ex;
          }
       }
+
 
       public class PricingStreamParameters
       {
@@ -70,7 +73,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// Events are authorized transactions posted to the subject account.
    /// For more information, visit: http://developer.oanda.com/rest-live-v20/transaction-ep/
    /// </summary>
-   [JsonConverter(typeof(PricingStreamResponseConverter))]
+   //[JsonConverter(typeof(PricingStreamResponseConverter))]
    public class PricingStreamResponse : IStreamResponse
    {
       public PricingHeartbeat heartbeat { get; set; }
@@ -98,7 +101,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          _snapshot = snapshot;
       }
 
-      protected override async Task<WebResponse> GetSession()
+      protected override async Task<HttpResponseMessage> GetSession()
       {
          var instruments = new List<string>();
          _instruments.ForEach(instrument => instruments.Add(instrument.name));

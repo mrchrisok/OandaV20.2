@@ -13,11 +13,12 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
    {
       public override bool CanConvert(Type objectType)
       {
-         bool canConvert = objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IHeartbeat));
-         return canConvert;
+         return objectType == typeof(PricingStreamResponse)
+            && objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IStreamResponse));
       }
 
-      public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+      public override object ReadJson(JsonReader reader, Type objectType, object existingValue
+         , JsonSerializer serializer)
       {
          var response = new PricingStreamResponse();
 
@@ -43,7 +44,8 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
             return response;
          }
          else
-            throw new ArgumentException(string.Format("Unexpected JTokenType ({0}) in reader.", jsonToken.Type.ToString()));
+            throw new ArgumentException(string.Format("Unexpected JTokenType ({0}) in reader."
+               , jsonToken.Type.ToString()));
       }
    }
 }

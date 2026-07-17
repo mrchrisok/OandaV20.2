@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST.OrderRequests
 {
-   [JsonConverter(typeof(PriceObjectConverter))]
+   //[JsonConverter(typeof(PriceObjectConverter))]
    public abstract class EntryOrderRequest : OrderRequest
    {
 	  public EntryOrderRequest(Instrument.Instrument oandaInstrument)

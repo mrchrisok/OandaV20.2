@@ -1,4 +1,6 @@
-﻿using OkonkwoOandaV20.TradeLibrary.REST;
+﻿using Azure.Core;
+using Azure.Identity;
+using OkonkwoOandaV20.TradeLibrary.REST;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
@@ -14,10 +16,10 @@ namespace OkonkwoOandaV20.Framework
       /// <returns>True if trading is halted, false if trading is not halted.</returns>
       public static async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD, bool throwIfHalted = false)
       {
-         var accountID = Credentials.GetDefaultCredentials().DefaultAccountId;
          var parameters = new PricingParameters() { instruments = new List<string>() { instrument } };
 
-         var prices = await Rest20.GetPricingAsync(accountID, parameters);
+         var accountId = Credentials.GetCredentials().AccountId;
+         var prices = await Rest20.GetPricingAsync(accountId, parameters);
 
          bool isTradeable = false, hasBids = false, hasAsks = false;
 
@@ -35,6 +37,15 @@ namespace OkonkwoOandaV20.Framework
             throw new MarketHaltedException($"Market is halted for this instrument: {instrument}");
 
          return true;
+      }
+
+      public static TokenCredential GetAzureCredential(bool isLocalEnvironment = true)
+      {
+         var credentialOptions = new DefaultAzureCredentialOptions
+         {
+            ExcludeManagedIdentityCredential = isLocalEnvironment
+         };
+         return new DefaultAzureCredential(credentialOptions);
       }
    }
 }

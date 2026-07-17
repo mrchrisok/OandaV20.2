@@ -127,7 +127,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// The list of Transactions that satisfy the request.
       /// </summary>
-      [JsonConverter(typeof(TransactionConverter))]
+      //[JsonConverter(typeof(TransactionConverter))]
       public List<ITransaction> transactions;
    }
 

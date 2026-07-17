@@ -18,7 +18,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          Trade
       }
 
-      public class Credentials
+      internal class Credentials
       {
          public bool HasServer(EServer server)
          {
@@ -54,24 +54,24 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          }
       };
 
-         private static Credentials m_DefaultCredentials;
+         private static Credentials m_Credentials;
 
          public string AccessToken { get; set; }
-         public string DefaultAccountId { get; set; }
-         public EEnvironment Environment { get; set; }
+         public string AccountId { get; set; }
+         private EEnvironment Environment { get; set; }
 
-         public static Credentials GetDefaultCredentials()
+         public static Credentials GetCredentials()
          {
-            return m_DefaultCredentials;
+            return m_Credentials;
          }
 
          public static void SetCredentials(EEnvironment environment, string accessToken, string defaultAccount = "0")
          {
-            m_DefaultCredentials = new Credentials
+            m_Credentials = new Credentials
             {
                Environment = environment,
                AccessToken = accessToken,
-               DefaultAccountId = defaultAccount
+               AccountId = defaultAccount
             };
          }
       }
