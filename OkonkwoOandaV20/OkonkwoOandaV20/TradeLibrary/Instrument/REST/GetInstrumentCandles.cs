@@ -1,5 +1,7 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,9 +17,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>List of Candlestick objects (or empty list) </returns>
-      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(string instrument, InstrumentCandlesParameters parameters)
+      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(InstrumentCandlesParameters parameters)
       {
-         string uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/candles";
+         TransformObjectValues(parameters);
+         //
+         string uri = ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/candles";
          var requestParams = ConvertToDictionary(parameters);
 
          var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(uri, "GET", requestParams);
@@ -25,7 +29,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var candles = new List<CandlestickPlus>();
          foreach (var candle in response.candles)
          {
-            candles.Add(new CandlestickPlus(candle) { instrument = instrument, granularity = response.granularity });
+            candles.Add(new CandlestickPlus(candle) { instrument = parameters.instrument, granularity = response.granularity });
          }
 
          return candles;
@@ -33,6 +37,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public class InstrumentCandlesParameters
       {
+         /// <summary>
+         /// Name of the Instrument [required]
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string instrument { get; set; }
+
          /// <summary>
          /// The Price component(s) to get candlestick data for. Can contain any combination 
          /// of the characters “M” (midpoint candles) “B” (bid candles) and “A” (ask candles). 

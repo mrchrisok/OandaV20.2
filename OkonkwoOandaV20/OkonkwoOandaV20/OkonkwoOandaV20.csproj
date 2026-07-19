@@ -147,6 +147,7 @@
     <Compile Include="Framework\Factories\OrderFactory.cs" />
     <Compile Include="Framework\Factories\PriceObjectFactory.cs" />
     <Compile Include="Framework\Factories\TransactionFactory.cs" />
+    <Compile Include="Framework\Constants.cs" />
     <Compile Include="Framework\JsonConverters\JsonConverterBase.cs" />
     <Compile Include="Framework\JsonConverters\PriceObjectConverter.cs" />
     <Compile Include="Framework\JsonConverters\OrderConverter.cs" />

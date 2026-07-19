@@ -15,6 +15,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>an OrderClientExtensionsModifyResponse (throws an OrderClientExtensionsModifyErrorResponse if the request fails.)</returns>
       public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(string accountID, long orderSpecifier, OrderClientExtensionsParameters parameters)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier + "/clientExtensions";
 
          //var extensions = new Dictionary<string, ClientExtensions>();

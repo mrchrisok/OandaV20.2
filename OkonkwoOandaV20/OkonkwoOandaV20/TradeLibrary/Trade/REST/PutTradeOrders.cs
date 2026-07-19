@@ -15,6 +15,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>The Transactions associated with the patched dependent orders</returns>
       public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders";
 
          var requestBody = ConvertObjectToJson(parameters.GetAsDictionary());

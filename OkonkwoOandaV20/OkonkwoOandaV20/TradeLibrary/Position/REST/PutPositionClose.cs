@@ -1,4 +1,6 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -13,9 +15,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">the instrument for which to close all trades</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>DeletePositionResponse object containing details about the actions taken</returns>
-      public static async Task<PositionCloseResponse> PutPositionCloseAsync(string accountID, string instrument, PositionCloseParameters parameters)
+      public static async Task<PositionCloseResponse> PutPositionCloseAsync(string accountID, PositionCloseParameters parameters)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument + "/close";
+         TransformObjectValues(parameters);
+         //
+         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + parameters.instrument + "/close";
 
          var requestBody = ConvertObjectToJson(parameters);
 
@@ -26,6 +30,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public class PositionCloseParameters
       {
+         /// <summary>
+         /// Name of the Instrument [required]
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string instrument { get; set; }
+
          /// <summary>
          /// Indication of how much of the long Position to closeout. Either the
          /// string “ALL”, the string “NONE”, or a DecimalNumber representing how many

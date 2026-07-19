@@ -14,6 +14,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>A list of TradeData objects (or empty list, if no trades)</returns>
       public static async Task<List<Trade.Trade>> GetTradesAsync(string accountID, TradesParameters parameters = null)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades";
 
          var requestParams = ConvertToDictionary(parameters);

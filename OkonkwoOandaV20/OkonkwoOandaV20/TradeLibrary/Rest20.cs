@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Resources.ResXFileRef;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -23,31 +24,34 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       #region initialization
 
       /// <summary>
-      /// Initialize the middleware that will make calls to TradeStation V3 endpoints.
+      /// Initialize the middleware that will make calls to Oanda V3 endpoints.
       /// This method is idempotent. Once initialize, any additional calls will have no effect.
       /// </summary>
       /// <param name="settings">The client TSV3 settings.</param>
       /// <param name="requestClient">An HttpClient configured to support standard connections.</param>
       /// <param name="streamsClient">An HttpClient configured to support streaming connections.</param>
-      /// <param name="jsonSerializerSettings"></param>
-      /// <param name="oauthSvc"></param>
-      /// <param name="cache"></param>
-      /// <param name="logger"></param>
-      /// <param name="authorizeApplication"></param>
+      /// <param name="jsonSerializerSettings">Used to json serialization .. nuff said</param>
+      /// <param name="valueTransformers">Used to transform request/response property values</param>
+      /// <param name="credentials">Used to authenticate to Oanda api</param>
+      /// <param name="logger">It's a logger.</param>
       /// <returns>True, if initialization was successful. False if not successful.</returns>
       public static Task<bool> InitializeAsync(HttpClient requestClient = null, HttpClient streamsClient = null
          , JsonSerializerSettings jsonSettingsRequest = null, JsonSerializerSettings jsonSettingsResponse = null
-         , IList<JsonConverter> jsonConverters = null, (EEnvironment environment
-         , string accessToken, string accountId)? credentials = null)
+         , IList<JsonConverter> jsonConverters = null, IDictionary<string, Action<object>> valueTransformers = null
+         , (EEnvironment environment, string accessToken, string accountId)? credentials = null, ILogger logger = null)
       {
          if (!_initialized)
          {
             _requestClient = requestClient ?? new HttpClient();
             _streamsClient = streamsClient ?? new HttpClient() { Timeout = Timeout.InfiniteTimeSpan };
 
-            JsonConverters = GetJsonConverters(jsonConverters);
-            JsonSettingsRequest = GetJsonSerializerSettings("Request", jsonSettingsRequest);
-            JsonSettingsResponse = GetJsonSerializerSettings("Response", jsonSettingsResponse);
+            JsonConverters = SetJsonConverters(jsonConverters);
+            JsonSettingsRequest = SetJsonSerializerSettings("Request", jsonSettingsRequest);
+            JsonSettingsResponse = SetJsonSerializerSettings("Response", jsonSettingsResponse);
+
+            ValueTransformers = valueTransformers ?? new Dictionary<string, Action<object>>();
+
+            _logger = logger;
 
             if (credentials.HasValue)
             {
@@ -60,7 +64,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return Task.FromResult(_initialized);
       }
 
-      public static JsonSerializerSettings GetJsonSerializerSettings(string httpAction
+      private static JsonSerializerSettings SetJsonSerializerSettings(string httpAction
          , JsonSerializerSettings jsonSettings = null)
       {
          jsonSettings = jsonSettings ?? new JsonSerializerSettings();
@@ -78,12 +82,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          };
       }
 
-      private static IList<JsonConverter> GetJsonConverters(IList<JsonConverter> jsonConverters = null)
+      private static IList<JsonConverter> SetJsonConverters(IList<JsonConverter> jsonConverters = null)
       {
          jsonConverters = jsonConverters ?? new List<JsonConverter>();
 
          return new List<JsonConverter>(jsonConverters) {
-            new TransactionConverter(), new OrderConverter(), new PriceObjectConverter(),
+
+            new OrderConverter(), new PriceObjectConverter(), new TransactionConverter(),
             new PricingStreamResponseConverter(), new TransactionsStreamResponseConverter()
          };
       }
@@ -95,21 +100,27 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       private static bool _initialized = false;
       private static HttpClient _requestClient;
       private static HttpClient _streamsClient;
+      private static ILogger _logger;
 
       /// <summary>
-      /// JsonSerializerSettings for request to TradeStation
+      /// JsonSerializerSettings for request to Oanda
       /// </summary>
       public static JsonSerializerSettings JsonSettingsRequest { get; private set; }
 
       /// <summary>
-      /// JsonSerializerSettings for response from TradeStation
+      /// JsonSerializerSettings for response from Oanda
       /// </summary>
       public static JsonSerializerSettings JsonSettingsResponse { get; private set; }
 
       /// <summary>
-      /// JsonConverters for request/response from TradeStation
+      /// JsonConverters for request/response from Oanda
       /// </summary>
       public static IList<JsonConverter> JsonConverters { get; private set; }
+
+      /// <summary>
+      /// Value transformers for request/response from Oanda
+      /// </summary>
+      public static IDictionary<string, Action<object>> ValueTransformers { get; private set; }
 
       /// <summary>
       /// The time of the last request made to an Oanda V20 service
@@ -239,14 +250,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
                var reader = new StreamReader(stream);
                var json = reader.ReadToEnd();
                var result = JsonConvert.DeserializeObject<T>(json, JsonSettingsResponse);
+
+               TransformObjectValues(result, HttpAction.Response);
+
                return result;
             }
          }
          catch (HttpRequestException ex)
          {
             // add a 'type' property for the ErrorResponseFactory
-            var errorObject = new JObject() { 
-               { "error", ex.Message }, { "type", typeof(E).Name } 
+            var errorObject = new JObject() {
+               { "error", ex.Message }, { "type", typeof(E).Name }
             };
             var errorResult = JsonConvert.SerializeObject(errorObject);
 
@@ -307,8 +321,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          var request = new HttpRequestMessage(new HttpMethod(method), uri)
          {
-            Content = !string.IsNullOrEmpty(requestBody) 
-                      ? new StringContent(requestBody, Encoding.UTF8, "application/json") 
+            Content = !string.IsNullOrEmpty(requestBody)
+                      ? new StringContent(requestBody, Encoding.UTF8, "application/json")
                       : null
          };
 
@@ -374,9 +388,24 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var json = JsonConvert.SerializeObject(input, _dictionarySettings);
          return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
       }
-
       private static JsonSerializerSettings _dictionarySettings;
 
       #endregion
+
+      internal static void TransformObjectValues(object inputObject, string httpAction = HttpAction.Request)
+      {
+         if (inputObject == null)
+            return;
+
+         if (httpAction == HttpAction.Request || httpAction == HttpAction.Response)
+         {
+            if (ValueTransformers.TryGetValue(httpAction, out var valueTransformer))
+               valueTransformer.Invoke(inputObject);
+
+            return;
+         }
+
+         throw new ArgumentException($"Value transformer type {httpAction} is not supported.");
+      }
    }
 }

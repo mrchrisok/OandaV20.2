@@ -14,6 +14,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>an AccountChangesResponse object</returns>
       public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/changes";
 
          uri += "?sinceTransactionID=" + parameters.sinceTransactionID;

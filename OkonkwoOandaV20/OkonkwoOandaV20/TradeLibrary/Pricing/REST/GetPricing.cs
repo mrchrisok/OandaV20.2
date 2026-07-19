@@ -17,6 +17,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<Price>> GetPricingAsync(string accountID, PricingParameters parameters)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/pricing";
 
          if (!(parameters?.instruments?.Count > 0))

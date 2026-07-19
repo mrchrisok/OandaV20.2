@@ -2,6 +2,7 @@
 using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -17,9 +18,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a PositionBook object</returns>
-      public static async Task<PositionBook> GetInstrumentPositionBookAsync(string instrument, InstrumentPositionBookParameters parameters)
+      public static async Task<PositionBook> GetInstrumentPositionBookAsync(InstrumentPositionBookParameters parameters)
       {
-         string uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/positionBook";
+         TransformObjectValues(parameters);
+         //
+         string uri = ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/positionBook";
          var requestParams = ConvertToDictionary(parameters);
 
          InstrumentPositionBookResponse response = null;
@@ -44,6 +47,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             this.getLastTimeOnFailure = getLastTimeOnFailure;
          }
+
+         /// <summary>
+         /// Name of the Instrument [required]
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string instrument { get; set; }
 
          /// <summary>
          /// The time of the snapshot to fetch. If not specified, then the most recent snapshot 
