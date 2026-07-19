@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {

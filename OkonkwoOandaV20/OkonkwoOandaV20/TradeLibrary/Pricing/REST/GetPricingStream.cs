@@ -22,7 +22,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public static async Task<HttpResponseMessage> GetPricingStream(string accountID, PricingStreamParameters parameters, CancellationToken cancellation = default)
       {
          var instruments = Uri.EscapeDataString(GetCommaSeparatedString(parameters.instruments));
-
          var uri = ServerUri(EServer.PricingStream) + $"accounts/{accountID}/pricing/stream";
          uri += "?instruments=" + instruments + "&snapshot=" + parameters.snapshot.ToString();
 
@@ -34,7 +33,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             AcceptType = "application/json"
          };
 
-         return await MakeStreamRequestAsync<PricingStreamResponse>(requestParams, cancellation);
+         return await MakeStreamRequestAsync<PricingStreamErrorResponse>(requestParams, cancellation);
       }
 
       public class PricingStreamParameters
@@ -64,6 +63,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          return (heartbeat != null);
       }
+   }
+
+   public class PricingStreamErrorResponse : ErrorResponse
+   {
+
    }
 
    public class PricingHeartbeat : Heartbeat

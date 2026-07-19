@@ -4,6 +4,7 @@ using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
+using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -20,7 +21,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          var requestParams = new HttpParameters(parameters, JsonSettingsRequest)
          {
-            Method = HttpMethod.Patch,
+            Method = new HttpMethod("PATCH"),
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/configuration"),
             Binding = HttpParametersBinding.Body,
             ContentType = "application/json"

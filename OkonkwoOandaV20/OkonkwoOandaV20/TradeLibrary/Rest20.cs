@@ -149,77 +149,77 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>Returns the base uri of the target server</returns>
       private static string ServerUri(EServer server) { return Credentials.GetCredentials().GetServer(server); }
 
-      /// <summary>
-      /// Sends a web request to a remote endpoint (uri).
-      /// </summary>
-      /// <typeparam name="T">The response type</typeparam>
-      /// <param name="uri">The uri of the remote service</param>
-      /// <param name="method">method for the request (defaults to GET)</param>
-      /// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
-      /// <returns>A success response object of type T or a failure response object of type ErrorResponse</returns>
-      private static async Task<T> MakeRequestAsync<T>(string uri, string method = "GET", Dictionary<string, string> requestParams = null, HttpCompletionOption? completionOption = null)
-      {
-         return await MakeRequestAsync<T, ErrorResponse>(uri, method, requestParams, completionOption);
-      }
+      ///// <summary>
+      ///// Sends a web request to a remote endpoint (uri).
+      ///// </summary>
+      ///// <typeparam name="T">The response type</typeparam>
+      ///// <param name="uri">The uri of the remote service</param>
+      ///// <param name="method">method for the request (defaults to GET)</param>
+      ///// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
+      ///// <returns>A success response object of type T or a failure response object of type ErrorResponse</returns>
+      //private static async Task<T> MakeRequestAsync<T>(string uri, string method = "GET", Dictionary<string, string> requestParams = null, HttpCompletionOption? completionOption = null)
+      //{
+      //   return await MakeRequestAsync<T, ErrorResponse>(uri, method, requestParams, completionOption);
+      //}
 
-      /// <summary>
-      /// Sends a web request to a remote service (uri).
-      /// </summary>
-      /// <typeparam name="T">The success response type</typeparam>
-      /// <typeparam name="E">The error  response type</typeparam>
-      /// <param name="uri">The uri of the remote service</param>
-      /// <param name="method">The request verb for the request. Default is GET</param>
-      /// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
-      /// <returns>A success response object of type T or a failure response object of type E</returns>
-      private static async Task<T> MakeRequestAsync<T, E>(string uri, string method = "GET", Dictionary<string, string> requestParams = null, HttpCompletionOption? completionOption = null)
-         where E : IErrorResponse
-      {
-         if (requestParams?.Count > 0)
-         {
-            var queryString = CreateQueryString(requestParams);
-            uri = uri + "?" + queryString;
-         }
+      ///// <summary>
+      ///// Sends a web request to a remote service (uri).
+      ///// </summary>
+      ///// <typeparam name="T">The success response type</typeparam>
+      ///// <typeparam name="E">The error  response type</typeparam>
+      ///// <param name="uri">The uri of the remote service</param>
+      ///// <param name="method">The request verb for the request. Default is GET</param>
+      ///// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
+      ///// <returns>A success response object of type T or a failure response object of type E</returns>
+      //private static async Task<T> MakeRequestAsync<T, E>(string uri, string method = "GET", Dictionary<string, string> requestParams = null, HttpCompletionOption? completionOption = null)
+      //   where E : IErrorResponse
+      //{
+      //   if (requestParams?.Count > 0)
+      //   {
+      //      var queryString = CreateQueryString(requestParams);
+      //      uri = uri + "?" + queryString;
+      //   }
 
-         return await GetWebResponse<T, E>(CreateHttpRequestMessage(uri, method), completionOption);
-      }
+      //   return await GetWebResponse<T, E>(CreateHttpRequestMessage(uri, method), completionOption);
+      //}
 
-      /// <summary>
-      /// Sends a web request with a JSON body to a remote service (uri). 
-      /// </summary>
-      /// <typeparam name="T">The success response type</typeparam>
-      /// <typeparam name="E">The error response type</typeparam>
-      /// <param name="method">The request verb for the request</param>
-      /// <param name="requestBody">The request body (must be a valid json string)</param>
-      /// <param name="uri">The uri of the remote service</param>
-      /// <returns>A success response object of type T or a failure response object of type E</returns>
-      private static async Task<T> MakeRequestWithJSONBody<T, E>(string method, string requestBody, string uri
-         , HttpCompletionOption? completionOption = null)
-         where E : IErrorResponse
-      {
-         // Create the request
-         HttpRequestMessage request = CreateHttpRequestMessage(uri, method, requestBody);
+      ///// <summary>
+      ///// Sends a web request with a JSON body to a remote service (uri). 
+      ///// </summary>
+      ///// <typeparam name="T">The success response type</typeparam>
+      ///// <typeparam name="E">The error response type</typeparam>
+      ///// <param name="method">The request verb for the request</param>
+      ///// <param name="requestBody">The request body (must be a valid json string)</param>
+      ///// <param name="uri">The uri of the remote service</param>
+      ///// <returns>A success response object of type T or a failure response object of type E</returns>
+      //private static async Task<T> MakeRequestWithJSONBody<T, E>(string method, string requestBody, string uri
+      //   , HttpCompletionOption? completionOption = null)
+      //   where E : IErrorResponse
+      //{
+      //   // Create the request
+      //   HttpRequestMessage request = CreateHttpRequestMessage(uri, method, requestBody);
 
-         return await GetWebResponse<T, E>(request, completionOption);
-      }
+      //   return await GetWebResponse<T, E>(request, completionOption);
+      //}
 
-      /// <summary>
-      /// Sends a web request with a JSON body to a remote service (uri).
-      /// </summary>
-      /// <typeparam name="T">The success response type</typeparam>
-      /// <typeparam name="E">The error response type</typeparam>
-      /// <typeparam name="P">The requestParams object type</typeparam>
-      /// <param name="method">The request verb for the request</param>
-      /// <param name="requestParams">the parameters to pass in the request body</param>
-      /// <param name="uri">The uri of the remote service</param>
-      /// <returns>A success response object of type T or a failure response object of type E</returns>
-      private static async Task<T> MakeRequestWithJSONBody<T, E, P>(string method, P requestParams, string uri
-         , HttpCompletionOption? completionOption = null)
-         where E : IErrorResponse
-      {
-         var requestBody = ConvertObjectToJson(requestParams);
+      ///// <summary>
+      ///// Sends a web request with a JSON body to a remote service (uri).
+      ///// </summary>
+      ///// <typeparam name="T">The success response type</typeparam>
+      ///// <typeparam name="E">The error response type</typeparam>
+      ///// <typeparam name="P">The requestParams object type</typeparam>
+      ///// <param name="method">The request verb for the request</param>
+      ///// <param name="requestParams">the parameters to pass in the request body</param>
+      ///// <param name="uri">The uri of the remote service</param>
+      ///// <returns>A success response object of type T or a failure response object of type E</returns>
+      //private static async Task<T> MakeRequestWithJSONBody<T, E, P>(string method, P requestParams, string uri
+      //   , HttpCompletionOption? completionOption = null)
+      //   where E : IErrorResponse
+      //{
+      //   var requestBody = ConvertObjectToJson(requestParams);
 
-         return await MakeRequestWithJSONBody<T, E>(method, requestBody, uri, completionOption);
-      }
+      //   return await MakeRequestWithJSONBody<T, E>(method, requestBody, uri, completionOption);
+      //}
 
       /// <summary>
       /// New: Sends a web request using HttpParameters (object -> querystring/body) and returns a deserialized object.
@@ -238,7 +238,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       private static async Task<HttpResponseMessage> MakeStreamRequestAsync<E>(HttpParameters parameters, CancellationToken cancellation = default)
          where E : IErrorResponse
       {
-         parameters.AcceptType ??= "application/json";
+         parameters.AcceptType = parameters.AcceptType ?? "application/json";
 
          HttpRequestMessage request = await CreateHttpRequestAsync(parameters, cancellation);
 

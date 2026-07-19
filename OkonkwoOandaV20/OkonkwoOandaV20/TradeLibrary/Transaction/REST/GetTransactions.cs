@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

@@ -29,7 +29,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             AcceptType = "application/json"
          };
 
-         return await MakeStreamRequestAsync<TransactionsStreamResponse>(parameters, cancellation);
+         return await MakeStreamRequestAsync<TransactionsStreamErrorResponse>(parameters, cancellation);
       }
    }
 
@@ -41,6 +41,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// The most recent Transaction completed for the Account
       /// </summary>
       public ITransaction transaction { get; set; }
+   }
+
+   public class TransactionsStreamErrorResponse : ErrorResponse
+   {
    }
 
    public class TransactionsHeartbeat : Heartbeat

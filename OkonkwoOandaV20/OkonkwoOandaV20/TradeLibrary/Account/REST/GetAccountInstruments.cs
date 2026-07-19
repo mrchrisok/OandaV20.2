@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
