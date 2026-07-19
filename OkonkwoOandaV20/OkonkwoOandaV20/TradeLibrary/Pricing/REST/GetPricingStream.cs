@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework.JsonConverters;
-using OkonkwoOandaV20.TradeLibrary.Pricing;
+using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
+using OkonkwoOandaV20.TradeLibrary.Pricing;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,44 +14,28 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    public partial class Rest20
    {
       /// <summary>
-      /// Get a stream of Account Prices starting from when the request is made. This pricing stream does not include every 
-      /// single price created for the Account, but instead will provide at most 4 prices per second(every 250 milliseconds) 
-      /// for each instrument being requested. If more than one price is created for an instrument during the 250 millisecond 
-      /// window, only the price in effect at the end of the window is sent.This means that during periods of rapid price movement, 
-      /// subscribers to this stream will not be sent every price. Pricing windows for different connections to the price stream 
-      /// are not all aligned in the same way (i.e.they are not all aligned to the top of the second). This means that during 
-      /// periods of rapid price movement, different subscribers may observe different prices depending on their alignment.
+      /// Get a pricing stream for the specified account and instrument list.
       /// </summary>
       /// <param name="accountID"></param>
       /// <param name="parameters">The parameters for the request</param>
-      /// <returns>The WebResponse object that can be used to retrieve the prices as they stream</returns>
-      public static async Task<HttpResponseMessage> GetPricingStream(string accountID, PricingStreamParameters parameters)
+      /// <returns>The HttpResponseMessage that can be used to retrieve the prices as they stream</returns>
+      public static async Task<HttpResponseMessage> GetPricingStream(string accountID, PricingStreamParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
          var instruments = Uri.EscapeDataString(GetCommaSeparatedString(parameters.instruments));
 
-         string uri = ServerUri(EServer.PricingStream) + "accounts/" + accountID + "/pricing/stream";
+         var uri = ServerUri(EServer.PricingStream) + $"accounts/{accountID}/pricing/stream";
          uri += "?instruments=" + instruments + "&snapshot=" + parameters.snapshot.ToString();
 
-         var request = new HttpRequestMessage(new HttpMethod("GET"), uri);
-         //
-         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
-         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(uri),
+            Binding = HttpParametersBinding.QueryString,
+            AcceptType = "application/json"
+         };
 
-         try
-         {
-            HttpResponseMessage response = await _streamsClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-            return response;
-         }
-         catch (HttpRequestException ex)
-         {
-            throw ex;
-         }
+         return await MakeStreamRequestAsync<PricingStreamResponse>(requestParams, cancellation);
       }
-
 
       public class PricingStreamParameters
       {
@@ -71,10 +54,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   /// <summary>
-   /// Events are authorized transactions posted to the subject account.
-   /// For more information, visit: http://developer.oanda.com/rest-live-v20/transaction-ep/
-   /// </summary>
    //[JsonConverter(typeof(PricingStreamResponseConverter))]
    public class PricingStreamResponse : IStreamResponse
    {
