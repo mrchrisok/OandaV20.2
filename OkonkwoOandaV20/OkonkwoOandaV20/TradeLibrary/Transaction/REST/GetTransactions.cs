@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework.JsonConverters;
-using OkonkwoOandaV20.TradeLibrary.Transaction;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
+using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -14,22 +16,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns></returns>
-      public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters)
+      public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         var requestParams = ConvertToDictionary(parameters);
+         var requestDict = ConvertToDictionary(parameters) ?? new Dictionary<string, string>();
 
          string type = null;
          if (parameters.type != null)
          {
             type = GetCommaSeparatedString(parameters.type);
-            requestParams.Add("type", type);
+            requestDict.Add("type", type);
          }
 
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions";
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/transactions"),
+            Binding = HttpParametersBinding.QueryString,
+            Data = requestDict.Count > 0 ? JToken.FromObject(requestDict) : null
+         };
 
-         var pagesResponse = await MakeRequestAsync<TransactionPagesResponse, TransactionPagesErrorResponse>(uri, "GET", requestParams);
+         var pagesResponse = await MakeRequestAsync<TransactionPagesResponse, TransactionPagesErrorResponse>(requestParams, cancellation);
 
          var transactions = new List<ITransaction>();
          foreach (string page in pagesResponse.pages)
@@ -122,19 +128,4 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    public class TransactionPagesErrorResponse : ErrorResponse
    {
    }
-
-   #region base classes
-   public class TransactionsResponse : Response
-   {
-      /// <summary>
-      /// The list of Transactions that satisfy the request.
-      /// </summary>
-      //[JsonConverter(typeof(TransactionConverter))]
-      public List<ITransaction> transactions;
-   }
-
-   public class TransactionsErrorResponse : ErrorResponse
-   {
-   }
-   #endregion
 }

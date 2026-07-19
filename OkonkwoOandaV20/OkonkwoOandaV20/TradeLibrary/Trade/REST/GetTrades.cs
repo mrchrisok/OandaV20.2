@@ -1,6 +1,9 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -12,17 +15,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>A list of TradeData objects (or empty list, if no trades)</returns>
-      public static async Task<List<Trade.Trade>> GetTradesAsync(string accountID, TradesParameters parameters = null)
+      public static async Task<List<Trade.Trade>> GetTradesAsync(string accountID, TradesParameters parameters = null, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades";
-
-         var requestParams = ConvertToDictionary(parameters);
+         var dict = ConvertToDictionary(parameters) ?? new Dictionary<string, string>();
          if (parameters?.ids.Count > 0)
-            requestParams.Add("ids", GetCommaSeparatedString(parameters.ids));
+            dict.Add("ids", GetCommaSeparatedString(parameters.ids));
 
-         var response = await MakeRequestAsync<TradesResponse, TradesErrorResponse>(uri, "GET", requestParams);
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/trades"),
+            Binding = HttpParametersBinding.QueryString,
+            Data = dict.Count > 0 ? JToken.FromObject(dict) : null
+         };
+
+         var response = await MakeRequestAsync<TradesResponse, TradesErrorResponse>(requestParams, cancellation);
 
          return response.trades ?? new List<Trade.Trade>();
       }

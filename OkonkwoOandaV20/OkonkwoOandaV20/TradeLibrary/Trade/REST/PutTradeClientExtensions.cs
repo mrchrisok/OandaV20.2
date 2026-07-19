@@ -1,5 +1,7 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -13,13 +15,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="tradeSpecifier">Specifier for the Trade</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
-      public static async Task<TradeClientExtensionsResponse> PutTradeClientExtensionsAsync(string accountID, long tradeSpecifier, TradeClientExtensionsParameters parameters)
+      public static async Task<TradeClientExtensionsResponse> PutTradeClientExtensionsAsync(string accountID, long tradeSpecifier, TradeClientExtensionsParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/clientExtensions";
+         var requestParams = new HttpParameters(parameters, JsonSettingsRequest)
+         {
+            Method = HttpMethod.Put,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/trades/{tradeSpecifier}/clientExtensions"),
+            Binding = HttpParametersBinding.Body,
+            ContentType = "application/json"
+         };
 
-         var response = await MakeRequestWithJSONBody<TradeClientExtensionsResponse, TradeClientExtensionsErrorResponse, TradeClientExtensionsParameters>("PUT", parameters, uri);
+         var response = await MakeRequestAsync<TradeClientExtensionsResponse, TradeClientExtensionsErrorResponse>(requestParams, cancellation);
 
          return response;
       }

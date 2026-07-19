@@ -1,8 +1,11 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Order;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -17,17 +20,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the identifier of the account to retrieve the list for</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
-      public static async Task<List<IOrder>> GetOrdersAsync(string accountID, OrdersParameters parameters = null)
+      public static async Task<List<IOrder>> GetOrdersAsync(string accountID, OrdersParameters parameters = null, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders";
-
-         var requestParams = ConvertToDictionary(parameters);
+         var dict = ConvertToDictionary(parameters) ?? new Dictionary<string, string>();
          if (parameters?.ids?.Count > 0)
-            requestParams.Add("ids", GetCommaSeparatedString(parameters.ids));
+            dict.Add("ids", GetCommaSeparatedString(parameters.ids));
 
-         var response = await MakeRequestAsync<OrdersResponse, OrdersErrorResponse>(uri, "GET", requestParams);
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders"),
+            Binding = HttpParametersBinding.QueryString,
+            Data = dict.Count > 0 ? JToken.FromObject(dict) : null
+         };
+
+         var response = await MakeRequestAsync<OrdersResponse, OrdersErrorResponse>(requestParams, cancellation);
 
          return new List<IOrder>(response.orders);
       }

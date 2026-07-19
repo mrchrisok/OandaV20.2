@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -10,11 +12,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">positions will be retrieved for this account id</param>
       /// <returns>List of Position objects with the details for each position (or empty list iff no positions)</returns>
-      public static async Task<List<Position.Position>> GetPositionsAsync(string accountID)
+      public static async Task<List<Position.Position>> GetPositionsAsync(string accountID, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions";
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/positions"),
+            Binding = HttpParametersBinding.QueryString
+         };
 
-         var response = await MakeRequestAsync<PositionsResponse, PositionsErrorResponse>(uri);
+         var response = await MakeRequestAsync<PositionsResponse, PositionsErrorResponse>(requestParams, cancellation);
 
          return response.positions ?? new List<Position.Position>();
       }
