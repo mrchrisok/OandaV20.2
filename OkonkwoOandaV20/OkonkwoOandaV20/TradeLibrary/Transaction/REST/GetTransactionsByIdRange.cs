@@ -20,40 +20,25 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<ITransaction>> GetTransactionsByIdRangeAsync(string accountID, TransactionsByIdRangeParameters parameters, CancellationToken cancellation = default)
       {
-         HttpParameters requestParams(string uri_ = null, object params_ = null) => new HttpParameters(params_)
+         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
          {
-            Method = HttpMethod.Get,
-            Uri = new Uri(uri_ ?? ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange"),
+            { "type", GetCommaSeparatedString(parameters.type ?? new List<string>()) }
          };
 
-         TransactionsResponse response = null;
-
-         if (!string.IsNullOrEmpty(parameters.page))
+         var requestParams = new HttpParameters(parameters)
          {
-            response = await MakeRequestAsync<TransactionsResponse, TransactionsByIdRangeErrorResponse>(
-               requestParams(uri_: parameters.page), cancellation);
-         }
-         else
-         {
-            var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-            {
-            { "type", GetCommaSeparatedString(parameters.type ?? new List<string>()) }
-            };
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange"),
+         };
 
-            response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(
-               requestParams(params_: requestDict));
-         }
+         var response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(requestParams
+            , cancellation);
 
          return response.transactions;
       }
 
       public class TransactionsByIdRangeParameters
       {
-         /// <summary>
-         /// The URI that represents the idrange query providing the data for the query results
-         /// </summary>
-         public string page { get; set; }
-
          /// <summary>
          /// The starting Transacion ID (inclusive) to fetch. [required]
          /// </summary>

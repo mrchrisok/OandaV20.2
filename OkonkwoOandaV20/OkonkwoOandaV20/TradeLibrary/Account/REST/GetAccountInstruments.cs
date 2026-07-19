@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -21,17 +22,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// the account are returned.</returns>
       public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters();
+         var parameters_ = new { instruments = GetCommaSeparatedString(parameters.instruments) };
 
-         requestParams.Method = HttpMethod.Get;
-         requestParams.Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/instruments");
-         requestParams.Binding = HttpParametersBinding.QueryString;
-
-         if (parameters?.instruments?.Count > 0)
+         var requestParams = new HttpParameters(parameters_)
          {
-            string commaSeparatedInstruments = GetCommaSeparatedString(parameters.instruments);
-            requestParams.Data = JToken.FromObject(new { instruments = commaSeparatedInstruments });
-         }
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/instruments"),
+            Binding = HttpParametersBinding.QueryString
+         };
 
          var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(requestParams, cancellation);
          return response.instruments;
@@ -42,6 +40,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// <summary>
          /// List of instruments to query specifically.
          /// </summary>
+         [JsonIgnore]
          public List<string> instruments { get; set; }
       }
    }

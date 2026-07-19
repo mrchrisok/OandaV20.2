@@ -19,7 +19,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/trades/{tradeSpecifier}"),
-            Binding = HttpParametersBinding.QueryString
          };
 
          var response = await MakeRequestAsync<TradeResponse, TradeErrorResponse>(requestParams, cancellation);

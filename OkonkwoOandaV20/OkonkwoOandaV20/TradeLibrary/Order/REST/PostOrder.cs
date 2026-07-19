@@ -20,12 +20,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
       public static async Task<PostOrderResponse> PostOrderAsync(string accountID, IOrderRequest request, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(new { order = request }, JsonSettingsRequest)
+         var requestParams = new HttpParameters(new { order = request })
          {
             Method = HttpMethod.Post,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders"),
             Binding = HttpParametersBinding.Body,
-            ContentType = "application/json"
          };
 
          var response = await MakeRequestAsync<PostOrderResponse, PostOrderErrorResponse>(requestParams, cancellation);

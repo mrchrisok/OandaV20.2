@@ -294,7 +294,6 @@
     <Compile Include="TradeLibrary\Transaction\REST\GetTransactionsByIdRange.cs" />
     <Compile Include="TradeLibrary\Transaction\REST\GetTransactionsSinceId.cs" />
     <Compile Include="TradeLibrary\Transaction\REST\GetTransactionsStream.cs" />
-    <Compile Include="TradeLibrary\Transaction\REST\TransactionsResponse.cs" />
     <Compile Include="TradeLibrary\Transaction\StopLossOrderRejectTransaction.cs" />
     <Compile Include="TradeLibrary\Transaction\StopLossOrderTransaction.cs" />
     <Compile Include="TradeLibrary\Transaction\StopOrderRejectTransaction.cs" />

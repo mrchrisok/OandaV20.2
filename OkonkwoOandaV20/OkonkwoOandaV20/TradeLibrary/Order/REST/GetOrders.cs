@@ -23,16 +23,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
       public static async Task<List<IOrder>> GetOrdersAsync(string accountID, OrdersParameters parameters = null, CancellationToken cancellation = default)
       {
-         var dict = ConvertToDictionary(parameters) ?? new Dictionary<string, string>();
-         if (parameters?.ids?.Count > 0)
-            dict.Add("ids", GetCommaSeparatedString(parameters.ids));
+         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
+         {
+            { "ids", GetCommaSeparatedString(parameters.ids ?? new List<string>()) }
+         };
 
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(requestDict)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders"),
-            Binding = HttpParametersBinding.QueryString,
-            Data = dict.Count > 0 ? JToken.FromObject(dict) : null
+            Binding = HttpParametersBinding.QueryString
          };
 
          var response = await MakeRequestAsync<OrdersResponse, OrdersErrorResponse>(requestParams, cancellation);

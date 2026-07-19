@@ -19,12 +19,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>an AccountConfigurationResponse object containing the updated values that were applied to the account</returns>
       public static async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(string accountID, AccountConfigurationParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters, JsonSettingsRequest)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = new HttpMethod("PATCH"),
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/configuration"),
             Binding = HttpParametersBinding.Body,
-            ContentType = "application/json"
          };
  
          var response = await MakeRequestAsync<AccountConfigurationResponse, AccountConfigurationErrorResponse>(requestParams, cancellation);

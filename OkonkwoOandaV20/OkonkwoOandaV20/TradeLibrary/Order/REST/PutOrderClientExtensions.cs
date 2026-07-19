@@ -25,14 +25,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             Binding = HttpParametersBinding.Body
          };
 
-         //var extensions = new Dictionary<string, ClientExtensions>();
-         //extensions.Add("clientExtensions", parameters.orderExtensions);
-
-         //if (parameters.tradeExtensions != null)
-         //extensions.Add("tradeClientExtensions", parameters.tradeExtensions);
-
-         //var response = await MakeRequestWithJSONBody<OrderClientExtensionsModifyResponse, OrderClientExtensionsModifyErrorResponse, Dictionary<string, ClientExtensions>>("PUT", extensions, uri);
-
          var response = await MakeRequestAsync<OrderClientExtensionsResponse, OrderClientExtensionsErrorResponse>(requestParams, cancellation);
 
          return response;

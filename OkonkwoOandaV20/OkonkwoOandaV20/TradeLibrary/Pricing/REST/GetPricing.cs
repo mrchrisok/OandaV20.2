@@ -20,25 +20,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<Price>> GetPricingAsync(string accountID, PricingParameters parameters, CancellationToken cancellation = default)
       {
-         if (!(parameters?.instruments?.Count > 0))
-            throw new ArgumentException("List of instruments cannot be null or empty.");
+         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
+         {
+            { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
+         };
 
-         string instrumentsCSV = GetCommaSeparatedString(parameters.instruments);
-
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(requestDict)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/pricing"),
             Binding = HttpParametersBinding.QueryString
          };
-
-         // set query values
-         var queryObject = new JObject();
-         if (!string.IsNullOrEmpty(parameters.since)) queryObject["since"] = parameters.since;
-         if (parameters.includeHomeConversions.HasValue) queryObject["includeHomeConversions"] = parameters.includeHomeConversions.Value;
-         queryObject["instruments"] = instrumentsCSV;
-
-         requestParams.Data = queryObject;
 
          var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(requestParams, cancellation);
 

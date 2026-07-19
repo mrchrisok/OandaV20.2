@@ -21,7 +21,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Put,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders/{orderSpecifier}/cancel"),
-            Binding = HttpParametersBinding.QueryString
          };
 
          var response = await MakeRequestAsync<OrderCancelResponse, OrderCancelErrorResponse>(requestParams, cancellation);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OkonkwoOandaV20.TradeLibrary.Common;
 using System;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -16,17 +17,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
    public class HttpParameters
    {
-      public HttpParameters(object payload, JsonSerializerSettings settings) : this(payload)
+      public HttpParameters(object payload, JsonSerializerSettings settings)
       {
-         JsonSettings = settings;
-      }
+         if (payload == null) return;
 
-      public HttpParameters(object payload)
-      {
          Rest20.TransformObjectValues(payload);
 
-         if (payload == null) return;
-         Data = payload is JToken jt ? jt : JToken.FromObject(payload);
+         JsonSettings = settings ?? (payload as ApiParameters)?.JsonSerializerSettingsRequest;
+         JsonSettings = JsonSettings ?? Rest20.JsonSettingsRequest;
+         var jsonSerializer = JsonSerializer.CreateDefault(JsonSettings);
+
+         Data = payload is JToken jt ? jt : JToken.FromObject(payload, jsonSerializer);
+      }
+
+      public HttpParameters(object payload) : this(payload, null)
+      {
       }
 
       public HttpParameters() { }

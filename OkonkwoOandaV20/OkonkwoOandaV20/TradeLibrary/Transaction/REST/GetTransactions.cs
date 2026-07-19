@@ -31,14 +31,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             Binding = HttpParametersBinding.QueryString,
          };
 
-         var pagesResponse = await MakeRequestAsync<TransactionPagesResponse, TransactionPagesErrorResponse>(requestParams, cancellation);
+         var pagesResponse = await MakeRequestAsync<TransactionsPageResponse, TransactionsPageErrorResponse>(requestParams, cancellation);
 
          var transactions = new List<ITransaction>();
          foreach (string page in pagesResponse.pages)
          {
-            var pageParams = new TransactionsByIdRangeParameters { page = page, type = parameters.type };
-
-            transactions.AddRange(await GetTransactionsByIdRangeAsync(accountID, pageParams));
+            var parameters_ = new HttpParameters() { Uri = new Uri(page) };
+            var transactions_ = await MakeRequestAsync<TransactionsResponse, TransactionsErrorResponse>(parameters_, cancellation);
+            transactions.AddRange(transactions_.transactions);
 
             await Task.Delay(parameters.pagingDelayMilliSeconds); // throttle these a bit
          }
@@ -81,10 +81,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   #region TransactionsPageResponse, TransactionsPageErrorResponse
+
    /// <summary>
    /// The GET success response received from accounts/accountID/transactions
    /// </summary>
-   public class TransactionPagesResponse : Response
+   public class TransactionsPageResponse : Response
    {
       /// <summary>
       /// The starting time provided in the request.
@@ -121,7 +123,31 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// <summary>
    /// The GET error response received from accounts/accountID/transactions
    /// </summary>
-   public class TransactionPagesErrorResponse : ErrorResponse
+   public class TransactionsPageErrorResponse : ErrorResponse
    {
    }
+
+   #endregion
+
+   #region TransactionsResponse, TransactionsErrorResponse
+
+   /// <summary>
+   /// The GET success response received from accounts/accountID/transactions/idrange or similar
+   /// </summary>
+   public class TransactionsResponse : Response
+   {
+      /// <summary>
+      /// The list of Transaction objects returned by the request
+      /// </summary>
+      public List<ITransaction> transactions { get; set; }
+   }
+
+   /// <summary>
+   /// The GET error response received from accounts/accountID/transactions endpoints
+   /// </summary>
+   public class TransactionsErrorResponse : ErrorResponse
+   {
+   }
+
+   #endregion
 }

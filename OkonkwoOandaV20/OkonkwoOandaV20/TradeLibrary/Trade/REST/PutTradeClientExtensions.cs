@@ -18,12 +18,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
       public static async Task<TradeClientExtensionsResponse> PutTradeClientExtensionsAsync(string accountID, long tradeSpecifier, TradeClientExtensionsParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters, JsonSettingsRequest)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/trades/{tradeSpecifier}/clientExtensions"),
             Binding = HttpParametersBinding.Body,
-            ContentType = "application/json"
          };
 
          var response = await MakeRequestAsync<TradeClientExtensionsResponse, TradeClientExtensionsErrorResponse>(requestParams, cancellation);

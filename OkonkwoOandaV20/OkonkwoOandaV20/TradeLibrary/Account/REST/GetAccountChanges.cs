@@ -17,7 +17,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>an AccountChangesResponse object</returns>
       public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(new { sinceTransactionID = parameters.sinceTransactionID })
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/changes"),

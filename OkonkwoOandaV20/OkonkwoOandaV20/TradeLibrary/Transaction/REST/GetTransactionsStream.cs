@@ -25,8 +25,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.TransactionsStream) + $"accounts/{accountID}/transactions/stream"),
-            Binding = HttpParametersBinding.QueryString,
-            AcceptType = "application/json"
          };
 
          return await MakeStreamRequestAsync<TransactionsStreamErrorResponse>(parameters, cancellation);

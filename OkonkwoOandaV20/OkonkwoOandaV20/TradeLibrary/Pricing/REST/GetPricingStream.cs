@@ -21,16 +21,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>The HttpResponseMessage that can be used to retrieve the prices as they stream</returns>
       public static async Task<HttpResponseMessage> GetPricingStream(string accountID, PricingStreamParameters parameters, CancellationToken cancellation = default)
       {
-         var instruments = Uri.EscapeDataString(GetCommaSeparatedString(parameters.instruments));
-         var uri = ServerUri(EServer.PricingStream) + $"accounts/{accountID}/pricing/stream";
-         uri += "?instruments=" + instruments + "&snapshot=" + parameters.snapshot.ToString();
+         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
+         {
+            { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
+         };
 
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(requestDict)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(uri),
+            Uri = new Uri(ServerUri(EServer.PricingStream) + $"accounts/{accountID}/pricing/stream"),
             Binding = HttpParametersBinding.QueryString,
-            AcceptType = "application/json"
          };
 
          return await MakeStreamRequestAsync<PricingStreamErrorResponse>(requestParams, cancellation);
@@ -43,6 +43,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// <summary>
          /// List of Instruments to stream Prices for. [required]
          /// </summary>
+         [JsonIgnore]
          public List<string> instruments { get; set; }
 
          /// <summary>
