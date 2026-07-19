@@ -1,7 +1,11 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Instrument;
+﻿using Microsoft.Identity.Client;
+using OkonkwoOandaV20.TradeLibrary.Instrument;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -17,14 +21,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>List of Candlestick objects (or empty list) </returns>
-      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(InstrumentCandlesParameters parameters)
+      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/candles";
-         var requestParams = ConvertToDictionary(parameters);
+         var requestParams = new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Put,
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/candles"),
+            Binding = HttpParametersBinding.QueryString
+         };
 
-         var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(uri, "GET", requestParams);
+         var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(requestParams, cancellation);
 
          var candles = new List<CandlestickPlus>();
          foreach (var candle in response.candles)

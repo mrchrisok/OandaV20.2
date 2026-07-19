@@ -1,4 +1,7 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -11,15 +14,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="tradeSpecifier">The Trade specifier</param>
       /// <returns>DeleteTradeResponse containing the details of the close</returns>
-      public static async Task<TradeCloseResponse> PutTradeCloseAsync(string accountID, long tradeSpecifier, TradeCloseParameters parameters = null)
+      public static async Task<TradeCloseResponse> PutTradeCloseAsync(string accountID, long tradeSpecifier, TradeCloseParameters parameters = null, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
+         var requestParams = new HttpParameters(parameters = parameters ?? new TradeCloseParameters())
+         {
+            Method = HttpMethod.Put,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/close"),
+            Binding = HttpParametersBinding.Body
+         };
+
+         //TransformObjectValues(parameters);
          //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/close";
+         //string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/close";
 
-         parameters = parameters ?? new TradeCloseParameters();
+         //parameters = parameters ?? new TradeCloseParameters();
 
-         return await MakeRequestWithJSONBody<TradeCloseResponse, TradeCloseErrorResponse, TradeCloseParameters>("PUT", parameters, uri);
+         return await MakeRequestAsync<TradeCloseResponse, TradeCloseErrorResponse>(requestParams, cancellation);
       }
 
       public class TradeCloseParameters

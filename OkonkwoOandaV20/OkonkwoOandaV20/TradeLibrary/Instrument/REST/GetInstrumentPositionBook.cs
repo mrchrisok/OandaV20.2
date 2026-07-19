@@ -3,6 +3,7 @@ using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
