@@ -1,0 +1,44 @@
+name: CI Build (.NET Framework - MSBuild)
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch: {}
+
+jobs:
+  build-windows:
+    name: Build (Windows + MSBuild)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+
+      - name: Restore NuGet packages
+        run: nuget restore OkonkwoOandaV20.sln
+
+      - name: Build solution (MSBuild)
+        run: msbuild OkonkwoOandaV20.sln /p:Configuration=Release /m
+
+      - name: Run unit tests (vstest)
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        run: |
+          $repo = $env:GITHUB_WORKSPACE
+          Write-Host "Workspace: $repo"
+          $tests = Get-ChildItem -Path $repo -Recurse -Include *OkonkwoOandaV20Tests*.dll, *Tests.dll -ErrorAction SilentlyContinue
+          if ($tests) {
+            foreach ($t in $tests) {
+              Write-Host "Running tests: $($t.FullName)"
+              vstest.console.exe $t.FullName
+            }
+          } else {
+            Write-Host "No test assemblies found; skipping tests."
+          }
