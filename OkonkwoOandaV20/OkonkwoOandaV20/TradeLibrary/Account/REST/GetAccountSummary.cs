@@ -1,4 +1,5 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Account;
+using OkonkwoOandaV20.TradeLibrary.Account;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -11,11 +12,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">summary will be retrieved for this account id</param>
       /// <returns>an AccountSummary object containing the account details</returns>
-      public static async Task<AccountSummary> GetAccountSummaryAsync(string accountID)
+      public static async Task<AccountSummary> GetAccountSummaryAsync(string accountID, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/summary";
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/summary"),
+            Binding = HttpParametersBinding.QueryString
+         };
 
-         var response = await MakeRequestAsync<AccountSummaryResponse, AccountSummaryErrorResponse>(uri);
+         var response = await MakeRequestAsync<AccountSummaryResponse, AccountSummaryErrorResponse>(requestParams, cancellation);
          return response.account;
       }
    }
