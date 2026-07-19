@@ -1,8 +1,11 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -15,21 +18,29 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account Identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns></returns>
-      public static async Task<List<Price>> GetPricingAsync(string accountID, PricingParameters parameters)
+      public static async Task<List<Price>> GetPricingAsync(string accountID, PricingParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/pricing";
-
          if (!(parameters?.instruments?.Count > 0))
             throw new ArgumentException("List of instruments cannot be null or empty.");
 
-         var requestParams = ConvertToDictionary(parameters);
-
          string instrumentsCSV = GetCommaSeparatedString(parameters.instruments);
-         requestParams.Add("instruments", instrumentsCSV);
 
-         var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(uri, "GET", requestParams);
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/pricing"),
+            Binding = HttpParametersBinding.QueryString
+         };
+
+         // set query values
+         var queryObject = new JObject();
+         if (!string.IsNullOrEmpty(parameters.since)) queryObject["since"] = parameters.since;
+         if (parameters.includeHomeConversions.HasValue) queryObject["includeHomeConversions"] = parameters.includeHomeConversions.Value;
+         queryObject["instruments"] = instrumentsCSV;
+
+         requestParams.Data = queryObject;
+
+         var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(requestParams, cancellation);
 
          return response.prices ?? new List<Price>();
       }

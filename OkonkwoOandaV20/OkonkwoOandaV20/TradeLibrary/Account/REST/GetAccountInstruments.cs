@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -16,19 +18,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a List of the tradeable instruments specified. If none are specified, all tradeable instruments for 
       /// the account are returned.</returns>
-      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null)
+      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/instruments";
+         var requestParams = new HttpParameters();
+
+         requestParams.Method = HttpMethod.Get;
+         requestParams.Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/instruments");
+         requestParams.Binding = HttpParametersBinding.QueryString;
 
          if (parameters?.instruments?.Count > 0)
          {
             string commaSeparatedInstruments = GetCommaSeparatedString(parameters.instruments);
-            uri += "?instruments=" + Uri.EscapeDataString(commaSeparatedInstruments);
+            requestParams.Data = JToken.FromObject(new { instruments = commaSeparatedInstruments });
          }
 
-         var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(uri);
+         var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(requestParams, cancellation);
          return response.instruments;
       }
 

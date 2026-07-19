@@ -1,5 +1,7 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Account;
+using OkonkwoOandaV20.TradeLibrary.Account;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -12,15 +14,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">details will be retrieved for this account id</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>an AccountChangesResponse object</returns>
-      public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters)
+      public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/changes";
+         var requestParams = new HttpParameters(new { sinceTransactionID = parameters.sinceTransactionID })
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/changes"),
+            Binding = HttpParametersBinding.QueryString
+         };
 
-         uri += "?sinceTransactionID=" + parameters.sinceTransactionID;
-
-         var response = await MakeRequestAsync<AccountChangesResponse, AccountChangesErrorResponse>(uri);
+         var response = await MakeRequestAsync<AccountChangesResponse, AccountChangesErrorResponse>(requestParams, cancellation);
 
          return response;
       }
