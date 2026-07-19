@@ -1,5 +1,6 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST

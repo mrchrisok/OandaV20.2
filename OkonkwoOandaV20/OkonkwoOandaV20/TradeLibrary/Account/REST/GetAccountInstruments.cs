@@ -18,6 +18,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// the account are returned.</returns>
       public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/instruments";
 
          if (parameters?.instruments?.Count > 0)

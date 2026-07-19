@@ -19,6 +19,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
       public static async Task<List<IOrder>> GetOrdersAsync(string accountID, OrdersParameters parameters = null)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders";
 
          var requestParams = ConvertToDictionary(parameters);

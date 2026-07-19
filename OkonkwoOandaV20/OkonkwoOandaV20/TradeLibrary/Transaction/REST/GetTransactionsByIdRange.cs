@@ -17,6 +17,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<ITransaction>> GetTransactionsByIdRangeAsync(string accountID, TransactionsByIdRangeParameters parameters)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = null;
          TransactionsResponse response = null;
 

@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
@@ -50,6 +51,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
                {
                   string line = reader.ReadLine();
                   var data = JsonConvert.DeserializeObject<T>(line, Rest20.JsonSettingsResponse);
+
+                  Rest20.TransformObjectValues(data, "Response");
 
                   OnSessionStatusChanged(!_shutdown, null);
 

@@ -16,6 +16,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters)
       {
+         TransformObjectValues(parameters);
+         //
          var requestParams = ConvertToDictionary(parameters);
 
          string type = null;

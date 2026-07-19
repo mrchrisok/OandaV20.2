@@ -28,6 +28,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>The WebResponse object that can be used to retrieve the prices as they stream</returns>
       public static async Task<HttpResponseMessage> GetPricingStream(string accountID, PricingStreamParameters parameters)
       {
+         TransformObjectValues(parameters);
+         //
          var instruments = Uri.EscapeDataString(GetCommaSeparatedString(parameters.instruments));
 
          string uri = ServerUri(EServer.PricingStream) + "accounts/" + accountID + "/pricing/stream";

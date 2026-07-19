@@ -13,6 +13,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>DeleteTradeResponse containing the details of the close</returns>
       public static async Task<TradeCloseResponse> PutTradeCloseAsync(string accountID, long tradeSpecifier, TradeCloseParameters parameters = null)
       {
+         TransformObjectValues(parameters);
+         //
          string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/close";
 
          parameters = parameters ?? new TradeCloseParameters();
