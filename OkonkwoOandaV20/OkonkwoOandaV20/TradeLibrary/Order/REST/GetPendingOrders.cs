@@ -1,5 +1,8 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Order;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -14,11 +17,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">the identifier of the account to retrieve the list for</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
-      public static async Task<List<IOrder>> GetPendingOrdersAsync(string accountID)
+      public static async Task<List<IOrder>> GetPendingOrdersAsync(string accountID, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/pendingOrders";
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/pendingOrders"),
+            Binding = HttpParametersBinding.QueryString
+         };
 
-         var response = await MakeRequestAsync<PendingOrdersResponse, PendingOrdersErrorResponse>(uri);
+         var response = await MakeRequestAsync<PendingOrdersResponse, PendingOrdersErrorResponse>(requestParams, cancellation);
 
          return new List<IOrder>(response.orders);
       }

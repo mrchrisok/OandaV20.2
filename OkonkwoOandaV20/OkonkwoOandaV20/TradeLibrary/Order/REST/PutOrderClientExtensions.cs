@@ -1,4 +1,7 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -13,11 +16,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="orderSpecifier">the orderSpecifier to update extensions for</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>an OrderClientExtensionsModifyResponse (throws an OrderClientExtensionsModifyErrorResponse if the request fails.)</returns>
-      public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(string accountID, long orderSpecifier, OrderClientExtensionsParameters parameters)
+      public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(string accountID, long orderSpecifier, OrderClientExtensionsParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier + "/clientExtensions";
+         var requestParams = new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Put,
+            Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{accountID}/orders/{orderSpecifier}/clientExtensions"),
+            Binding = HttpParametersBinding.Body
+         };
 
          //var extensions = new Dictionary<string, ClientExtensions>();
          //extensions.Add("clientExtensions", parameters.orderExtensions);
@@ -27,7 +33,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          //var response = await MakeRequestWithJSONBody<OrderClientExtensionsModifyResponse, OrderClientExtensionsModifyErrorResponse, Dictionary<string, ClientExtensions>>("PUT", extensions, uri);
 
-         var response = await MakeRequestWithJSONBody<OrderClientExtensionsResponse, OrderClientExtensionsErrorResponse, OrderClientExtensionsParameters>("PUT", parameters, uri);
+         var response = await MakeRequestAsync<OrderClientExtensionsResponse, OrderClientExtensionsErrorResponse>(requestParams, cancellation);
 
          return response;
       }

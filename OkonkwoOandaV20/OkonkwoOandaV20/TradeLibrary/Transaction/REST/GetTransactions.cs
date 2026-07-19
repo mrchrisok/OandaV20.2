@@ -19,21 +19,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters, CancellationToken cancellation = default)
       {
-         var requestDict = ConvertToDictionary(parameters) ?? new Dictionary<string, string>();
-
-         string type = null;
-         if (parameters.type != null)
+         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
          {
-            type = GetCommaSeparatedString(parameters.type);
-            requestDict.Add("type", type);
-         }
+            { "type", GetCommaSeparatedString(parameters.type ?? new List<string>()) }
+         };
 
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(requestDict)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/transactions"),
             Binding = HttpParametersBinding.QueryString,
-            Data = requestDict.Count > 0 ? JToken.FromObject(requestDict) : null
          };
 
          var pagesResponse = await MakeRequestAsync<TransactionPagesResponse, TransactionPagesErrorResponse>(requestParams, cancellation);

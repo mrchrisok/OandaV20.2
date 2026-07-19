@@ -1,9 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Identity.Client;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -19,21 +22,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a PositionBook object</returns>
-      public static async Task<PositionBook> GetInstrumentPositionBookAsync(InstrumentPositionBookParameters parameters)
+      public static async Task<PositionBook> GetInstrumentPositionBookAsync(InstrumentPositionBookParameters parameters
+         , CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/positionBook";
-         var requestParams = ConvertToDictionary(parameters);
+         HttpParameters requestParams() => new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/positionBook"),
+            Binding = HttpParametersBinding.QueryString
+         };
 
          InstrumentPositionBookResponse response = null;
-         try { response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(uri, "GET", requestParams); }
+         try { response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(
+                                                   requestParams(), cancellation); }
          catch (Exception ex)
          {
             if (parameters.getLastTimeOnFailure)
             {
                parameters.time = null;
-               response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(uri, "GET", requestParams);
+               response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(
+                                                   requestParams(), cancellation);
             }            
             else
                throw ex;

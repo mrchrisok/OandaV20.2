@@ -1,5 +1,8 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -13,15 +16,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="tradeSpecifier">Specifier for the Trade</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>The Transactions associated with the patched dependent orders</returns>
-      public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters)
+      public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders";
+         var requestParams = new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Put,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders"),
+            Binding = HttpParametersBinding.Body
+         };
 
-         var requestBody = ConvertObjectToJson(parameters.GetAsDictionary());
-
-         return await MakeRequestWithJSONBody<TradeOrdersResponse, TradeOrdersErrorResponse>("PUT", requestBody, uri);
+         return await MakeRequestAsync<TradeOrdersResponse, TradeOrdersErrorResponse>(requestParams, cancellation);
       }
 
       public class TradeOrdersParameters

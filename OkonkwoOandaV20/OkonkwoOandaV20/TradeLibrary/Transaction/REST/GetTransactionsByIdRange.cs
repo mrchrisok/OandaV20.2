@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,28 +18,30 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns></returns>
-      public static async Task<List<ITransaction>> GetTransactionsByIdRangeAsync(string accountID, TransactionsByIdRangeParameters parameters)
+      public static async Task<List<ITransaction>> GetTransactionsByIdRangeAsync(string accountID, TransactionsByIdRangeParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = null;
+         HttpParameters requestParams(string uri_ = null, object params_ = null) => new HttpParameters(params_)
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(uri_ ?? ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange"),
+         };
+
          TransactionsResponse response = null;
 
          if (!string.IsNullOrEmpty(parameters.page))
          {
-            uri = parameters.page;
-
-            response = await MakeRequestAsync<TransactionsResponse>(uri);
+            response = await MakeRequestAsync<TransactionsResponse, TransactionsByIdRangeErrorResponse>(
+               requestParams(uri_: parameters.page), cancellation);
          }
          else
          {
-            uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange";
+            var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
+            {
+            { "type", GetCommaSeparatedString(parameters.type ?? new List<string>()) }
+            };
 
-            var requestParams = ConvertToDictionary(parameters);
-            if (parameters.type?.Count > 0)
-               requestParams.Add("type", GetCommaSeparatedString(parameters.type));
-
-            response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(uri, "GET", requestParams);
+            response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(
+               requestParams(params_: requestDict));
          }
 
          return response.transactions;

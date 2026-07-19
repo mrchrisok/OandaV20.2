@@ -1,6 +1,9 @@
 ﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -14,12 +17,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the id of the account to which the transaction belongs</param>
       /// <param name="transactionID">the id of the first transaction to retrieve</param>
       /// <returns>A list of transaction objects</returns>
-      public static async Task<List<ITransaction>> GetTransactionsSinceIdAsync(string accountID, long transactionID)
+      public static async Task<List<ITransaction>> GetTransactionsSinceIdAsync(string accountID, long transactionID
+         , CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/sinceid";
-         uri += "?id=" + transactionID;
+         var requestParams = new HttpParameters(new { id = transactionID })
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/sinceid"),
+         };
 
-         var response = await MakeRequestAsync<TransactionsSinceIdRangeResponse, TransactionsSinceIdRangeErrorResponse>(uri);
+         var response = await MakeRequestAsync
+            <TransactionsSinceIdRangeResponse, TransactionsSinceIdRangeErrorResponse>(requestParams, cancellation);
 
          return response.transactions;
       }

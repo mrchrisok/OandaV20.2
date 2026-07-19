@@ -23,12 +23,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             Binding = HttpParametersBinding.Body
          };
 
-         //TransformObjectValues(parameters);
-         //
-         //string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/close";
-
-         //parameters = parameters ?? new TradeCloseParameters();
-
          return await MakeRequestAsync<TradeCloseResponse, TradeCloseErrorResponse>(requestParams, cancellation);
       }
 
