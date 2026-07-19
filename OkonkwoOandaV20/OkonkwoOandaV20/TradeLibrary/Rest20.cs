@@ -220,6 +220,106 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          return await MakeRequestWithJSONBody<T, E>(method, requestBody, uri, completionOption);
       }
+
+      /// <summary>
+      /// New: Sends a web request using HttpParameters (object -> querystring/body) and returns a deserialized object.
+      /// </summary>
+      private static async Task<T> MakeRequestAsync<T, E>(HttpParameters parameters, CancellationToken cancellation = default)
+         where E : IErrorResponse
+      {
+         HttpRequestMessage request = await CreateHttpRequestAsync(parameters, cancellation);
+
+         return await GetObjectResponseAsync<T, E>(request, parameters, cancellation);
+      }
+
+      /// <summary>
+      /// New: Sends a streaming request using HttpParameters and returns the raw HttpResponseMessage for streaming consumption.
+      /// </summary>
+      private static async Task<HttpResponseMessage> MakeStreamRequestAsync<E>(HttpParameters parameters, CancellationToken cancellation = default)
+         where E : IErrorResponse
+      {
+         parameters.AcceptType ??= "application/json";
+
+         HttpRequestMessage request = await CreateHttpRequestAsync(parameters, cancellation);
+
+         return await GetStreamResponseAsync<E>(request, parameters);
+      }
+
+      /// <summary>
+      /// New: Create an HttpRequestMessage from HttpParameters
+      /// </summary>
+      private static async Task<HttpRequestMessage> CreateHttpRequestAsync(HttpParameters parameters, CancellationToken cancellation)
+      {
+         if (cancellation.IsCancellationRequested) return default;
+
+         string queryString = string.Empty;
+         HttpContent content = null;
+
+         if (parameters.Binding == HttpParametersBinding.QueryString)
+         {
+            if (parameters.Data is JObject jObj && jObj.Count > 0)
+            {
+               var sb = new StringBuilder();
+               foreach (var prop in jObj)
+               {
+                  if (prop.Value == null) continue;
+                  sb.Append(WebUtility.UrlEncode(prop.Key));
+                  sb.Append("=");
+                  sb.Append(WebUtility.UrlEncode(prop.Value.ToString()));
+                  sb.Append("&");
+               }
+               queryString = "?" + sb.ToString().Trim('&');
+            }
+         }
+
+         else if (parameters.Binding == HttpParametersBinding.Body)
+         {
+            if (parameters.ContentType == "application/x-www-form-urlencoded")
+            {
+               var data = new Dictionary<string, string>();
+               if (parameters.Data is JObject jObj2)
+               {
+                  foreach (var item in jObj2)
+                  {
+                     data.Add(item.Key, item.Value.ToString());
+                  }
+               }
+               content = new FormUrlEncodedContent(data);
+            }
+
+            else if (parameters.ContentType == "application/json")
+            {
+               var json = parameters.Data == null ? string.Empty : parameters.Data.ToString(Formatting.None);
+               content = new StringContent(json, System.Text.Encoding.UTF8, parameters.ContentType);
+            }
+         }
+
+         var request = new HttpRequestMessage()
+         {
+            Method = parameters.Method,
+            RequestUri = new Uri(parameters.Uri.ToString() + queryString),
+            Content = content
+         };
+
+         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(parameters.AcceptType));
+         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
+         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
+
+         // transform request values if a transformer exists
+         try
+         {
+            if (parameters.Data != null)
+               TransformObjectValues(parameters.Data, HttpAction.Request);
+         }
+         catch
+         {
+            // ignore transformation errors for now
+         }
+
+         return request;
+      }
+
       #endregion
 
       #region response
@@ -230,7 +330,87 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <typeparam name="T">>Type of the response returned by the remote service</typeparam>
       /// <typeparam name="E">>Type of the error response returned by the remote service</typeparam>
       /// <param name="request">The request sent to the remote service</param>
-      /// <returns>A success response object of type T or a failure response object of type E</returns>
+      /// <param name="parameters">The parameters needed to configure the request</param>
+      /// <param name="cancellation">The token for cancelling the request</param>
+      /// <returns>The object returned in the response.</returns>
+      private static async Task<T> GetObjectResponseAsync<T, E>(HttpRequestMessage request, HttpParameters parameters, CancellationToken cancellation)
+         where E : IErrorResponse
+      {
+         if (request == null) return default;
+
+         while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
+         {
+         }
+
+         var completionOption = parameters?.CompletionOption ?? HttpCompletionOption.ResponseHeadersRead;
+
+         try
+         {
+            using (HttpResponseMessage response = await _requestClient.SendAsync(request, completionOption))
+            {
+               response.EnsureSuccessStatusCode();
+
+               var stream = GetResponseStream(response);
+               var reader = new StreamReader(stream);
+               var json = reader.ReadToEnd();
+               var result = JsonConvert.DeserializeObject<T>(json, JsonSettingsResponse);
+
+               TransformObjectValues(result, HttpAction.Response);
+
+               return result;
+            }
+         }
+         catch (HttpRequestException ex)
+         {
+            var errorObject = new JObject() {
+               { "error", ex.Message }, { "type", typeof(E).Name }
+            };
+            var errorResult = JsonConvert.SerializeObject(errorObject);
+
+            throw new Exception(errorResult);
+         }
+         finally
+         {
+            m_LastRequestTime = DateTime.UtcNow;
+         }
+      }
+
+      /// <summary>
+      /// Sends an Http request to a remote service and returns the HttpResponseMessage for streaming consumption
+      /// </summary>
+      private static async Task<HttpResponseMessage> GetStreamResponseAsync<E>(HttpRequestMessage request, HttpParameters parameters)
+         where E : IErrorResponse
+      {
+         while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
+         {
+         }
+
+         try
+         {
+            var completionOption = parameters?.CompletionOption ?? HttpCompletionOption.ResponseHeadersRead;
+            var response = await _streamsClient.SendAsync(request, completionOption);
+            response.EnsureSuccessStatusCode();
+
+            return response;
+         }
+         catch (HttpRequestException ex)
+         {
+            var errorObject = new JObject() {
+               { "error", ex.Message }, { "type", typeof(E).Name }
+            };
+            var errorResult = JsonConvert.SerializeObject(errorObject);
+
+            throw new Exception(errorResult);
+         }
+         finally
+         {
+            m_LastRequestTime = DateTime.UtcNow;
+         }
+      }
+
+      /// <summary>
+      /// Existing implementation retained for backward compatibility.
+      /// </summary>
       private static async Task<T> GetWebResponse<T, E>(HttpRequestMessage request
          , HttpCompletionOption? completionOption = null)
       {
