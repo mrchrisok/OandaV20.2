@@ -172,6 +172,9 @@
     <Compile Include="TradeLibrary\Account\REST\GetAccounts.cs" />
     <Compile Include="TradeLibrary\Account\REST\GetAccountSummary.cs" />
     <Compile Include="TradeLibrary\Account\REST\PatchAccountConfiguration.cs" />
+    <Compile Include="TradeLibrary\Common\ApiParameters.cs" />
+    <Compile Include="TradeLibrary\Common\HttpParameters.cs" />
+    <Compile Include="TradeLibrary\Common\RateLimitResourceCategory.cs" />
     <Compile Include="TradeLibrary\Instrument\Candlestick.cs" />
     <Compile Include="TradeLibrary\Instrument\CandleStickData.cs" />
     <Compile Include="TradeLibrary\Instrument\Definitions.cs" />
