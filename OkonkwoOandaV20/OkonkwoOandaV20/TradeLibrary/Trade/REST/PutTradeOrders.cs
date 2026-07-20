@@ -1,9 +1,8 @@
-﻿
+﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,6 +19,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>The Transactions associated with the patched dependent orders</returns>
       public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters, CancellationToken cancellation = default)
       {
+         //var jsonSettings = new JsonSerializerSettings()
+         //{
+         //   TypeNameHandling = TypeNameHandling.None,
+         //   NullValueHandling = NullValueHandling.Include
+         //};
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
@@ -74,21 +78,18 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// The API action to perform on the takeProfit.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
-         [JsonIgnore]
          public string takeProfitAction { get; protected set; }
 
          /// <summary>
          /// The API action to perform on the stopLoss.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
-         [JsonIgnore]
          public string stopLossAction { get; protected set; }
 
          /// <summary>
          /// The API action to perform on the trailingStopLoss.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
-         [JsonIgnore]
          public string trailingStopLossAction { get; protected set; }
          #endregion
 

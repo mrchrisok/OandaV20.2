@@ -400,6 +400,7 @@ namespace OkonkwoOandaV20Tests
 
          string expiry = ConvertDateTimeToAcceptDateFormat(DateTime.Now.AddMonths(1));
          decimal price = GetOandaPrice(m_TestInstrument) * (decimal)0.9;
+
          #region create new pending order
          var request1 = new MarketIfTouchedOrderRequest(GetOandaInstrument())
          {
@@ -628,7 +629,7 @@ namespace OkonkwoOandaV20Tests
       /// </summary>
       /// <param name="key">The key root used to store the order success and order fill results.</param>
       /// <returns></returns>
-      private static async Task PlaceMarketOrder(string key, decimal units = 0, bool closeAllTrades = true)
+      private static async Task PlaceMarketOrder(string key, decimal units = 0, bool closeAllTrades = true, bool closeAllOrders = true)
       {
          // I'm fine with a throw here
          // To each his/her own on doing something different.
@@ -639,6 +640,11 @@ namespace OkonkwoOandaV20Tests
          {
             var closeList = await Rest20.GetOpenTradesAsync(AccountID);
             closeList.ForEach(async x => await Rest20.PutTradeCloseAsync(AccountID, x.id));
+         }
+         if (closeAllOrders)
+         {
+            var openOrders = await Rest20.GetPendingOrdersAsync(AccountID);
+            openOrders.ForEach(async x => await Rest20.PutOrderCancelAsync(AccountID, x.id));
          }
 
          // this should have a value by now
