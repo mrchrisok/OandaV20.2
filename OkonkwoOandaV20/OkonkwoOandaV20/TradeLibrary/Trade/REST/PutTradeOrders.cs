@@ -26,10 +26,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Put,
             Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders"),
-            Binding = HttpParametersBinding.Body
+            Binding = HttpParametersBinding.Body,
+            ForInternalRequest = true,
          };
 
-         return await MakeRequestAsync<TradeOrdersResponse, TradeOrdersErrorResponse>(requestParams, cancellation);
+         var response = await MakeRequestAsync<TradeOrdersResponse, TradeOrdersErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response);
+         return response;
       }
 
       public class TradeOrdersParameters : ApiParameters

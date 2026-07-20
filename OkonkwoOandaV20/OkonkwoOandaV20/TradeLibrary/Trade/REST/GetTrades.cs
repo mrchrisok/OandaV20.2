@@ -31,7 +31,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          Rest20.TransformObjectValues(response.trades);
 
-
          return response.trades ?? new List<Trade.Trade>();
       }
 
