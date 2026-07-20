@@ -44,7 +44,8 @@ namespace OkonkwoOandaV20.Framework
       /// <returns>True if trading is halted, false if trading is not halted.</returns>
       public static async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD, bool throwIfHalted = false)
       {
-         var parameters = new PricingParameters() { instruments = new List<string>() { instrument } };
+         var parameters = new PricingParameters() { instruments = new List<string>() { instrument }
+            , ForInternalRequest = true };
 
          var accountId = Credentials.GetCredentials().AccountId;
          var prices = await Rest20.GetPricingAsync(accountId, parameters);
