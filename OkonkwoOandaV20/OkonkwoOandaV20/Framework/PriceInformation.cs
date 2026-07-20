@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace OkonkwoOandaV20.Framework
 {
-   public interface IHasPrices
-   {
-	  PriceInformation priceInformation { get; set; }
-   }
-
    /// <summary>
    /// Provides metadata for PriceObject instances
    /// </summary>
