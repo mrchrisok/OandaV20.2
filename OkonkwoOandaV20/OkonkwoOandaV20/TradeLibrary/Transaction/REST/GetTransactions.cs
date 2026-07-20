@@ -42,7 +42,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             await Task.Delay(parameters.pagingDelayMilliSeconds); // throttle these a bit
          }
 
-         Rest20.TransformObjectValues(transactions, HttpAction.Response);
+         Rest20.TransformObjectValues(transactions);
 
          return transactions;
       }

@@ -57,7 +57,26 @@ namespace OkonkwoOandaV20Tests
       {
          try
          {
-            if (!await Rest20.InitializeAsync(credentials: await GetApiCredentials()))
+            if (!await Rest20.InitializeAsync(
+               credentials: await GetApiCredentials(),
+               valueTransformers: new Dictionary<string, Action<object>>()
+               {
+                  { 
+                     HttpAction.Request
+                     , input => {
+                        if (input is AccountChangesParameters acp)
+                           --acp.sinceTransactionID;
+                     } 
+                  },
+                  //{
+                  //   HttpAction.Response
+                  //   , input => {
+                  //      if (input is List<Instrument> lis) 
+                  //         lis[0].name = lis[0].name.ToLower();
+                  //   }
+                  //},
+               }
+               ))
             {
                throw new Exception("Exception: RestV20Test - Rest20 initialization failed.");
             }
