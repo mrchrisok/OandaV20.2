@@ -1,17 +1,19 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Resources.ResXFileRef;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -23,31 +25,34 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       #region initialization
 
       /// <summary>
-      /// Initialize the middleware that will make calls to TradeStation V3 endpoints.
+      /// Initialize the middleware that will make calls to Oanda V3 endpoints.
       /// This method is idempotent. Once initialize, any additional calls will have no effect.
       /// </summary>
       /// <param name="settings">The client TSV3 settings.</param>
       /// <param name="requestClient">An HttpClient configured to support standard connections.</param>
       /// <param name="streamsClient">An HttpClient configured to support streaming connections.</param>
-      /// <param name="jsonSerializerSettings"></param>
-      /// <param name="oauthSvc"></param>
-      /// <param name="cache"></param>
-      /// <param name="logger"></param>
-      /// <param name="authorizeApplication"></param>
+      /// <param name="jsonSerializerSettings">Used to json serialization .. nuff said</param>
+      /// <param name="valueTransformers">Used to transform request/response property values</param>
+      /// <param name="credentials">Used to authenticate to Oanda api</param>
+      /// <param name="logger">It's a logger.</param>
       /// <returns>True, if initialization was successful. False if not successful.</returns>
       public static Task<bool> InitializeAsync(HttpClient requestClient = null, HttpClient streamsClient = null
          , JsonSerializerSettings jsonSettingsRequest = null, JsonSerializerSettings jsonSettingsResponse = null
-         , IList<JsonConverter> jsonConverters = null, (EEnvironment environment
-         , string accessToken, string accountId)? credentials = null)
+         , IList<JsonConverter> jsonConverters = null, IDictionary<string, Action<object>> valueTransformers = null
+         , (EEnvironment environment, string accessToken, string accountId)? credentials = null, ILogger logger = null)
       {
          if (!_initialized)
          {
             _requestClient = requestClient ?? new HttpClient();
             _streamsClient = streamsClient ?? new HttpClient() { Timeout = Timeout.InfiniteTimeSpan };
 
-            JsonConverters = GetJsonConverters(jsonConverters);
-            JsonSettingsRequest = GetJsonSerializerSettings("Request", jsonSettingsRequest);
-            JsonSettingsResponse = GetJsonSerializerSettings("Response", jsonSettingsResponse);
+            JsonConverters = SetJsonConverters(jsonConverters);
+            JsonSettingsRequest = SetJsonSerializerSettings("Request", jsonSettingsRequest);
+            JsonSettingsResponse = SetJsonSerializerSettings("Response", jsonSettingsResponse);
+
+            ValueTransformers = valueTransformers ?? new Dictionary<string, Action<object>>();
+
+            _logger = logger;
 
             if (credentials.HasValue)
             {
@@ -60,7 +65,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return Task.FromResult(_initialized);
       }
 
-      public static JsonSerializerSettings GetJsonSerializerSettings(string httpAction
+      private static JsonSerializerSettings SetJsonSerializerSettings(string httpAction
          , JsonSerializerSettings jsonSettings = null)
       {
          jsonSettings = jsonSettings ?? new JsonSerializerSettings();
@@ -78,12 +83,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          };
       }
 
-      private static IList<JsonConverter> GetJsonConverters(IList<JsonConverter> jsonConverters = null)
+      private static IList<JsonConverter> SetJsonConverters(IList<JsonConverter> jsonConverters = null)
       {
          jsonConverters = jsonConverters ?? new List<JsonConverter>();
 
          return new List<JsonConverter>(jsonConverters) {
-            new TransactionConverter(), new OrderConverter(), new PriceObjectConverter(),
+
+            new OrderConverter(), new PriceObjectConverter(), new TransactionConverter(),
             new PricingStreamResponseConverter(), new TransactionsStreamResponseConverter()
          };
       }
@@ -95,21 +101,27 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       private static bool _initialized = false;
       private static HttpClient _requestClient;
       private static HttpClient _streamsClient;
+      private static ILogger _logger;
 
       /// <summary>
-      /// JsonSerializerSettings for request to TradeStation
+      /// JsonSerializerSettings for request to Oanda
       /// </summary>
       public static JsonSerializerSettings JsonSettingsRequest { get; private set; }
 
       /// <summary>
-      /// JsonSerializerSettings for response from TradeStation
+      /// JsonSerializerSettings for response from Oanda
       /// </summary>
       public static JsonSerializerSettings JsonSettingsResponse { get; private set; }
 
       /// <summary>
-      /// JsonConverters for request/response from TradeStation
+      /// JsonConverters for request/response from Oanda
       /// </summary>
       public static IList<JsonConverter> JsonConverters { get; private set; }
+
+      /// <summary>
+      /// Value transformers for request/response from Oanda
+      /// </summary>
+      public static IDictionary<string, Action<object>> ValueTransformers { get; private set; }
 
       /// <summary>
       /// The time of the last request made to an Oanda V20 service
@@ -131,6 +143,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       #endregion
 
       #region request
+
       /// <summary>
       /// Gets the base uri of the target service
       /// </summary>
@@ -139,76 +152,85 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       private static string ServerUri(EServer server) { return Credentials.GetCredentials().GetServer(server); }
 
       /// <summary>
-      /// Sends a web request to a remote endpoint (uri).
+      /// New: Sends a web request using HttpParameters (object -> querystring/body) and returns a deserialized object.
       /// </summary>
-      /// <typeparam name="T">The response type</typeparam>
-      /// <param name="uri">The uri of the remote service</param>
-      /// <param name="method">method for the request (defaults to GET)</param>
-      /// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
-      /// <returns>A success response object of type T or a failure response object of type ErrorResponse</returns>
-      private static async Task<T> MakeRequestAsync<T>(string uri, string method = "GET", Dictionary<string, string> requestParams = null, HttpCompletionOption? completionOption = null)
+      private static async Task<T> MakeRequestAsync<T, E>(HttpParameters parameters, CancellationToken cancellation = default)
+         where E : IErrorResponse
       {
-         return await MakeRequestAsync<T, ErrorResponse>(uri, method, requestParams, completionOption);
+         HttpRequestMessage request = await CreateHttpRequestAsync(parameters, cancellation);
+
+         return await GetObjectResponseAsync<T, E>(request, parameters, cancellation);
       }
 
       /// <summary>
-      /// Sends a web request to a remote service (uri).
+      /// New: Sends a streaming request using HttpParameters and returns the raw HttpResponseMessage for streaming consumption.
       /// </summary>
-      /// <typeparam name="T">The success response type</typeparam>
-      /// <typeparam name="E">The error  response type</typeparam>
-      /// <param name="uri">The uri of the remote service</param>
-      /// <param name="method">The request verb for the request. Default is GET</param>
-      /// <param name="requestParams">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
-      /// <returns>A success response object of type T or a failure response object of type E</returns>
-      private static async Task<T> MakeRequestAsync<T, E>(string uri, string method = "GET", Dictionary<string, string> requestParams = null, HttpCompletionOption? completionOption = null)
+      private static async Task<HttpResponseMessage> MakeStreamRequestAsync<E>(HttpParameters parameters, CancellationToken cancellation = default)
          where E : IErrorResponse
       {
-         if (requestParams?.Count > 0)
+         parameters.AcceptType = parameters.AcceptType ?? "application/json";
+
+         HttpRequestMessage request = await CreateHttpRequestAsync(parameters, cancellation);
+
+         return await GetStreamResponseAsync<E>(request, parameters);
+      }
+
+      /// <summary>
+      /// New: Create an HttpRequestMessage from HttpParameters
+      /// </summary>
+      private static async Task<HttpRequestMessage> CreateHttpRequestAsync(HttpParameters parameters, CancellationToken cancellation)
+      {
+         if (cancellation.IsCancellationRequested) return default;
+
+         string queryString = string.Empty;
+         HttpContent content = null;
+
+         if (parameters.Binding == HttpParametersBinding.QueryString)
          {
-            var queryString = CreateQueryString(requestParams);
-            uri = uri + "?" + queryString;
+            if (parameters.Data is JObject jObj && jObj.Count > 0)
+            {
+               if (parameters.Data?.Count() > 0)
+                  queryString = $"?{Utilities.ConvertToQueryString(parameters.Data.Value<JObject>())}";
+            }
          }
 
-         return await GetWebResponse<T, E>(CreateHttpRequestMessage(uri, method), completionOption);
+         else if (parameters.Binding == HttpParametersBinding.Body)
+         {
+            if (parameters.ContentType == "application/x-www-form-urlencoded")
+            {
+               var data = new Dictionary<string, string>();
+               if (parameters.Data is JObject jObj2)
+               {
+                  foreach (var item in jObj2)
+                  {
+                     data.Add(item.Key, item.Value.ToString());
+                  }
+               }
+               content = new FormUrlEncodedContent(data);
+            }
+
+            else if (parameters.ContentType == "application/json")
+            {
+               var json = parameters?.Data.ToString(Formatting.None);
+               content = new StringContent(json, System.Text.Encoding.UTF8, parameters.ContentType);
+            }
+         }
+
+         var request = new HttpRequestMessage()
+         {
+            Method = parameters.Method,
+            RequestUri = new Uri(parameters.Uri.ToString() + queryString),
+            Content = content
+         };
+
+         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(parameters.AcceptType));
+         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
+         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
+
+         return request;
       }
 
-      /// <summary>
-      /// Sends a web request with a JSON body to a remote service (uri). 
-      /// </summary>
-      /// <typeparam name="T">The success response type</typeparam>
-      /// <typeparam name="E">The error response type</typeparam>
-      /// <param name="method">The request verb for the request</param>
-      /// <param name="requestBody">The request body (must be a valid json string)</param>
-      /// <param name="uri">The uri of the remote service</param>
-      /// <returns>A success response object of type T or a failure response object of type E</returns>
-      private static async Task<T> MakeRequestWithJSONBody<T, E>(string method, string requestBody, string uri
-         , HttpCompletionOption? completionOption = null)
-         where E : IErrorResponse
-      {
-         // Create the request
-         HttpRequestMessage request = CreateHttpRequestMessage(uri, method, requestBody);
-
-         return await GetWebResponse<T, E>(request, completionOption);
-      }
-
-      /// <summary>
-      /// Sends a web request with a JSON body to a remote service (uri).
-      /// </summary>
-      /// <typeparam name="T">The success response type</typeparam>
-      /// <typeparam name="E">The error response type</typeparam>
-      /// <typeparam name="P">The requestParams object type</typeparam>
-      /// <param name="method">The request verb for the request</param>
-      /// <param name="requestParams">the parameters to pass in the request body</param>
-      /// <param name="uri">The uri of the remote service</param>
-      /// <returns>A success response object of type T or a failure response object of type E</returns>
-      private static async Task<T> MakeRequestWithJSONBody<T, E, P>(string method, P requestParams, string uri
-         , HttpCompletionOption? completionOption = null)
-         where E : IErrorResponse
-      {
-         var requestBody = ConvertObjectToJson(requestParams);
-
-         return await MakeRequestWithJSONBody<T, E>(method, requestBody, uri, completionOption);
-      }
       #endregion
 
       #region response
@@ -219,19 +241,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <typeparam name="T">>Type of the response returned by the remote service</typeparam>
       /// <typeparam name="E">>Type of the error response returned by the remote service</typeparam>
       /// <param name="request">The request sent to the remote service</param>
-      /// <returns>A success response object of type T or a failure response object of type E</returns>
-      private static async Task<T> GetWebResponse<T, E>(HttpRequestMessage request
-         , HttpCompletionOption? completionOption = null)
+      /// <param name="parameters">The parameters needed to configure the request</param>
+      /// <param name="cancellation">The token for cancelling the request</param>
+      /// <returns>The object returned in the response.</returns>
+      private static async Task<T> GetObjectResponseAsync<T, E>(HttpRequestMessage request, HttpParameters parameters, CancellationToken cancellation)
+         where E : IErrorResponse
       {
+         if (request == null) return default;
+
          while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
          {
          }
 
-         completionOption = completionOption ?? HttpCompletionOption.ResponseHeadersRead;
+         var completionOption = parameters?.CompletionOption ?? HttpCompletionOption.ResponseHeadersRead;
 
          try
          {
-            using (HttpResponseMessage response = await _requestClient.SendAsync(request, completionOption.Value))
+            using (HttpResponseMessage response = await _requestClient.SendAsync(request, completionOption))
             {
                response.EnsureSuccessStatusCode();
 
@@ -239,14 +265,50 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
                var reader = new StreamReader(stream);
                var json = reader.ReadToEnd();
                var result = JsonConvert.DeserializeObject<T>(json, JsonSettingsResponse);
+
+               if (!parameters.ForInternalRequest)
+                  TransformObjectValues(result, HttpAction.Response);
+
                return result;
             }
          }
          catch (HttpRequestException ex)
          {
-            // add a 'type' property for the ErrorResponseFactory
-            var errorObject = new JObject() { 
-               { "error", ex.Message }, { "type", typeof(E).Name } 
+            var errorObject = new JObject() {
+               { "error", ex.Message }, { "type", typeof(E).Name }
+            };
+            var errorResult = JsonConvert.SerializeObject(errorObject);
+
+            throw new Exception(errorResult);
+         }
+         finally
+         {
+            m_LastRequestTime = DateTime.UtcNow;
+         }
+      }
+
+      /// <summary>
+      /// Sends an Http request to a remote service and returns the HttpResponseMessage for streaming consumption
+      /// </summary>
+      private static async Task<HttpResponseMessage> GetStreamResponseAsync<E>(HttpRequestMessage request, HttpParameters parameters)
+         where E : IErrorResponse
+      {
+         while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
+         {
+         }
+
+         try
+         {
+            var completionOption = parameters?.CompletionOption ?? HttpCompletionOption.ResponseHeadersRead;
+            var response = await _streamsClient.SendAsync(request, completionOption);
+            response.EnsureSuccessStatusCode();
+
+            return response;
+         }
+         catch (HttpRequestException ex)
+         {
+            var errorObject = new JObject() {
+               { "error", ex.Message }, { "type", typeof(E).Name }
             };
             var errorResult = JsonConvert.SerializeObject(errorObject);
 
@@ -286,41 +348,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       #region json
 
       /// <summary>
-      /// Serializes an object to a JSON string
-      /// </summary>
-      /// <param name="obj">The object to serialize</param>
-      /// <param name="ignoreNulls">Indicates if null properties should be excluded from the JSON output</param>
-      /// <returns>A JSON string representing the input object</returns>
-      private static string ConvertObjectToJson(object obj, bool ignoreNulls = true)
-      {
-         var nullHandling = ignoreNulls ? NullValueHandling.Ignore : NullValueHandling.Include;
-
-         var settings = new JsonSerializerSettings(JsonSettingsRequest)
-         {
-            NullValueHandling = nullHandling,
-         };
-
-         return JsonConvert.SerializeObject(obj, settings);
-      }
-
-      private static HttpRequestMessage CreateHttpRequestMessage(string uri, string method, string requestBody = null)
-      {
-         var request = new HttpRequestMessage(new HttpMethod(method), uri)
-         {
-            Content = !string.IsNullOrEmpty(requestBody) 
-                      ? new StringContent(requestBody, Encoding.UTF8, "application/json") 
-                      : null
-         };
-
-         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
-         request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
-
-         return request;
-      }
-
-      /// <summary>
       /// Converts a list of strings into a comma-separated values list (csv)
       /// </summary>
       /// <param name="items">The list of strings to convert to csv</param>
@@ -334,22 +361,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
                stringBuilder.Append(item + ",");
          }
          return stringBuilder.ToString().Trim(',');
-      }
-
-      /// <summary>
-      /// Creates a query string from a dictionary of parameters
-      /// </summary>
-      /// <param name="requestParams">The parameters dictionary to convert to a query string.</param>
-      /// <returns>A query string</returns>
-      private static string CreateQueryString(Dictionary<string, string> requestParams)
-      {
-         string queryString = "";
-         foreach (var pair in requestParams)
-         {
-            queryString += $"{WebUtility.UrlEncode(pair.Key)}={WebUtility.UrlEncode(pair.Value)}&";
-         }
-         queryString = queryString.Trim('&');
-         return queryString;
       }
 
       /// <summary>
@@ -374,9 +385,24 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var json = JsonConvert.SerializeObject(input, _dictionarySettings);
          return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
       }
-
       private static JsonSerializerSettings _dictionarySettings;
 
       #endregion
+
+      internal static void TransformObjectValues(object inputObject, string httpAction = HttpAction.Response)
+      {
+         if (inputObject == null)
+            return;
+
+         if (httpAction == HttpAction.Request || httpAction == HttpAction.Response)
+         {
+            if (ValueTransformers.TryGetValue(httpAction, out var valueTransformer))
+               valueTransformer.Invoke(inputObject);
+
+            return;
+         }
+
+         throw new ArgumentException($"Value transformer type {httpAction} is not supported.");
+      }
    }
 }

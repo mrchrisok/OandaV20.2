@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Order;
+using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -16,11 +20,18 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the identifier of the account to retrieve the list for</param>
       /// <param name="orderSpecifier">The Order Specifier (orderId) [required]</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
-      public static async Task<IOrder> GetOrderAsync(string accountID, long orderSpecifier)
+      public static async Task<IOrder> GetOrderAsync(string accountID, long orderSpecifier, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier;
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders/{orderSpecifier}"),
+            ForInternalRequest = true
+         };
 
-         var response = await MakeRequestAsync<OrderResponse, OrderErrorResponse>(uri);
+         var response = await MakeRequestAsync<OrderResponse, OrderErrorResponse>(requestParams, cancellation);
+
+         Rest20.TransformObjectValues(response.order);
 
          return response.order;
       }

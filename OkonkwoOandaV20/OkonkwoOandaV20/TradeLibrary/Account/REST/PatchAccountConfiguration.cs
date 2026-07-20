@@ -1,7 +1,10 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
+
 using OkonkwoOandaV20.TradeLibrary.Transaction;
-using System.Runtime.Serialization;
+using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,16 +18,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account Identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>an AccountConfigurationResponse object containing the updated values that were applied to the account</returns>
-      public static async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(string accountID, AccountConfigurationParameters parameters)
+      public static async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(string accountID, AccountConfigurationParameters parameters, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/configuration";
+         var requestParams = new HttpParameters(parameters)
+         {
+            Method = new HttpMethod("PATCH"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/configuration"),
+            Binding = HttpParametersBinding.Body,
+         };
  
-         var response = await MakeRequestWithJSONBody<AccountConfigurationResponse, AccountConfigurationErrorResponse, AccountConfigurationParameters>("PATCH", parameters, uri);
+         var response = await MakeRequestAsync<AccountConfigurationResponse, AccountConfigurationErrorResponse>(requestParams, cancellation);
 
          return response;
       }
 
-      public class AccountConfigurationParameters
+      public class AccountConfigurationParameters : ApiParameters
       {
          /// <summary>
          /// Client-defined alias (name) for the Account

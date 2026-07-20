@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework.Factories;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -17,28 +19,35 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a PositionBook object</returns>
-      public static async Task<PositionBook> GetInstrumentPositionBookAsync(string instrument, InstrumentPositionBookParameters parameters)
+      public static async Task<PositionBook> GetInstrumentPositionBookAsync(string instrument, InstrumentPositionBookParameters parameters , CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/positionBook";
-         var requestParams = ConvertToDictionary(parameters);
+         HttpParameters requestParams() => new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/positionBook"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true,
+         };
 
          InstrumentPositionBookResponse response = null;
-         try { response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(uri, "GET", requestParams); }
+         try { response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(
+                                                   requestParams(), cancellation); }
          catch (Exception ex)
          {
             if (parameters.getLastTimeOnFailure)
             {
                parameters.time = null;
-               response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(uri, "GET", requestParams);
+               response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(
+                                                   requestParams(), cancellation);
             }            
             else
                throw ex;
          }
-
+         Rest20.TransformObjectValues(response.positionBook);
          return response.positionBook;
       } 
 
-      public class InstrumentPositionBookParameters
+      public class InstrumentPositionBookParameters : ApiParameters
       {
          public InstrumentPositionBookParameters(bool getLastTimeOnFailure = true)
          {

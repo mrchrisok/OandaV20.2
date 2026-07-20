@@ -1,5 +1,10 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -13,22 +18,35 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="tradeSpecifier">Specifier for the Trade</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>The Transactions associated with the patched dependent orders</returns>
-      public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters)
+      public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders";
+         Rest20.TransformObjectValues(parameters, HttpAction.Request);
+         //
+         var requestParams = new HttpParameters(parameters.Dependents)
+         {
+            Method = HttpMethod.Put,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders"),
+            Binding = HttpParametersBinding.Body
+         };
 
-         var requestBody = ConvertObjectToJson(parameters.GetAsDictionary());
-
-         return await MakeRequestWithJSONBody<TradeOrdersResponse, TradeOrdersErrorResponse>("PUT", requestBody, uri);
+         return await MakeRequestAsync<TradeOrdersResponse, TradeOrdersErrorResponse>(requestParams, cancellation);
       }
 
-      public class TradeOrdersParameters
+      public class TradeOrdersParameters : ApiParameters
       {
          public TradeOrdersParameters()
          {
             takeProfitAction = TradeOrdersAction.None;
             stopLossAction = TradeOrdersAction.None;
             trailingStopLossAction = TradeOrdersAction.None;
+            //
+            Dependents = new Dictionary<string, object>();
+            //
+            JsonSettingsRequest = new JsonSerializerSettings()
+            {
+               TypeNameHandling = TypeNameHandling.None,
+               NullValueHandling = NullValueHandling.Include
+            };
          }
 
          #region properties 
@@ -66,54 +84,57 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// The API action to perform on the takeProfit.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string takeProfitAction { get; protected set; }
 
          /// <summary>
          /// The API action to perform on the stopLoss.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string stopLossAction { get; protected set; }
 
          /// <summary>
          /// The API action to perform on the trailingStopLoss.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string trailingStopLossAction { get; protected set; }
          #endregion
 
          #region setter methods
          public virtual void SetTakeProfit(string action, TakeProfitDetails details)
          {
-            takeProfitAction = action;
-            takeProfit = action == TradeOrdersAction.Cancel ? null : details;
+            if (action != TradeOrdersAction.None)
+            {
+               takeProfitAction = action;
+               takeProfit = action == TradeOrdersAction.Cancel ? null : details;
+               Dependents.Add("takeProfit", takeProfit);
+            }
          }
 
          public virtual void SetStopLoss(string action, StopLossDetails details)
          {
-            stopLossAction = action;
-            stopLoss = action == TradeOrdersAction.Cancel ? null : details;
+            if (action != TradeOrdersAction.None)
+            {
+               stopLossAction = action;
+               stopLoss = action == TradeOrdersAction.Cancel ? null : details;
+               Dependents.Add("stopLoss", stopLoss);
+            }
          }
 
          public virtual void SetTrailingStopLoss(string action, TrailingStopLossDetails details)
          {
-            trailingStopLossAction = action;
-            trailingStopLoss = action == TradeOrdersAction.Cancel ? null : details;
+            if (action != TradeOrdersAction.None)
+            {
+               trailingStopLossAction = action;
+               trailingStopLoss = action == TradeOrdersAction.Cancel ? null : details;
+               Dependents.Add("trailingStopLoss", trailingStopLoss);
+            }
          }
          #endregion
 
-         public Dictionary<string, object> GetAsDictionary()
-         {
-            var result = new Dictionary<string, object>();
-
-            if (takeProfitAction != TradeOrdersAction.None)
-               result.Add("takeProfit", takeProfit);
-            if (stopLossAction != TradeOrdersAction.None)
-               result.Add("stopLoss", stopLoss);
-            if (trailingStopLossAction != TradeOrdersAction.None)
-               result.Add("trailingStopLoss", trailingStopLoss);
-
-            return result;
-         }
+         internal Dictionary<string, object> Dependents { get; private set; }
       }
 
       public class TradeOrdersAction

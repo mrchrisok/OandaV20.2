@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -10,12 +13,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="tradeSpecifier">Specifier for the Trade</param>
       /// <returns>TradeData object containing the details of the trade</returns>
-      public static async Task<Trade.Trade> GetTradeAsync(string accountID, long tradeSpecifier)
+      public static async Task<Trade.Trade> GetTradeAsync(string accountID, long tradeSpecifier, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier;
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/trades/{tradeSpecifier}"),
+            ForInternalRequest = true,
+         };
 
-         var response = await MakeRequestAsync<TradeResponse, TradeErrorResponse>(uri);
-
+         var response = await MakeRequestAsync<TradeResponse, TradeErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response.trade);
          return response.trade;
       }
    }

@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -11,11 +14,18 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the account for which to get the position</param>
       /// <param name="instrument">the instrument for which to get the position</param>
       /// <returns>Position object with the details of the position</returns>
-      public static async Task<Position.Position> GetPositionAsync(string accountID, string instrument)
+      public static async Task<Position.Position> GetPositionAsync(string accountID, string instrument, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument;
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument),
+            ForInternalRequest = true
+         };
 
-         var response = await MakeRequestAsync<PositionResponse, PositionErrorResponse>(uri);
+         var response = await MakeRequestAsync<PositionResponse, PositionErrorResponse>(requestParams, cancellation);
+
+         Rest20.TransformObjectValues(response.position);
 
          return response.position;
       }

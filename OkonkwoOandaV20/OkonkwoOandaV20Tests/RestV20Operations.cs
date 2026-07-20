@@ -57,7 +57,26 @@ namespace OkonkwoOandaV20Tests
       {
          try
          {
-            if (!await Rest20.InitializeAsync(credentials: await GetApiCredentials()))
+            if (!await Rest20.InitializeAsync(
+               credentials: await GetApiCredentials(),
+               valueTransformers: new Dictionary<string, Action<object>>()
+               {
+                  { 
+                     HttpAction.Request
+                     , input => {
+                        if (input is AccountChangesParameters acp)
+                           --acp.sinceTransactionID;
+                     } 
+                  },
+                  //{
+                  //   HttpAction.Response
+                  //   , input => {
+                  //      if (input is List<Instrument> lis) 
+                  //         lis[0].name = lis[0].name.ToLower();
+                  //   }
+                  //},
+               }
+               ))
             {
                throw new Exception("Exception: RestV20Test - Rest20 initialization failed.");
             }
@@ -125,7 +144,7 @@ namespace OkonkwoOandaV20Tests
       {
          bool marketIsHalted = await Utilities.IsMarketHalted();
          m_Results.Verify("00.0", marketIsHalted, "Market is halted.");
-         if (marketIsHalted) throw new MarketHaltedException("Unable to continue tests. OANDA Fx market is halted!");
+         if (marketIsHalted) throw new MarketHaltedException("Unable to continue tests. OANDA FX market is halted!");
       }
 
       #region Account
@@ -400,6 +419,7 @@ namespace OkonkwoOandaV20Tests
 
          string expiry = ConvertDateTimeToAcceptDateFormat(DateTime.Now.AddMonths(1));
          decimal price = GetOandaPrice(m_TestInstrument) * (decimal)0.9;
+
          #region create new pending order
          var request1 = new MarketIfTouchedOrderRequest(GetOandaInstrument())
          {
@@ -628,7 +648,7 @@ namespace OkonkwoOandaV20Tests
       /// </summary>
       /// <param name="key">The key root used to store the order success and order fill results.</param>
       /// <returns></returns>
-      private static async Task PlaceMarketOrder(string key, decimal units = 0, bool closeAllTrades = true)
+      private static async Task PlaceMarketOrder(string key, decimal units = 0, bool closeAllTrades = true, bool closeAllOrders = true)
       {
          // I'm fine with a throw here
          // To each his/her own on doing something different.
@@ -639,6 +659,11 @@ namespace OkonkwoOandaV20Tests
          {
             var closeList = await Rest20.GetOpenTradesAsync(AccountID);
             closeList.ForEach(async x => await Rest20.PutTradeCloseAsync(AccountID, x.id));
+         }
+         if (closeAllOrders)
+         {
+            var openOrders = await Rest20.GetPendingOrdersAsync(AccountID);
+            openOrders.ForEach(async x => await Rest20.PutOrderCancelAsync(AccountID, x.id));
          }
 
          // this should have a value by now
@@ -706,7 +731,7 @@ namespace OkonkwoOandaV20Tests
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeClientExtensionsErrorResponse;
-            m_Results.Verify("13.E0", errorResponse != null, "Error response has correct type: TradeClientExtensionsModifyErrorResponse");
+            m_Results.Verify("13.E0", errorResponse != null, "Error response has correct type: TradeClientExtensionsErrorResponse");
          }
 
          // update extensions
@@ -743,7 +768,7 @@ namespace OkonkwoOandaV20Tests
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeOrdersErrorResponse;
-            m_Results.Verify("13.E1", errorResponse != null, "Error response has correct type: TradePatchExitOrdersErrorResponse");
+            m_Results.Verify("13.E1", errorResponse != null, "Error response has correct type: TradeOrdersErrorResponse");
          }
 
          // add a takeProft to an open trade

@@ -1,5 +1,10 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Instrument;
+﻿
+using OkonkwoOandaV20.Framework;
+using OkonkwoOandaV20.TradeLibrary.Instrument;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,12 +20,19 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>List of Candlestick objects (or empty list) </returns>
-      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(string instrument, InstrumentCandlesParameters parameters)
+      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(string instrument, InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/candles";
-         var requestParams = ConvertToDictionary(parameters);
+         var requestParams = new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/candles"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true
+         };
 
-         var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(uri, "GET", requestParams);
+         var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(requestParams, cancellation);
+
+         Rest20.TransformObjectValues(response.candles);
 
          var candles = new List<CandlestickPlus>();
          foreach (var candle in response.candles)
@@ -31,7 +43,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return candles;
       }
 
-      public class InstrumentCandlesParameters
+      public class InstrumentCandlesParameters : ApiParameters
       {
          /// <summary>
          /// The Price component(s) to get candlestick data for. Can contain any combination 

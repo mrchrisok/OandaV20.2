@@ -1,6 +1,10 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
+using System.Net.Http;
+using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -14,11 +18,18 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the id of the account to which the transaction belongs</param>
       /// <param name="transactionID">the id of the transaction to retrieve</param>
       /// <returns>A Transaction object with the details of the transaction</returns>
-      public static async Task<ITransaction> GetTransactionAsync(string accountID, long transactionID)
+      public static async Task<ITransaction> GetTransactionAsync(string accountID, long transactionID, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/" + transactionID;
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/" + transactionID),
+            ForInternalRequest = true,
+         };
 
-         var response = await MakeRequestAsync<TransactionResponse, TransactionErrorResponse>(uri);
+         var response = await MakeRequestAsync<TransactionResponse, TransactionErrorResponse>(requestParams, cancellation);
+
+         Rest20.TransformObjectValues(response.transaction);
 
          return response.transaction;
       }

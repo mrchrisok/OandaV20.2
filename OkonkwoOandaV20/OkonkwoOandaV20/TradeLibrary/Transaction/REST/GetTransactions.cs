@@ -1,7 +1,12 @@
-﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework.JsonConverters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OkonkwoOandaV20.Framework;
+
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -14,35 +19,35 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns></returns>
-      public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters)
+      public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = ConvertToDictionary(parameters);
-
-         string type = null;
-         if (parameters.type != null)
+         var requestParams = new HttpParameters(parameters)
          {
-            type = GetCommaSeparatedString(parameters.type);
-            requestParams.Add("type", type);
-         }
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/transactions"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true
+         };
 
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions";
-
-         var pagesResponse = await MakeRequestAsync<TransactionPagesResponse, TransactionPagesErrorResponse>(uri, "GET", requestParams);
+         var pagesResponse = await MakeRequestAsync
+            <TransactionsPageResponse, TransactionsPageErrorResponse>(requestParams, cancellation);
 
          var transactions = new List<ITransaction>();
          foreach (string page in pagesResponse.pages)
          {
-            var pageParams = new TransactionsByIdRangeParameters { page = page, type = parameters.type };
-
-            transactions.AddRange(await GetTransactionsByIdRangeAsync(accountID, pageParams));
+            var parameters_ = new HttpParameters() { Uri = new Uri(page), ForInternalRequest = true };
+            var transactions_ = await MakeRequestAsync<TransactionsResponse, TransactionsErrorResponse>(parameters_, cancellation);
+            transactions.AddRange(transactions_.transactions);
 
             await Task.Delay(parameters.pagingDelayMilliSeconds); // throttle these a bit
          }
 
+         Rest20.TransformObjectValues(transactions);
+
          return transactions;
       }
 
-      public class TransactionsParameters
+      public class TransactionsParameters : ApiParameters
       {
          /// <summary>
          /// The starting time (inclusive) of the time range for the Transactions being queried. 
@@ -77,10 +82,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
+   #region TransactionsPageResponse, TransactionsPageErrorResponse
+
    /// <summary>
    /// The GET success response received from accounts/accountID/transactions
    /// </summary>
-   public class TransactionPagesResponse : Response
+   public class TransactionsPageResponse : Response
    {
       /// <summary>
       /// The starting time provided in the request.
@@ -117,22 +124,31 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// <summary>
    /// The GET error response received from accounts/accountID/transactions
    /// </summary>
-   public class TransactionPagesErrorResponse : ErrorResponse
+   public class TransactionsPageErrorResponse : ErrorResponse
    {
    }
 
-   #region base classes
+   #endregion
+
+   #region TransactionsResponse, TransactionsErrorResponse
+
+   /// <summary>
+   /// The GET success response received from accounts/accountID/transactions/idrange or similar
+   /// </summary>
    public class TransactionsResponse : Response
    {
       /// <summary>
-      /// The list of Transactions that satisfy the request.
+      /// The list of Transaction objects returned by the request
       /// </summary>
-      //[JsonConverter(typeof(TransactionConverter))]
-      public List<ITransaction> transactions;
+      public List<ITransaction> transactions { get; set; }
    }
 
+   /// <summary>
+   /// The GET error response received from accounts/accountID/transactions endpoints
+   /// </summary>
    public class TransactionsErrorResponse : ErrorResponse
    {
    }
+
    #endregion
 }

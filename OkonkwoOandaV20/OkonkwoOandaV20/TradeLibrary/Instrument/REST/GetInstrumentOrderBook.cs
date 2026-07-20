@@ -1,7 +1,12 @@
 ﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.Factories;
+
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -17,28 +22,36 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>an OrderBook object</returns>
-      public static async Task<OrderBook> GetInstrumentOrderBookAsync(string instrument, InstrumentOrderBookParameters parameters)
+      public static async Task<OrderBook> GetInstrumentOrderBookAsync(string instrument, InstrumentOrderBookParameters parameters, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "instruments/" + instrument + "/orderBook";
-         var requestParams = ConvertToDictionary(parameters);
+         HttpParameters requestParams() => new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/orderBook"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true,
+         };
 
          InstrumentOrderBookResponse response = null;
-         try { response = await MakeRequestAsync<InstrumentOrderBookResponse>(uri, "GET", requestParams); }
+         try { response = await MakeRequestAsync<InstrumentOrderBookResponse, InstrumentOrderBookErrorResponse>(
+                                                   requestParams(), cancellation); 
+         }
          catch (Exception ex)
          {
             if (parameters.getLastTimeOnFailure)
             {
                parameters.time = null;
-               response = await MakeRequestAsync<InstrumentOrderBookResponse, InstrumentOrderBookErrorResponse>(uri, "GET", requestParams);
+               response = await MakeRequestAsync<InstrumentOrderBookResponse, InstrumentOrderBookErrorResponse>(
+                                                   requestParams(), cancellation);
             }
             else
                throw ex;
          }
-
+         Rest20.TransformObjectValues(response.orderBook);
          return response.orderBook;
       }
 
-      public class InstrumentOrderBookParameters
+      public class InstrumentOrderBookParameters : ApiParameters
       {
          public InstrumentOrderBookParameters(bool getLastTimeOnFailure = true)
          {

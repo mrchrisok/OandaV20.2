@@ -72,7 +72,7 @@ namespace OkonkwoOandaV20.Framework.Factories
 			case "TransactionsByIdRangeErrorResponse":
 			   return JsonConvert.DeserializeObject<TransactionsByIdRangeErrorResponse>(message);
 			case "TransactionPagesErrorResponse":
-			   return JsonConvert.DeserializeObject<TransactionPagesErrorResponse>(message);
+			   return JsonConvert.DeserializeObject<TransactionsPageErrorResponse>(message);
 			case "TransactionsSinceIdRangeErrorResponse":
 			   return JsonConvert.DeserializeObject<TransactionsSinceIdRangeErrorResponse>(message);
 

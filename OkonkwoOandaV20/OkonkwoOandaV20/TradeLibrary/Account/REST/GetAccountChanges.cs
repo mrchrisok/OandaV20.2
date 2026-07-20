@@ -1,4 +1,8 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Account;
+using OkonkwoOandaV20.TradeLibrary.Account;
+
+using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -12,18 +16,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">details will be retrieved for this account id</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>an AccountChangesResponse object</returns>
-      public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters)
+      public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/changes";
+         var requestParams = new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/changes"),
+            Binding = HttpParametersBinding.QueryString
+         };
 
-         uri += "?sinceTransactionID=" + parameters.sinceTransactionID;
-
-         var response = await MakeRequestAsync<AccountChangesResponse, AccountChangesErrorResponse>(uri);
+         var response = await MakeRequestAsync<AccountChangesResponse, AccountChangesErrorResponse>(requestParams, cancellation);
 
          return response;
       }
 
-      public class AccountChangesParameters
+      public class AccountChangesParameters : ApiParameters
       {
          /// <summary>
          /// ID of the Transaction to get Account changes since.

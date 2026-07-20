@@ -1,4 +1,8 @@
-﻿using System.Threading.Tasks;
+using OkonkwoOandaV20.Framework;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -11,11 +15,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">details will be retrieved for this account id</param>
       /// <returns>an Account object containing the account details</returns>
-      public static async Task<Account.Account> GetAccountAsync(string accountID)
+      public static async Task<Account.Account> GetAccountAsync(string accountID, CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID;
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}"),
+            ForInternalRequest = true,
+         };
 
-         var response = await MakeRequestAsync<AccountResponse, AccountErrorResponse>(uri);
+         var response = await MakeRequestAsync<AccountResponse, AccountErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response.account);
          return response.account;
       }
    }
