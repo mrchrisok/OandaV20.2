@@ -8,5 +8,5 @@ namespace OkonkwoOandaV20.Framework
       {
          return "Is Optional";
       }
-   } 
+   }
 }

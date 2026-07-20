@@ -1,7 +1,11 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
+
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,40 +19,24 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns></returns>
-      public static async Task<List<ITransaction>> GetTransactionsByIdRangeAsync(string accountID, TransactionsByIdRangeParameters parameters)
+      public static async Task<List<ITransaction>> GetTransactionsByIdRangeAsync(string accountID, TransactionsByIdRangeParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = null;
-         TransactionsResponse response = null;
-
-         if (!string.IsNullOrEmpty(parameters.page))
+         var requestParams = new HttpParameters(parameters)
          {
-            uri = parameters.page;
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange"),
+            ForInternalRequest = true,
+         };
 
-            response = await MakeRequestAsync<TransactionsResponse>(uri);
-         }
-         else
-         {
-            uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange";
+         var response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(requestParams, cancellation);
 
-            var requestParams = ConvertToDictionary(parameters);
-            if (parameters.type?.Count > 0)
-               requestParams.Add("type", GetCommaSeparatedString(parameters.type));
-
-            response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(uri, "GET", requestParams);
-         }
+         Rest20.TransformObjectValues(response.transactions);
 
          return response.transactions;
       }
 
-      public class TransactionsByIdRangeParameters
+      public class TransactionsByIdRangeParameters : ApiParameters
       {
-         /// <summary>
-         /// The URI that represents the idrange query providing the data for the query results
-         /// </summary>
-         public string page { get; set; }
-
          /// <summary>
          /// The starting Transacion ID (inclusive) to fetch. [required]
          /// </summary>
@@ -63,7 +51,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// A comma separated list (csv) that restricts the types of Transactions to retreive.
          /// The valid values are defined in the TransactionFilter class.
          /// </summary>
-         [JsonIgnore]
          public List<string> type { get; set; }
       }
    }

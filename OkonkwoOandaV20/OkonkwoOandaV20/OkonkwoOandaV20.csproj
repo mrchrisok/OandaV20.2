@@ -235,8 +235,11 @@
     <Compile Include="TradeLibrary\Pricing\UnitsAvailable.cs" />
     <Compile Include="TradeLibrary\Pricing\UnitsAvailableDetails.cs" />
     <Compile Include="TradeLibrary\Rest20.cs" />
+    <Compile Include="TradeLibrary\REST\ApiParameters.cs" />
     <Compile Include="TradeLibrary\REST\Credentials.cs" />
+    <Compile Include="TradeLibrary\REST\HttpParameters.cs" />
     <Compile Include="TradeLibrary\REST\Primitives.cs" />
+    <Compile Include="TradeLibrary\REST\RateLimitResourceCategory.cs" />
     <Compile Include="TradeLibrary\REST\Request.cs" />
     <Compile Include="TradeLibrary\REST\Response.cs" />
     <Compile Include="TradeLibrary\REST\Streaming\Heartbeat.cs" />

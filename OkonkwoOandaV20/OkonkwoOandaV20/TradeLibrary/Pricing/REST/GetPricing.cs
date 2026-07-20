@@ -1,7 +1,11 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,26 +19,27 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account Identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns></returns>
-      public static async Task<List<Price>> GetPricingAsync(string accountID, PricingParameters parameters)
+      public static async Task<List<Price>> GetPricingAsync(string accountID, PricingParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/pricing";
+         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
+         {
+            { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
+         };
 
-         if (!(parameters?.instruments?.Count > 0))
-            throw new ArgumentException("List of instruments cannot be null or empty.");
+         var requestParams = new HttpParameters(requestDict)
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/pricing"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true,
+         };
 
-         var requestParams = ConvertToDictionary(parameters);
-
-         string instrumentsCSV = GetCommaSeparatedString(parameters.instruments);
-         requestParams.Add("instruments", instrumentsCSV);
-
-         var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(uri, "GET", requestParams);
-
+         var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response.prices);
          return response.prices ?? new List<Price>();
       }
 
-      public class PricingParameters
+      public class PricingParameters : ApiParameters
       {
          /// <summary>
          /// List of Instruments to get pricing for. [required]

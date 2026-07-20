@@ -1,6 +1,9 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Account;
+using OkonkwoOandaV20.TradeLibrary.Account;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -11,11 +14,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_2
       /// </summary>
       /// <returns>a List of AccountProperties that includes basic information about the accounts</returns>
-      public static async Task<List<AccountProperties>> GetAccountsAsync()
+      public static async Task<List<AccountProperties>> GetAccountsAsync(CancellationToken cancellation = default)
       {
-         string uri = ServerUri(EServer.Account) + "accounts";
+         var requestParams = new HttpParameters()
+         {
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts"),
+            ForInternalRequest = true
+         };
 
-         var response = await MakeRequestAsync<AccountsResponse, AccountsErrorResponse>(uri);
+         var response = await MakeRequestAsync<AccountsResponse, AccountsErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response.accounts);
          return response.accounts;
       }
    }

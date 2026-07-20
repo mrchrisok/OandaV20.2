@@ -1,5 +1,10 @@
-﻿using System;
+using Newtonsoft.Json.Linq;
+
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -16,23 +21,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a List of the tradeable instruments specified. If none are specified, all tradeable instruments for 
       /// the account are returned.</returns>
-      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null)
+      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/instruments";
-
-         if (parameters?.instruments?.Count > 0)
+         var requestParams = new HttpParameters(parameters ?? new AccountInstrumentsParameters())
          {
-            string commaSeparatedInstruments = GetCommaSeparatedString(parameters.instruments);
-            uri += "?instruments=" + Uri.EscapeDataString(commaSeparatedInstruments);
-         }
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/instruments"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true
+         };
 
-         var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(uri);
+         var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response.instruments);
          return response.instruments;
       }
 
-      public class AccountInstrumentsParameters
+      public class AccountInstrumentsParameters : ApiParameters
       {
          /// <summary>
          /// List of instruments to query specifically.

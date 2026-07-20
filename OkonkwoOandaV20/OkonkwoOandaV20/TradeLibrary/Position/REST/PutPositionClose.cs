@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
-using OkonkwoOandaV20.TradeLibrary.Transaction;
-using System.ComponentModel.DataAnnotations;
+﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -15,28 +16,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">the instrument for which to close all trades</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>DeletePositionResponse object containing details about the actions taken</returns>
-      public static async Task<PositionCloseResponse> PutPositionCloseAsync(string accountID, PositionCloseParameters parameters)
+      public static async Task<PositionCloseResponse> PutPositionCloseAsync(string accountID, string instrument, PositionCloseParameters parameters, CancellationToken cancellation = default)
       {
-         TransformObjectValues(parameters);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + parameters.instrument + "/close";
+         var requestParams = new HttpParameters(parameters)
+         {
+            Method = HttpMethod.Put,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument + "/close"),
+            Binding = HttpParametersBinding.Body
+         };
 
-         var requestBody = ConvertObjectToJson(parameters);
-
-         var response = await MakeRequestWithJSONBody<PositionCloseResponse, PositionCloseErrorResponse>("PUT", requestBody, uri);
+         var response = await MakeRequestAsync<PositionCloseResponse, PositionCloseErrorResponse>(requestParams, cancellation);
 
          return response;
       }
 
-      public class PositionCloseParameters
+      public class PositionCloseParameters : ApiParameters
       {
-         /// <summary>
-         /// Name of the Instrument [required]
-         /// </summary>
-         [JsonIgnore]
-         [Required]
-         public string instrument { get; set; }
-
          /// <summary>
          /// Indication of how much of the long Position to closeout. Either the
          /// string “ALL”, the string “NONE”, or a DecimalNumber representing how many

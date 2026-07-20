@@ -2,8 +2,11 @@
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -20,16 +23,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="orderSpecifier">the orderSpecifier of the order to cancel</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
-      public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(string accountID, long orderSpecifier, IOrderRequest request)
+      public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(string accountID, long orderSpecifier, IOrderRequest request, CancellationToken cancellation = default)
       {
-         TransformObjectValues(request);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier;
+         var requestParams = new HttpParameters(new { order = request })
+         {
+            Method = HttpMethod.Put,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier),
+            Binding = HttpParametersBinding.Body
+         };
 
-         var order = new Dictionary<string, IOrderRequest> { { "order", request } };
-         var body = ConvertObjectToJson(order);
-
-         var response = await MakeRequestWithJSONBody<OrderReplaceResponse, OrderReplaceErrorResponse>("PUT", body, uri);
+         var response = await MakeRequestAsync<OrderReplaceResponse, OrderReplaceErrorResponse>(requestParams, cancellation);
 
          return response;
       }

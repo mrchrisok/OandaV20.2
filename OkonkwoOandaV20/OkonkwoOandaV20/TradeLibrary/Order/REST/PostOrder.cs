@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System.Collections.Generic;
-using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -16,16 +18,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the identifier of the account to post on</param>
       /// <param name="request">the order request to post</param>
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
-      public static async Task<PostOrderResponse> PostOrderAsync(string accountID, IOrderRequest request)
+      public static async Task<PostOrderResponse> PostOrderAsync(string accountID, IOrderRequest request, CancellationToken cancellation = default)
       {
-         TransformObjectValues(request);
-         //
-         string uri = ServerUri(EServer.Account) + "accounts/" + accountID + "/orders";
+         var requestParams = new HttpParameters(new { order = request })
+         {
+            Method = HttpMethod.Post,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders"),
+            Binding = HttpParametersBinding.Body,
+         };
 
-         var order = new Dictionary<string, IOrderRequest> { { "order", request } };
-         var body = ConvertObjectToJson(order);
-
-         var response = await MakeRequestWithJSONBody<PostOrderResponse, PostOrderErrorResponse>("POST", body, uri);
+         var response = await MakeRequestAsync<PostOrderResponse, PostOrderErrorResponse>(requestParams, cancellation);
 
          return response;
       }
