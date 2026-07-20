@@ -26,7 +26,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          if (!(parameters is ApiParameters apiParameters && apiParameters.ForInternalRequest))
             Rest20.TransformObjectValues(parameters, HttpAction.Request);
 
-         jsonSettings = jsonSettings ?? (parameters as ApiParameters)?.JsonSerializerSettingsRequest;
+         jsonSettings = jsonSettings ?? (parameters as ApiParameters)?.JsonSettingsRequest;
          jsonSettings = jsonSettings ?? Rest20.JsonSettingsRequest;
          //jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
          var jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);

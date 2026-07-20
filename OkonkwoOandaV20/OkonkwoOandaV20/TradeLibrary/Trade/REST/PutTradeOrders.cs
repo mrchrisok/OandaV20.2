@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;
@@ -19,12 +20,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>The Transactions associated with the patched dependent orders</returns>
       public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters, CancellationToken cancellation = default)
       {
-         //var jsonSettings = new JsonSerializerSettings()
-         //{
-         //   TypeNameHandling = TypeNameHandling.None,
-         //   NullValueHandling = NullValueHandling.Include
-         //};
-         var requestParams = new HttpParameters(parameters)
+         Rest20.TransformObjectValues(parameters, HttpAction.Request);
+         //
+         var requestParams = new HttpParameters(parameters.Dependents)
          {
             Method = HttpMethod.Put,
             Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders"),
@@ -41,6 +39,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             takeProfitAction = TradeOrdersAction.None;
             stopLossAction = TradeOrdersAction.None;
             trailingStopLossAction = TradeOrdersAction.None;
+            //
+            Dependents = new Dictionary<string, object>();
+            //
+            JsonSettingsRequest = new JsonSerializerSettings()
+            {
+               TypeNameHandling = TypeNameHandling.None,
+               NullValueHandling = NullValueHandling.Include
+            };
          }
 
          #region properties 
@@ -78,54 +84,57 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// The API action to perform on the takeProfit.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string takeProfitAction { get; protected set; }
 
          /// <summary>
          /// The API action to perform on the stopLoss.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string stopLossAction { get; protected set; }
 
          /// <summary>
          /// The API action to perform on the trailingStopLoss.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string trailingStopLossAction { get; protected set; }
          #endregion
 
          #region setter methods
          public virtual void SetTakeProfit(string action, TakeProfitDetails details)
          {
-            takeProfitAction = action;
-            takeProfit = action == TradeOrdersAction.Cancel ? null : details;
+            if (action != TradeOrdersAction.None)
+            {
+               takeProfitAction = action;
+               takeProfit = action == TradeOrdersAction.Cancel ? null : details;
+               Dependents.Add("takeProfit", takeProfit);
+            }
          }
 
          public virtual void SetStopLoss(string action, StopLossDetails details)
          {
-            stopLossAction = action;
-            stopLoss = action == TradeOrdersAction.Cancel ? null : details;
+            if (action != TradeOrdersAction.None)
+            {
+               stopLossAction = action;
+               stopLoss = action == TradeOrdersAction.Cancel ? null : details;
+               Dependents.Add("stopLoss", stopLoss);
+            }
          }
 
          public virtual void SetTrailingStopLoss(string action, TrailingStopLossDetails details)
          {
-            trailingStopLossAction = action;
-            trailingStopLoss = action == TradeOrdersAction.Cancel ? null : details;
+            if (action != TradeOrdersAction.None)
+            {
+               trailingStopLossAction = action;
+               trailingStopLoss = action == TradeOrdersAction.Cancel ? null : details;
+               Dependents.Add("trailingStopLoss", trailingStopLoss);
+            }
          }
          #endregion
 
-         public Dictionary<string, object> GetAsDictionary()
-         {
-            var result = new Dictionary<string, object>();
-
-            if (takeProfitAction != TradeOrdersAction.None)
-               result.Add("takeProfit", takeProfit);
-            if (stopLossAction != TradeOrdersAction.None)
-               result.Add("stopLoss", stopLoss);
-            if (trailingStopLossAction != TradeOrdersAction.None)
-               result.Add("trailingStopLoss", trailingStopLoss);
-
-            return result;
-         }
+         internal Dictionary<string, object> Dependents { get; private set; }
       }
 
       public class TradeOrdersAction
