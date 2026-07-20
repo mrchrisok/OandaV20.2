@@ -1,7 +1,9 @@
 ﻿using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OkonkwoOandaV20.TradeLibrary.Common;
+using Newtonsoft.Json.Serialization;
+using OkonkwoOandaV20.Framework;
+
 using System;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -17,17 +19,19 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
    public class HttpParameters
    {
-      public HttpParameters(object payload, JsonSerializerSettings settings)
+      public HttpParameters(object parameters, JsonSerializerSettings jsonSettings)
       {
-         if (payload == null) return;
+         if (parameters == null) return;
 
-         Rest20.TransformObjectValues(payload);
+         if (!(parameters is ApiParameters apiParameters && apiParameters.ForInternalRequest))
+            Rest20.TransformObjectValues(parameters, HttpAction.Request);
 
-         JsonSettings = settings ?? (payload as ApiParameters)?.JsonSerializerSettingsRequest;
-         JsonSettings = JsonSettings ?? Rest20.JsonSettingsRequest;
-         var jsonSerializer = JsonSerializer.CreateDefault(JsonSettings);
+         jsonSettings = jsonSettings ?? (parameters as ApiParameters)?.JsonSerializerSettingsRequest;
+         jsonSettings = jsonSettings ?? Rest20.JsonSettingsRequest;
+         //jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+         var jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);
 
-         Data = payload is JToken jt ? jt : JToken.FromObject(payload, jsonSerializer);
+         Data = parameters is JToken jt ? jt : JToken.FromObject(parameters, jsonSerializer);
       }
 
       public HttpParameters(object payload) : this(payload, null)
@@ -47,6 +51,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public string AcceptType { get; set; } = "application/json";
       public string ContentType { get; set; } = "application/json";
 
-      public JsonSerializerSettings JsonSettings { get; set; }
+      //public JsonSerializerSettings JsonSettings { get; set; }
+      internal bool ForInternalRequest { get; set; } = false;
    }
 }

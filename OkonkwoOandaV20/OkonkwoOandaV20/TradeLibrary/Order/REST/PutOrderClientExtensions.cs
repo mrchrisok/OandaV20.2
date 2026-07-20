@@ -1,4 +1,5 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+﻿
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Net.Http;
 using System.Threading;
@@ -30,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class OrderClientExtensionsParameters
+      public class OrderClientExtensionsParameters : ApiParameters
       {
          /// <summary>
          /// The Client Extensions to update for the Order. Do not set, modify, or

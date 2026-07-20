@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
+
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;
@@ -20,24 +21,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<ITransaction>> GetTransactionsByIdRangeAsync(string accountID, TransactionsByIdRangeParameters parameters, CancellationToken cancellation = default)
       {
-         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-         {
-            { "type", GetCommaSeparatedString(parameters.type ?? new List<string>()) }
-         };
-
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange"),
+            ForInternalRequest = true,
          };
 
-         var response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(requestParams
-            , cancellation);
+         var response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(requestParams, cancellation);
+
+         Rest20.TransformObjectValues(response.transactions);
 
          return response.transactions;
       }
 
-      public class TransactionsByIdRangeParameters
+      public class TransactionsByIdRangeParameters : ApiParameters
       {
          /// <summary>
          /// The starting Transacion ID (inclusive) to fetch. [required]
@@ -53,7 +51,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// A comma separated list (csv) that restricts the types of Transactions to retreive.
          /// The valid values are defined in the TransactionFilter class.
          /// </summary>
-         [JsonIgnore]
          public List<string> type { get; set; }
       }
    }

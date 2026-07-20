@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -188,16 +189,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             if (parameters.Data is JObject jObj && jObj.Count > 0)
             {
-               var sb = new StringBuilder();
-               foreach (var prop in jObj)
-               {
-                  if (prop.Value == null) continue;
-                  sb.Append(WebUtility.UrlEncode(prop.Key));
-                  sb.Append("=");
-                  sb.Append(WebUtility.UrlEncode(prop.Value.ToString()));
-                  sb.Append("&");
-               }
-               queryString = "?" + sb.ToString().Trim('&');
+               if (parameters.Data?.Count() > 0)
+                  queryString = $"?{Utilities.ConvertToQueryString(parameters.Data.Value<JObject>())}";
             }
          }
 
@@ -218,7 +211,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
             else if (parameters.ContentType == "application/json")
             {
-               var json = parameters.Data == null ? string.Empty : parameters.Data.ToString(Formatting.None);
+               var json = parameters?.Data.ToString(Formatting.None);
                content = new StringContent(json, System.Text.Encoding.UTF8, parameters.ContentType);
             }
          }
@@ -273,7 +266,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
                var json = reader.ReadToEnd();
                var result = JsonConvert.DeserializeObject<T>(json, JsonSettingsResponse);
 
-               TransformObjectValues(result, HttpAction.Response);
+               if (!parameters.ForInternalRequest)
+                  TransformObjectValues(result, HttpAction.Response);
 
                return result;
             }

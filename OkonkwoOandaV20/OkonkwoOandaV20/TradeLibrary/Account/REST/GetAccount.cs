@@ -1,7 +1,8 @@
+using OkonkwoOandaV20.Framework;
+using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -20,9 +21,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}"),
+            ForInternalRequest = true,
          };
 
          var response = await MakeRequestAsync<AccountResponse, AccountErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response.account);
          return response.account;
       }
    }

@@ -23,9 +23,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/pendingOrders"),
+            ForInternalRequest = true,
          };
 
          var response = await MakeRequestAsync<PendingOrdersResponse, PendingOrdersErrorResponse>(requestParams, cancellation);
+
+         Rest20.TransformObjectValues(response.orders);
 
          return new List<IOrder>(response.orders);
       }

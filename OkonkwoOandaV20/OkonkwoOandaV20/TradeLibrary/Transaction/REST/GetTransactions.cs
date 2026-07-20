@@ -1,11 +1,13 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OkonkwoOandaV20.Framework;
+
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using Newtonsoft.Json.Linq;
-using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -19,34 +21,33 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters, CancellationToken cancellation = default)
       {
-         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-         {
-            { "type", GetCommaSeparatedString(parameters.type ?? new List<string>()) }
-         };
-
-         var requestParams = new HttpParameters(requestDict)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/transactions"),
             Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true
          };
 
-         var pagesResponse = await MakeRequestAsync<TransactionsPageResponse, TransactionsPageErrorResponse>(requestParams, cancellation);
+         var pagesResponse = await MakeRequestAsync
+            <TransactionsPageResponse, TransactionsPageErrorResponse>(requestParams, cancellation);
 
          var transactions = new List<ITransaction>();
          foreach (string page in pagesResponse.pages)
          {
-            var parameters_ = new HttpParameters() { Uri = new Uri(page) };
+            var parameters_ = new HttpParameters() { Uri = new Uri(page), ForInternalRequest = true };
             var transactions_ = await MakeRequestAsync<TransactionsResponse, TransactionsErrorResponse>(parameters_, cancellation);
             transactions.AddRange(transactions_.transactions);
 
             await Task.Delay(parameters.pagingDelayMilliSeconds); // throttle these a bit
          }
 
+         Rest20.TransformObjectValues(transactions, HttpAction.Response);
+
          return transactions;
       }
 
-      public class TransactionsParameters
+      public class TransactionsParameters : ApiParameters
       {
          /// <summary>
          /// The starting time (inclusive) of the time range for the Transactions being queried. 

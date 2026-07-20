@@ -1,11 +1,12 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using Newtonsoft.Json.Linq;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -29,15 +30,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/pricing"),
-            Binding = HttpParametersBinding.QueryString
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true,
          };
 
          var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(requestParams, cancellation);
-
+         Rest20.TransformObjectValues(response.prices);
          return response.prices ?? new List<Price>();
       }
 
-      public class PricingParameters
+      public class PricingParameters : ApiParameters
       {
          /// <summary>
          /// List of Instruments to get pricing for. [required]

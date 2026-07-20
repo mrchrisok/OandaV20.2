@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OkonkwoOandaV20.TradeLibrary.Common
+namespace OkonkwoOandaV20.TradeLibrary.REST
 {
    /// <summary>
    /// Enumeration of resource categories for rate limits

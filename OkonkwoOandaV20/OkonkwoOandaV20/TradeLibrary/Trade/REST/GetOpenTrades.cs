@@ -20,9 +20,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/openTrades"),
+            ForInternalRequest = true
          };
 
          var response = await MakeRequestAsync<OpenTradesResponse, OpenTradesErrorResponse>(requestParams, cancellation);
+
+         Rest20.TransformObjectValues(response.trades);
 
          return response.trades ?? new List<Trade.Trade>();
       }

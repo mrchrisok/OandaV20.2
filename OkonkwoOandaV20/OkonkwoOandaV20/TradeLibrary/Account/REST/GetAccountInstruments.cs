@@ -1,10 +1,11 @@
+using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using Newtonsoft.Json.Linq;
-using System.Text.Json.Serialization;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -22,25 +23,24 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// the account are returned.</returns>
       public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
       {
-         var parameters_ = new { instruments = GetCommaSeparatedString(parameters.instruments) };
-
-         var requestParams = new HttpParameters(parameters_)
+         var requestParams = new HttpParameters(parameters ?? new AccountInstrumentsParameters())
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/instruments"),
-            Binding = HttpParametersBinding.QueryString
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true
          };
 
          var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response.instruments);
          return response.instruments;
       }
 
-      public class AccountInstrumentsParameters
+      public class AccountInstrumentsParameters : ApiParameters
       {
          /// <summary>
          /// List of instruments to query specifically.
          /// </summary>
-         [JsonIgnore]
          public List<string> instruments { get; set; }
       }
    }

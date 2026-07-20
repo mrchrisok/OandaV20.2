@@ -20,9 +20,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + "accounts"),
+            ForInternalRequest = true
          };
 
          var response = await MakeRequestAsync<AccountsResponse, AccountsErrorResponse>(requestParams, cancellation);
+         Rest20.TransformObjectValues(response.accounts);
          return response.accounts;
       }
    }

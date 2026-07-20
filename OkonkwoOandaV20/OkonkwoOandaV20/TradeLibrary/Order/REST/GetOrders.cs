@@ -8,6 +8,7 @@ using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System;
 
+
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
    /// <summary>
@@ -23,29 +24,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
       public static async Task<List<IOrder>> GetOrdersAsync(string accountID, OrdersParameters parameters = null, CancellationToken cancellation = default)
       {
-         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-         {
-            { "ids", GetCommaSeparatedString(parameters.ids ?? new List<string>()) }
-         };
-
-         var requestParams = new HttpParameters(requestDict)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders"),
-            Binding = HttpParametersBinding.QueryString
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true
          };
 
          var response = await MakeRequestAsync<OrdersResponse, OrdersErrorResponse>(requestParams, cancellation);
 
+         Rest20.TransformObjectValues(response.orders);
+
          return new List<IOrder>(response.orders);
       }
 
-      public class OrdersParameters
+      public class OrdersParameters : ApiParameters
       {
          /// <summary>
          /// Comma separated list of Order IDs to retrieve
          /// </summary>
-         [JsonIgnore]
          public List<string> ids { get; set; }
 
          /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.Factories;
+
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -20,13 +21,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>an OrderBook object</returns>
-      public static async Task<OrderBook> GetInstrumentOrderBookAsync(InstrumentOrderBookParameters parameters, CancellationToken cancellation = default)
+      public static async Task<OrderBook> GetInstrumentOrderBookAsync(string instrument, InstrumentOrderBookParameters parameters, CancellationToken cancellation = default)
       {
          HttpParameters requestParams() => new HttpParameters(parameters)
          {
-            Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/orderBook"),
-            Binding = HttpParametersBinding.QueryString
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/orderBook"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true,
          };
 
          InstrumentOrderBookResponse response = null;
@@ -44,23 +46,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             else
                throw ex;
          }
-
+         Rest20.TransformObjectValues(response.orderBook);
          return response.orderBook;
       }
 
-      public class InstrumentOrderBookParameters
+      public class InstrumentOrderBookParameters : ApiParameters
       {
          public InstrumentOrderBookParameters(bool getLastTimeOnFailure = true)
          {
             this.getLastTimeOnFailure = getLastTimeOnFailure;
          }
-
-         /// <summary>
-         /// Name of the Instrument [required]
-         /// </summary>
-         [JsonIgnore]
-         [Required]
-         public string instrument { get; set; }
 
          /// <summary>
          /// The time of the snapshot to fetch. If not specified, then the most recent snapshot 

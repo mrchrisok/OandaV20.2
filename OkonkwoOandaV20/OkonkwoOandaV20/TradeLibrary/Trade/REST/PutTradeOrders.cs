@@ -1,7 +1,9 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+﻿
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,7 +30,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return await MakeRequestAsync<TradeOrdersResponse, TradeOrdersErrorResponse>(requestParams, cancellation);
       }
 
-      public class TradeOrdersParameters
+      public class TradeOrdersParameters : ApiParameters
       {
          public TradeOrdersParameters()
          {
@@ -72,18 +74,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// The API action to perform on the takeProfit.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string takeProfitAction { get; protected set; }
 
          /// <summary>
          /// The API action to perform on the stopLoss.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string stopLossAction { get; protected set; }
 
          /// <summary>
          /// The API action to perform on the trailingStopLoss.
          /// Valid values are specified in the TradeOrdersAction class.
          /// </summary>
+         [JsonIgnore]
          public string trailingStopLossAction { get; protected set; }
          #endregion
 

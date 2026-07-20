@@ -1,8 +1,9 @@
 using OkonkwoOandaV20.TradeLibrary.Account;
+
+using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -29,7 +30,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class AccountChangesParameters
+      public class AccountChangesParameters : ApiParameters
       {
          /// <summary>
          /// ID of the Transaction to get Account changes since.

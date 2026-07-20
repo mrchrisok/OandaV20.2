@@ -6,6 +6,7 @@ using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System;
 
+
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
    public partial class Rest20
@@ -18,29 +19,27 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>A list of TradeData objects (or empty list, if no trades)</returns>
       public static async Task<List<Trade.Trade>> GetTradesAsync(string accountID, TradesParameters parameters = null, CancellationToken cancellation = default)
       {
-         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-         {
-            { "ids", GetCommaSeparatedString(parameters.ids ?? new List<string>()) }
-         };
-
-         var requestParams = new HttpParameters(requestDict)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/trades"),
-            Binding = HttpParametersBinding.QueryString
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true,
          };
 
          var response = await MakeRequestAsync<TradesResponse, TradesErrorResponse>(requestParams, cancellation);
 
+         Rest20.TransformObjectValues(response.trades);
+
+
          return response.trades ?? new List<Trade.Trade>();
       }
 
-      public class TradesParameters
+      public class TradesParameters : ApiParameters
       {
          /// <summary>
          /// Comma separated list of tradeIDs to retrieve
          /// </summary>
-         [JsonIgnore]
          public List<string> ids { get; set; }
 
          /// <summary>

@@ -1,10 +1,8 @@
-﻿using Microsoft.Identity.Client;
+﻿
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,35 +19,31 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>List of Candlestick objects (or empty list) </returns>
-      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
+      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(string instrument, InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
-            Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/candles"),
-            Binding = HttpParametersBinding.QueryString
+            Method = HttpMethod.Get,
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/candles"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true
          };
 
          var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(requestParams, cancellation);
 
+         Rest20.TransformObjectValues(response.candles);
+
          var candles = new List<CandlestickPlus>();
          foreach (var candle in response.candles)
          {
-            candles.Add(new CandlestickPlus(candle) { instrument = parameters.instrument, granularity = response.granularity });
+            candles.Add(new CandlestickPlus(candle) { instrument = instrument, granularity = response.granularity });
          }
 
          return candles;
       }
 
-      public class InstrumentCandlesParameters
+      public class InstrumentCandlesParameters : ApiParameters
       {
-         /// <summary>
-         /// Name of the Instrument [required]
-         /// </summary>
-         [JsonIgnore]
-         [Required]
-         public string instrument { get; set; }
-
          /// <summary>
          /// The Price component(s) to get candlestick data for. Can contain any combination 
          /// of the characters “M” (midpoint candles) “B” (bid candles) and “A” (ask candles). 

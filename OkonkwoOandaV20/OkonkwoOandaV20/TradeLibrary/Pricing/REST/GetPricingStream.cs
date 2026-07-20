@@ -1,11 +1,9 @@
 using Newtonsoft.Json;
-using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
+using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,7 +34,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return await MakeStreamRequestAsync<PricingStreamErrorResponse>(requestParams, cancellation);
       }
 
-      public class PricingStreamParameters
+      public class PricingStreamParameters : ApiParameters
       {
          public PricingStreamParameters() { snapshot = true; }
 

@@ -1,10 +1,7 @@
-﻿using Microsoft.Identity.Client;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OkonkwoOandaV20.Framework.Factories;
+﻿using Newtonsoft.Json;
+
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,14 +19,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a PositionBook object</returns>
-      public static async Task<PositionBook> GetInstrumentPositionBookAsync(InstrumentPositionBookParameters parameters
-         , CancellationToken cancellation = default)
+      public static async Task<PositionBook> GetInstrumentPositionBookAsync(string instrument, InstrumentPositionBookParameters parameters , CancellationToken cancellation = default)
       {
          HttpParameters requestParams() => new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/positionBook"),
-            Binding = HttpParametersBinding.QueryString
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/positionBook"),
+            Binding = HttpParametersBinding.QueryString,
+            ForInternalRequest = true,
          };
 
          InstrumentPositionBookResponse response = null;
@@ -46,23 +43,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             else
                throw ex;
          }
-
+         Rest20.TransformObjectValues(response.positionBook);
          return response.positionBook;
       } 
 
-      public class InstrumentPositionBookParameters
+      public class InstrumentPositionBookParameters : ApiParameters
       {
          public InstrumentPositionBookParameters(bool getLastTimeOnFailure = true)
          {
             this.getLastTimeOnFailure = getLastTimeOnFailure;
          }
-
-         /// <summary>
-         /// Name of the Instrument [required]
-         /// </summary>
-         [JsonIgnore]
-         [Required]
-         public string instrument { get; set; }
 
          /// <summary>
          /// The time of the snapshot to fetch. If not specified, then the most recent snapshot 

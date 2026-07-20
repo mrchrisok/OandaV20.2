@@ -304,13 +304,12 @@ namespace OkonkwoOandaV20Tests
 
          var parameters = new InstrumentCandlesParameters()
          {
-            instrument = instrument,
             price = price,
             granularity = granularity,
             count = count
          };
 
-         List<CandlestickPlus> result = await Rest20.GetInstrumentCandlesAsync(parameters);
+         List<CandlestickPlus> result = await Rest20.GetInstrumentCandlesAsync(instrument, parameters);
          CandlestickPlus candle = result.FirstOrDefault();
 
          m_Results.Verify("12.0", result != null, "Candles list received.");
@@ -334,11 +333,10 @@ namespace OkonkwoOandaV20Tests
          string unavailableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
          var parameters = new InstrumentOrderBookParameters()
          {
-            instrument = m_TestInstrument,
             time = unavailableSnapshotTime,
             getLastTimeOnFailure = false
          };
-         try { result = await Rest20.GetInstrumentOrderBookAsync(parameters); }
+         try { result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message);
@@ -349,7 +347,7 @@ namespace OkonkwoOandaV20Tests
          string availableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
          parameters.time = availableSnapshotTime;
          parameters.getLastTimeOnFailure = true;
-         result = await Rest20.GetInstrumentOrderBookAsync(parameters);
+         result = await Rest20.GetInstrumentOrderBookAsync(m_TestInstrument, parameters);
 
          m_Results.Verify("19.0", result != null, "Order book snapshot was received.");
          m_Results.Verify("19.1", result.time == availableSnapshotTime, "Order book snapshot time is correct.");
@@ -368,11 +366,10 @@ namespace OkonkwoOandaV20Tests
          string unavailableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(futureDateTime).Split(':')[0]}:00:00Z";
          var parameters = new InstrumentPositionBookParameters()
          {
-            instrument = m_TestInstrument,
             time = unavailableSnapshotTime,
             getLastTimeOnFailure = false
          };
-         try { result = await Rest20.GetInstrumentPositionBookAsync(parameters); }
+         try { result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message);
@@ -383,7 +380,7 @@ namespace OkonkwoOandaV20Tests
          string availableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
          parameters.time = availableSnapshotTime;
          parameters.getLastTimeOnFailure = true;
-         result = await Rest20.GetInstrumentPositionBookAsync(parameters);
+         result = await Rest20.GetInstrumentPositionBookAsync(m_TestInstrument, parameters);
 
          m_Results.Verify("20.0", result != null, "Position book snapshot was received.");
          m_Results.Verify("20.1", result.time == availableSnapshotTime, "Position book snapshot time is correct.");
@@ -709,7 +706,7 @@ namespace OkonkwoOandaV20Tests
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeClientExtensionsErrorResponse;
-            m_Results.Verify("13.E0", errorResponse != null, "Error response has correct type: TradeClientExtensionsModifyErrorResponse");
+            m_Results.Verify("13.E0", errorResponse != null, "Error response has correct type: TradeClientExtensionsErrorResponse");
          }
 
          // update extensions
@@ -746,7 +743,7 @@ namespace OkonkwoOandaV20Tests
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeOrdersErrorResponse;
-            m_Results.Verify("13.E1", errorResponse != null, "Error response has correct type: TradePatchExitOrdersErrorResponse");
+            m_Results.Verify("13.E1", errorResponse != null, "Error response has correct type: TradeOrdersErrorResponse");
          }
 
          // add a takeProft to an open trade
@@ -882,9 +879,9 @@ namespace OkonkwoOandaV20Tests
          increment = verifyPosition(onePosition, increment);
 
          // error test - close open position
-         var parameters = new PositionCloseParameters() { instrument = m_TestInstrument, longUnits = "FAKE" };
+         var parameters = new PositionCloseParameters() { longUnits = "FAKE" };
          PositionCloseResponse response = null;
-         try { response = await Rest20.PutPositionCloseAsync(AccountID, parameters); }
+         try { response = await Rest20.PutPositionCloseAsync(AccountID, m_TestInstrument, parameters); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as PositionCloseErrorResponse;
@@ -893,7 +890,7 @@ namespace OkonkwoOandaV20Tests
 
          // closeout open position 
          parameters.longUnits = "ALL";
-         response = await Rest20.PutPositionCloseAsync(AccountID, parameters);
+         response = await Rest20.PutPositionCloseAsync(AccountID, m_TestInstrument, parameters);
          m_LastTransactionID = response.lastTransactionID;
          m_Results.Verify("14." + increment.ToString(), response.longOrderCreateTransaction != null && response.longOrderCreateTransaction.id > 0, "Position close order created.");
          m_Results.Verify("14." + (increment + 1).ToString(), response.longOrderFillTransaction != null && response.longOrderFillTransaction.id > 0, "Position close fill order created.");

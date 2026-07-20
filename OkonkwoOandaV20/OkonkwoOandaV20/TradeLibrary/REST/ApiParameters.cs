@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace OkonkwoOandaV20.TradeLibrary.Common
+namespace OkonkwoOandaV20.TradeLibrary.REST
 {
    /// <summary>
    /// Base class for API parameters, providing a common structure for all parameter classes used in API requests.
@@ -23,6 +23,8 @@ namespace OkonkwoOandaV20.TradeLibrary.Common
       /// </summary>
       [JsonIgnore]
       public JsonSerializerSettings JsonSerializerSettingsResponse { get; set; }
+
+      internal bool ForInternalRequest { get; set; } = false;
    }
 
    /// <summary>

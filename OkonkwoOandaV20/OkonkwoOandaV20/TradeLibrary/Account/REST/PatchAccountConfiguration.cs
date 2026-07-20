@@ -1,10 +1,11 @@
 using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
+
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -31,7 +32,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class AccountConfigurationParameters
+      public class AccountConfigurationParameters : ApiParameters
       {
          /// <summary>
          /// Client-defined alias (name) for the Account
