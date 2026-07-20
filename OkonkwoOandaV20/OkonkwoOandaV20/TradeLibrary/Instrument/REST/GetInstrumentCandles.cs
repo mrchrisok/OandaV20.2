@@ -32,13 +32,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.candles);
-
          var candles = new List<CandlestickPlus>();
          foreach (var candle in response.candles)
          {
             candles.Add(new CandlestickPlus(candle) { instrument = instrument, granularity = response.granularity });
          }
+
+         Rest20.TransformObjectValues(candles);
 
          return candles;
       }
