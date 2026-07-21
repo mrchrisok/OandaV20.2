@@ -1,7 +1,7 @@
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,8 +36,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// The account id
       /// </summary>
-      [Required]
       [JsonIgnore]
+      [Required]
       public string accountID { get; set; }
    }
 

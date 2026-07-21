@@ -38,7 +38,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// the order request to post
       /// </summary>
-      public IOrderRequest Request { get; set; }
+      public IOrderRequest order { get; set; }
    }
 
    /// <summary>

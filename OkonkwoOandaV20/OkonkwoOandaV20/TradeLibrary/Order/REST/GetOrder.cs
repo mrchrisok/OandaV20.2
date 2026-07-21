@@ -1,8 +1,8 @@
+using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.Order;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 

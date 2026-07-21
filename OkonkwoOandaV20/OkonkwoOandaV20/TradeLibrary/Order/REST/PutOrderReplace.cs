@@ -42,7 +42,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// 
       /// </summary>
-      public IOrderRequest Request { get; set; }
+      public IOrderRequest order { get; set; }
    }
 
    /// <summary>

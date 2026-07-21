@@ -44,6 +44,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// <summary>
          /// The account ID
          /// </summary>
+         [JsonIgnore]
+         [Required]
          public string accountID { get; set; }
 
          /// <summary>

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,14 +37,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// The account ID
       /// </summary>
       [JsonIgnore]
-      [JsonRequired]
+      [Required]
       public string accountID { get; set; }
 
       /// <summary>
       /// The account ID
       /// </summary>
       [JsonIgnore]
-      [JsonRequired]
+      [Required]
       public string instrument { get; set; }
    }
 

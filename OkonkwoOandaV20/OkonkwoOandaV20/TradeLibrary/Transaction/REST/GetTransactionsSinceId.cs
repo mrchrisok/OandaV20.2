@@ -42,10 +42,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public string accountID { get; set; }
 
       /// <summary>
-      /// The transaction ID
+      /// The ID of the last Transaction fetched. 
+      /// This query will return all Transactions newer than the TransactionID. [required]
       /// </summary>
       [Required]
-      public long transactionID { get; set; }
+      public long id { get; set; }
+
+      /// <summary>
+      /// A filter for restricting the types of Transactions to retrieve.
+      /// Valid values are listed in the TransactionFilter class
+      /// /// </summary>
+      public string type { get; set; }
    }
 
    /// <summary>

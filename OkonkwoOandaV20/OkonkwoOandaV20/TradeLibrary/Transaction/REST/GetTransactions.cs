@@ -5,6 +5,7 @@ using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Security.Permissions;
 using System.Threading;
@@ -55,6 +56,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// <summary>
          /// The account ID
          /// </summary>
+         [JsonIgnore]
+         [Required]
          public string accountID { get; set; }
 
          /// <summary>
@@ -78,7 +81,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// A list of TransactionFilter values that restricts the types of Transactions to retreive.
          /// The valid values are defined in the TransactionFilter class.
          /// </summary>
-         [JsonIgnore]
          public List<string> type { get; set; }
 
          /// <summary>

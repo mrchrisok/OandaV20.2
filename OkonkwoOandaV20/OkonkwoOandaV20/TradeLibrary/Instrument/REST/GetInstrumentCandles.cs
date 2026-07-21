@@ -1,11 +1,9 @@
-﻿
-using OkonkwoOandaV20.Framework;
+﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 

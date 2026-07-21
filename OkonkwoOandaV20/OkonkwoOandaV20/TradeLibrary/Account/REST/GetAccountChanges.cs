@@ -1,8 +1,6 @@
 using OkonkwoOandaV20.TradeLibrary.Account;
-
 using System;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
