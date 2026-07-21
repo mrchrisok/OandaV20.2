@@ -36,7 +36,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public class TransactionsByIdRangeParameters : ApiParameters
       {
          /// <summary>
-         /// The account ID
+         /// Account Identifier [required]
          /// </summary>
          [JsonIgnore]
          [Required]

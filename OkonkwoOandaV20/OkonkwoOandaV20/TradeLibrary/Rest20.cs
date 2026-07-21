@@ -389,7 +389,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       #endregion
 
-      internal static void TransformObjectValues(object inputObject, string httpAction = HttpAction.Response)
+      public static void TransformObjectValues(object inputObject, string httpAction = HttpAction.Response)
       {
          if (inputObject == null)
             return;

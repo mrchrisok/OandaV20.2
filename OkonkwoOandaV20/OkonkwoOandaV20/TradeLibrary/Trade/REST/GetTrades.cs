@@ -37,7 +37,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public class TradesParameters : ApiParameters
       {
          /// <summary>
-         /// The account ID
+         /// Account Identifier [required]
          /// </summary>
          [Required]
          [JsonIgnore]

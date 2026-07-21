@@ -20,11 +20,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>The HttpResponseMessage that can be used to retrieve the prices as they stream</returns>
       public static async Task<HttpResponseMessage> GetPricingStream(PricingStreamParameters parameters, CancellationToken cancellation = default)
       {
-         //var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-         //{
-         //   { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
-         //};
-
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
@@ -38,7 +33,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public class PricingStreamParameters : ApiParameters
       {
          /// <summary>
-         /// The account ID
+         /// Account Identifier [required]
          /// </summary>
          [JsonIgnore]
          [Required]

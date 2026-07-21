@@ -40,7 +40,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public class OrdersParameters : ApiParameters
       {
          /// <summary>
-         /// The account ID
+         /// Account Identifier [required]
          /// </summary>
          [JsonIgnore]
          [Required]
