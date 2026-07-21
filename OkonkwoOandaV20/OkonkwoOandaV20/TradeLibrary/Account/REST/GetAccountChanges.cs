@@ -2,6 +2,7 @@ using OkonkwoOandaV20.TradeLibrary.Account;
 
 using System;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,12 +17,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">details will be retrieved for this account id</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>an AccountChangesResponse object</returns>
-      public static async Task<AccountChangesResponse> GetAccountChangesAsync(string accountID, AccountChangesParameters parameters, CancellationToken cancellation = default)
+      public static async Task<AccountChangesResponse> GetAccountChangesAsync(AccountChangesParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/changes"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/changes"),
             Binding = HttpParametersBinding.QueryString
          };
 
@@ -30,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class AccountChangesParameters : ApiParameters
+      public class AccountChangesParameters : AccountParameters
       {
          /// <summary>
          /// ID of the Transaction to get Account changes since.

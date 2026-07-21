@@ -18,12 +18,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">Account Identifier</param>
       /// <param name="parameters">The parameters for the request</param>
       /// <returns>an AccountConfigurationResponse object containing the updated values that were applied to the account</returns>
-      public static async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(string accountID, AccountConfigurationParameters parameters, CancellationToken cancellation = default)
+      public static async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(AccountConfigurationParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = new HttpMethod("PATCH"),
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/configuration"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/configuration"),
             Binding = HttpParametersBinding.Body,
          };
  
@@ -32,7 +32,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class AccountConfigurationParameters : ApiParameters
+      public class AccountConfigurationParameters : AccountParameters
       {
          /// <summary>
          /// Client-defined alias (name) for the Account

@@ -19,35 +19,34 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a PositionBook object</returns>
-      public static async Task<PositionBook> GetInstrumentPositionBookAsync(string instrument, InstrumentPositionBookParameters parameters , CancellationToken cancellation = default)
+      public static async Task<InstrumentPositionBookResponse> GetInstrumentPositionBookAsync(InstrumentPositionBookParameters parameters , CancellationToken cancellation = default)
       {
-         HttpParameters requestParams() => new HttpParameters(parameters)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/positionBook"),
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/positionBook"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalRequest = true,
          };
 
          InstrumentPositionBookResponse response = null;
          try { response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(
-                                                   requestParams(), cancellation); }
+                                                   requestParams, cancellation); }
          catch (Exception ex)
          {
             if (parameters.getLastTimeOnFailure)
             {
                parameters.time = null;
                response = await MakeRequestAsync<InstrumentPositionBookResponse, InstrumentPositionBookErrorResponse>(
-                                                   requestParams(), cancellation);
+                                                   requestParams, cancellation);
             }            
             else
                throw ex;
          }
-         Rest20.TransformObjectValues(response.positionBook);
-         return response.positionBook;
+
+         return response;
       } 
 
-      public class InstrumentPositionBookParameters : ApiParameters
+      public class InstrumentPositionBookParameters : InstrumentParameters
       {
          public InstrumentPositionBookParameters(bool getLastTimeOnFailure = true)
          {

@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/pricing"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalRequest = true,
+            ForInternalResponse = true,
          };
 
          var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(requestParams, cancellation);

@@ -15,21 +15,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">summary will be retrieved for this account id</param>
       /// <returns>an AccountSummary object containing the account details</returns>
-      public static async Task<AccountSummary> GetAccountSummaryAsync(string accountID, CancellationToken cancellation = default)
+      public static async Task<AccountSummaryResponse> GetAccountSummaryAsync(AccountSummaryParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/summary"),
-            ForInternalRequest = true,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/summary"),
          };
 
          var response = await MakeRequestAsync<AccountSummaryResponse, AccountSummaryErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.account);
-
-         return response.account;
+         return response;
       }
+   }
+
+   public class AccountSummaryParameters: AccountParameters
+   {
+
    }
 
    /// <summary>

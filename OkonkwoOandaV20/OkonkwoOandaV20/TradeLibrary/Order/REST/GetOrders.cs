@@ -22,24 +22,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the identifier of the account to retrieve the list for</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
-      public static async Task<List<IOrder>> GetOrdersAsync(string accountID, OrdersParameters parameters = null, CancellationToken cancellation = default)
+      public static async Task<OrdersResponse> GetOrdersAsync(OrdersParameters parameters = null, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/orders"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalRequest = true
+            ForInternalResponse = true
          };
 
          var response = await MakeRequestAsync<OrdersResponse, OrdersErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.orders);
-
-         return new List<IOrder>(response.orders);
+         return response;
       }
 
-      public class OrdersParameters : ApiParameters
+      public class OrdersParameters : OrderParameters
       {
          /// <summary>
          /// Comma separated list of Order IDs to retrieve

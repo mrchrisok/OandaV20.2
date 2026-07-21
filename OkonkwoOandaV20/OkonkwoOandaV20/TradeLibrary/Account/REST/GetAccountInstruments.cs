@@ -21,22 +21,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a List of the tradeable instruments specified. If none are specified, all tradeable instruments for 
       /// the account are returned.</returns>
-      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
+      public static async Task<AccountInstrumentsResponse> GetAccountInstrumentsAsync(AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters ?? new AccountInstrumentsParameters())
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/instruments"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/instruments"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalRequest = true
          };
 
-         var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(requestParams, cancellation);
-         Rest20.TransformObjectValues(response.instruments);
-         return response.instruments;
+         var response = await MakeRequestAsync
+            <AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(requestParams, cancellation);
+
+         return response;
       }
 
-      public class AccountInstrumentsParameters : ApiParameters
+      public class AccountInstrumentsParameters : AccountParameters
       {
          /// <summary>
          /// List of instruments to query specifically.

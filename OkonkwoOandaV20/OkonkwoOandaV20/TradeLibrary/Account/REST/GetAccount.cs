@@ -1,6 +1,8 @@
 using OkonkwoOandaV20.Framework;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,20 +17,30 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">details will be retrieved for this account id</param>
       /// <returns>an Account object containing the account details</returns>
-      public static async Task<Account.Account> GetAccountAsync(string accountID, CancellationToken cancellation = default)
+      public static async Task<AccountResponse> GetAccountAsync(AccountParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}"),
-            ForInternalRequest = true,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}"),
          };
 
          var response = await MakeRequestAsync<AccountResponse, AccountErrorResponse>(requestParams, cancellation);
-         Rest20.TransformObjectValues(response.account);
-         return response.account;
+
+         return response;
       }
    }
+
+   public class AccountParameters : ApiParameters
+   {
+      /// <summary>
+      /// The account id
+      /// </summary>
+      [Required]
+      [JsonIgnore]
+      public string accountID { get; set; }
+   }
+
 
    /// <summary>
    /// The GET success response received from the accounts/accountID

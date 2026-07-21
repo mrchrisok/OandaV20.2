@@ -26,7 +26,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/transactions"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalRequest = true
+            ForInternalResponse = true
          };
 
          var pagesResponse = await MakeRequestAsync
@@ -35,7 +35,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var transactions = new List<ITransaction>();
          foreach (string page in pagesResponse.pages)
          {
-            var parameters_ = new HttpParameters() { Uri = new Uri(page), ForInternalRequest = true };
+            var parameters_ = new HttpParameters() { Uri = new Uri(page), ForInternalResponse = true };
             var transactions_ = await MakeRequestAsync<TransactionsResponse, TransactionsErrorResponse>(parameters_, cancellation);
             transactions.AddRange(transactions_.transactions);
 

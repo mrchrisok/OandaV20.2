@@ -20,7 +20,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument),
-            ForInternalRequest = true
+            ForInternalResponse = true
          };
 
          var response = await MakeRequestAsync<PositionResponse, PositionErrorResponse>(requestParams, cancellation);
