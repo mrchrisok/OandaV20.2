@@ -34,14 +34,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public class TradeClientExtensionsParameters : ApiParameters
       {
          /// <summary>
-         /// The account ID
+         /// Account Identifier [required]
          /// </summary>
          [JsonIgnore]
          [Required]
          public string accountID { get; set; }
 
          /// <summary>
-         /// The account ID
+         /// Account Identifier [required]
          /// </summary>
          [JsonIgnore]
          [Required]

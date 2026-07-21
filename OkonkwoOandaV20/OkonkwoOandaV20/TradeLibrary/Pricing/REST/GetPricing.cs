@@ -22,11 +22,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns></returns>
       public static async Task<PricingResponse> GetPricingAsync(PricingParameters parameters, CancellationToken cancellation = default)
       {
-         //var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-         //{
-         //   { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
-         //};
-
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
@@ -42,7 +37,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public class PricingParameters : ApiParameters
       {
          /// <summary>
-         /// The account ID
+         /// Account Identifier [required]
          /// </summary>
          [JsonIgnore]
          [Required]

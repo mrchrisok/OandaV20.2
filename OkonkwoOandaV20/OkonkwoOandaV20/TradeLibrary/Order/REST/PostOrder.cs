@@ -37,7 +37,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    public class PostOrderParameters : ApiParameters
    {
       /// <summary>
-      /// The account ID
+      /// Account Identifier [required]
       /// </summary>
       [JsonIgnore]
       [Required]
