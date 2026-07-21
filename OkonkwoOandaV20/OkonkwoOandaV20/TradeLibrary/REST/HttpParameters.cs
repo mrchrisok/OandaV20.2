@@ -34,7 +34,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          Data = parameters is JToken jt ? jt : JToken.FromObject(parameters, jsonSerializer);
       }
 
-      public HttpParameters(object payload) : this(payload, null)
+      public HttpParameters(object payload) 
+         : this(payload, null)
       {
       }
 

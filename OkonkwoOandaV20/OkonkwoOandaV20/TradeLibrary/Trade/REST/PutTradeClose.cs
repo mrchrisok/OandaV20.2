@@ -1,6 +1,8 @@
 ﻿
+using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,15 +14,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Close (partially or full) a specific open Trade in an Account
       /// </summary>
-      /// <param name="accountID">Account identifier</param>
-      /// <param name="tradeSpecifier">The Trade specifier</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>DeleteTradeResponse containing the details of the close</returns>
-      public static async Task<TradeCloseResponse> PutTradeCloseAsync(string accountID, long tradeSpecifier, TradeCloseParameters parameters = null, CancellationToken cancellation = default)
+      public static async Task<TradeCloseResponse> PutTradeCloseAsync(TradeCloseParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters ?? new TradeCloseParameters())
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/close"),
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + parameters.accountID + "/trades/" + parameters.tradeSpecifier + "/close"),
             Binding = HttpParametersBinding.Body
          };
 
@@ -29,6 +31,20 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public class TradeCloseParameters : ApiParameters
       {
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string accountID { get; set; }
+
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public long tradeSpecifier { get; set; }
+
          public TradeCloseParameters() { units = "ALL"; }
 
          /// <summary>

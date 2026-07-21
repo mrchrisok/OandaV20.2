@@ -1,4 +1,3 @@
-using OkonkwoOandaV20.Framework;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
@@ -15,7 +14,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// and open Position representations are provided.
       /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_3
       /// </summary>
-      /// <param name="accountID">details will be retrieved for this account id</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an Account object containing the account details</returns>
       public static async Task<AccountResponse> GetAccountAsync(AccountParameters parameters, CancellationToken cancellation = default)
       {

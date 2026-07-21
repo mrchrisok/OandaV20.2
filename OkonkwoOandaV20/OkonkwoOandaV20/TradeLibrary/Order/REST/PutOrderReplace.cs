@@ -19,9 +19,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Replace an order by simultaneously cancelling it and replacing it with the given order request
       /// </summary>
-      /// <param name="accountID">the identifier of the account to post on</param>
-      /// <param name="orderSpecifier">the orderSpecifier of the order to cancel</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
       public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(OrderReplaceParameters parameters, CancellationToken cancellation = default)
       {

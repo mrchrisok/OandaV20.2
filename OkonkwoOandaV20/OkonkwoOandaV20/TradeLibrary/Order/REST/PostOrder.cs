@@ -15,8 +15,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Posts an order on the given account with the given parameters
       /// </summary>
-      /// <param name="accountID">the identifier of the account to post on</param>
-      /// <param name="request">the order request to post</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
       public static async Task<PostOrderResponse> PostOrderAsync(PostOrderParameters parameters, CancellationToken cancellation = default)
       {

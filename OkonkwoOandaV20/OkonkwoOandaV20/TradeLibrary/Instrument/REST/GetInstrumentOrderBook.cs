@@ -19,8 +19,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Retrieves the order book for an instrument
       /// </summary>
-      /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an OrderBook object</returns>
       public static async Task<InstrumentOrderBookResponse> GetInstrumentOrderBookAsync(InstrumentOrderBookParameters parameters, CancellationToken cancellation = default)
       {

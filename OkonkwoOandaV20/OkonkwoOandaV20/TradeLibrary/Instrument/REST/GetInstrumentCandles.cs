@@ -19,8 +19,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Fetch candlestick data for an instrument
       /// </summary>
-      /// <param name="instrument">Name of the Instrument [required]</param>
-      /// <param name="parameters">The parameters for the request</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>List of Candlestick objects (or empty list) </returns>
       public static async Task<InstrumentCandlesResponse> GetInstrumentCandlesAsync(InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
       {

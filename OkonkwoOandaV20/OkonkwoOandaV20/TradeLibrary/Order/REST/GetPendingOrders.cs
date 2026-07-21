@@ -15,7 +15,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Retrieves the list of pending orders belonging to the account
       /// </summary>
-      /// <param name="accountID">the identifier of the account to retrieve the list for</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
       public static async Task<PendingOrdersResponse> GetPendingOrdersAsync(PendingOrdersParameters parameters, CancellationToken cancellation = default)
       {

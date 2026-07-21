@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,35 +17,39 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Get pricing information for a specified list of instrumentes within an Account
       /// http://developer.oanda.com/rest-live-v20/pricing-ep/#collapse_endpoint_2
       /// </summary>
-      /// <param name="accountID">Account Identifier</param>
-      /// <param name="parameters">The parameters for the request</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns></returns>
-      public static async Task<List<Price>> GetPricingAsync(string accountID, PricingParameters parameters, CancellationToken cancellation = default)
+      public static async Task<PricingResponse> GetPricingAsync(PricingParameters parameters, CancellationToken cancellation = default)
       {
-         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-         {
-            { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
-         };
+         //var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
+         //{
+         //   { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
+         //};
 
-         var requestParams = new HttpParameters(requestDict)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/pricing"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/pricing"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalResponse = true,
          };
 
          var response = await MakeRequestAsync<PricingResponse, PricingErrorResponse>(requestParams, cancellation);
-         Rest20.TransformObjectValues(response.prices);
-         return response.prices ?? new List<Price>();
+
+         return response;
       }
 
       public class PricingParameters : ApiParameters
       {
          /// <summary>
+         /// The account ID
+         /// </summary>
+         public string accountID { get; set; }
+
+         /// <summary>
          /// List of Instruments to get pricing for. [required]
          /// </summary>
-         [JsonIgnore]
+         [Required]
          public List<string> instruments { get; set; }
 
          /// <summary>

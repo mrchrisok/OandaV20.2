@@ -6,6 +6,7 @@ using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,15 +17,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Get a list of Transactions pages that satisfy a time-based Transaction query.
       /// </summary>
-      /// <param name="accountID">Account identifier</param>
-      /// <param name="parameters">The parameters for the request</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns></returns>
-      public static async Task<List<ITransaction>> GetTransactionsAsync(string accountID, TransactionsParameters parameters, CancellationToken cancellation = default)
+      public static async Task<TransactionsResponse> GetTransactionsAsync(TransactionsParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/transactions"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/transactions"),
             Binding = HttpParametersBinding.QueryString,
             ForInternalResponse = true
          };
@@ -32,23 +33,30 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var pagesResponse = await MakeRequestAsync
             <TransactionsPageResponse, TransactionsPageErrorResponse>(requestParams, cancellation);
 
-         var transactions = new List<ITransaction>();
+         var response = new TransactionsResponse() { transactions = new List<ITransaction>() };
+
          foreach (string page in pagesResponse.pages)
          {
             var parameters_ = new HttpParameters() { Uri = new Uri(page), ForInternalResponse = true };
             var transactions_ = await MakeRequestAsync<TransactionsResponse, TransactionsErrorResponse>(parameters_, cancellation);
-            transactions.AddRange(transactions_.transactions);
+
+            response.transactions.AddRange(transactions_.transactions);
 
             await Task.Delay(parameters.pagingDelayMilliSeconds); // throttle these a bit
          }
 
-         Rest20.TransformObjectValues(transactions);
+         Rest20.TransformObjectValues(response);
 
-         return transactions;
+         return response;
       }
 
       public class TransactionsParameters : ApiParameters
       {
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         public string accountID { get; set; }
+
          /// <summary>
          /// The starting time (inclusive) of the time range for the Transactions being queried. 
          /// [default=Account Creation Time]

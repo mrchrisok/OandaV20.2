@@ -16,27 +16,29 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Get a range of Transactions for an Account based on the Transaction IDs
       /// http://developer.oanda.com/rest-live-v20/transaction-ep/
       /// </summary>
-      /// <param name="accountID">Account identifier</param>
-      /// <param name="parameters">The parameters for the request</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns></returns>
-      public static async Task<List<ITransaction>> GetTransactionsByIdRangeAsync(string accountID, TransactionsByIdRangeParameters parameters, CancellationToken cancellation = default)
+      public static async Task<TransactionsByIdRangeResponse> GetTransactionsByIdRangeAsync(TransactionsByIdRangeParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/transactions/idrange"),
-            ForInternalResponse = true,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + parameters.accountID + "/transactions/idrange"),
          };
 
          var response = await MakeRequestAsync<TransactionsByIdRangeResponse, TransactionsByIdRangeErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.transactions);
-
-         return response.transactions;
+         return response;
       }
 
       public class TransactionsByIdRangeParameters : ApiParameters
       {
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         public string accountID { get; set; }
+
          /// <summary>
          /// The starting Transacion ID (inclusive) to fetch. [required]
          /// </summary>

@@ -16,7 +16,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Retrieves an order belonging to the account
       /// </summary>
-      /// <param name="parameters">The Order parameters</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
       public static async Task<OrderResponse> GetOrderAsync(OrderParameters parameters, CancellationToken cancellation = default)
       {

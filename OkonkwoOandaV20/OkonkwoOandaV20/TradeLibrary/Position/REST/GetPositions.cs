@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System;
+using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -11,23 +13,31 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Retrieves all positions for a given account
       /// </summary>
-      /// <param name="accountID">positions will be retrieved for this account id</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>List of Position objects with the details for each position (or empty list iff no positions)</returns>
-      public static async Task<List<Position.Position>> GetPositionsAsync(string accountID, CancellationToken cancellation = default)
+      public static async Task<PositionsResponse> GetPositionsAsync(PositionsParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/positions"),
-            ForInternalResponse = true,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/positions"),
          };
 
          var response = await MakeRequestAsync<PositionsResponse, PositionsErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.positions);
-
-         return response.positions ?? new List<Position.Position>();
+         return response;
       }
+   }
+
+   public class PositionsParameters : ApiParameters
+   {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
    }
 
    /// <summary>

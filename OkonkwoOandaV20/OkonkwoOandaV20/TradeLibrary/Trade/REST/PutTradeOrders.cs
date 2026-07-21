@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Identity.Client;
+using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
@@ -14,24 +15,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Create or replace a Trade's dependent Orders (TakeProfit, StopLoss and TrailingStopLoss) through the Trade itself
       /// </summary>
-      /// <param name="accountID">Account identifier</param>
-      /// <param name="tradeSpecifier">Specifier for the Trade</param>
-      /// <param name="parameters">The parameters for the request</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>The Transactions associated with the patched dependent orders</returns>
-      public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(string accountID, long tradeSpecifier, TradeOrdersParameters parameters, CancellationToken cancellation = default)
+      public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(TradeOrdersParameters parameters, CancellationToken cancellation = default)
       {
          Rest20.TransformObjectValues(parameters, HttpAction.Request);
          //
          var requestParams = new HttpParameters(parameters.Dependents)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/trades/" + tradeSpecifier + "/orders"),
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + parameters.accountID + "/trades/" + parameters.tradeSpecifier + "/orders"),
             Binding = HttpParametersBinding.Body,
-            ForInternalResponse = true,
          };
 
          var response = await MakeRequestAsync<TradeOrdersResponse, TradeOrdersErrorResponse>(requestParams, cancellation);
-         Rest20.TransformObjectValues(response);
+
          return response;
       }
 
@@ -52,6 +51,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             };
          }
 
+         public string accountID { get; set; }
+         public long tradeSpecifier { get; set; }
+
          #region properties 
          /// <summary>
          /// The specification of the Take Profit to create/modify/cancel. If
@@ -61,6 +63,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// field will be set to a default value on create, and be inherited by the
          /// replacing order on modify.
          /// </summary>
+         [JsonIgnore]
          public TakeProfitDetails takeProfit { get; protected set; }
 
          /// <summary>
@@ -71,6 +74,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// set to a default value on create, and be inherited by the replacing order
          /// on modify.
          /// </summary>
+         [JsonIgnore]
          public StopLossDetails stopLoss { get; protected set; }
 
          /// <summary>
@@ -81,6 +85,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// of trailngStopLoss is not specified, that field will be set to a default
          /// value on create, and be inherited by the replacing order on modify.
          /// </summary>
+         [JsonIgnore]
          public TrailingStopLossDetails trailingStopLoss { get; protected set; }
 
          /// <summary>

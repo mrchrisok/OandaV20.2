@@ -16,8 +16,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Fetch a position book for an instrument
       /// </summary>
-      /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>a PositionBook object</returns>
       public static async Task<InstrumentPositionBookResponse> GetInstrumentPositionBookAsync(InstrumentPositionBookParameters parameters , CancellationToken cancellation = default)
       {

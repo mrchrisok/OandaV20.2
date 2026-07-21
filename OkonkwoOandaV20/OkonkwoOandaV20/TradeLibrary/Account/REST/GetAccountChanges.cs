@@ -14,8 +14,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Endpoint used to poll an Account for its current state and changes since a specified TransactionID.
       /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_7
       /// </summary>
-      /// <param name="accountID">details will be retrieved for this account id</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an AccountChangesResponse object</returns>
       public static async Task<AccountChangesResponse> GetAccountChangesAsync(AccountChangesParameters parameters, CancellationToken cancellation = default)
       {

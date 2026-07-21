@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,23 +16,31 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Retrieves the current open positions for a given account
       /// </summary>
-      /// <param name="accountID">positions will be retrieved for this account id</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>A list of Position objects with the details for each position (or empty list if no positions)</returns>
-      public static async Task<List<Position.Position>> GetOpenPositionsAsync(string accountID, CancellationToken cancellation = default)
+      public static async Task<OpenPositionsResponse> GetOpenPositionsAsync(OpenPositionsParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/openPositions"),
-            ForInternalResponse = true,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + parameters.accountID + "/openPositions"),
          };
 
          var response = await MakeRequestAsync<OpenPositionsResponse, OpenPositionsErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.positions);
-
-         return response.positions ?? new List<Position.Position>();
+         return response;
       }
+   }
+
+   public class OpenPositionsParameters : ApiParameters
+   {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
    }
 
    /// <summary>

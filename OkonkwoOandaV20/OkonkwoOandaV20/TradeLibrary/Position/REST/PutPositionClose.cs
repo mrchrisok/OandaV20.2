@@ -1,5 +1,7 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Transaction;
+﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,16 +14,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Close the given position
       /// This will close all trades on the provided account/instrument
       /// </summary>
-      /// <param name="accountID">the account to close trades on</param>
-      /// <param name="instrument">the instrument for which to close all trades</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>DeletePositionResponse object containing details about the actions taken</returns>
-      public static async Task<PositionCloseResponse> PutPositionCloseAsync(string accountID, string instrument, PositionCloseParameters parameters, CancellationToken cancellation = default)
+      public static async Task<PositionCloseResponse> PutPositionCloseAsync(PositionCloseParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument + "/close"),
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + parameters.accountID + "/positions/" + parameters.instrument + "/close"),
             Binding = HttpParametersBinding.Body
          };
 
@@ -32,6 +33,20 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public class PositionCloseParameters : ApiParameters
       {
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string accountID { get; set; }
+
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string instrument { get; set; }
+
          /// <summary>
          /// Indication of how much of the long Position to closeout. Either the
          /// string “ALL”, the string “NONE”, or a DecimalNumber representing how many

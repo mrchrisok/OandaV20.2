@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,24 +12,39 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Retrieves the current position for the given instrument and account
       /// This will cause an error if there is no position for that instrument 
       /// </summary>
-      /// <param name="accountID">the account for which to get the position</param>
-      /// <param name="instrument">the instrument for which to get the position</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>Position object with the details of the position</returns>
-      public static async Task<Position.Position> GetPositionAsync(string accountID, string instrument, CancellationToken cancellation = default)
+      public static async Task<PositionResponse> GetPositionAsync(PositionParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/positions/" + instrument),
-            ForInternalResponse = true
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + parameters.accountID + "/positions/" + parameters.instrument),
+
          };
 
          var response = await MakeRequestAsync<PositionResponse, PositionErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.position);
-
-         return response.position;
+         return response;
       }
+   }
+
+   public class PositionParameters : ApiParameters
+   {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [JsonRequired]
+      public string accountID { get; set; }
+
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [JsonRequired]
+      public string instrument { get; set; }
    }
 
    /// <summary>

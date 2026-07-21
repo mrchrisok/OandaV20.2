@@ -13,9 +13,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Modify the Client Extensions for the order in the given account.
       /// http://developer.oanda.com/rest-live-v20/order-ep/
       /// </summary>
-      /// <param name="accountId">the identifier of the account to post on</param>
-      /// <param name="orderSpecifier">the orderSpecifier to update extensions for</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an OrderClientExtensionsModifyResponse (throws an OrderClientExtensionsModifyErrorResponse if the request fails.)</returns>
       public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(OrderClientExtensionsParameters parameters, CancellationToken cancellation = default)
       {
