@@ -19,22 +19,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Retrieves the order book for an instrument
       /// </summary>
-      /// <param name="instrument">Name of the Instrument [required]</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an OrderBook object</returns>
-      public static async Task<OrderBook> GetInstrumentOrderBookAsync(string instrument, InstrumentOrderBookParameters parameters, CancellationToken cancellation = default)
+      public static async Task<InstrumentOrderBookResponse> GetInstrumentOrderBookAsync(InstrumentOrderBookParameters parameters, CancellationToken cancellation = default)
       {
-         HttpParameters requestParams() => new HttpParameters(parameters)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/orderBook"),
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/orderBook"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalRequest = true,
          };
 
          InstrumentOrderBookResponse response = null;
          try { response = await MakeRequestAsync<InstrumentOrderBookResponse, InstrumentOrderBookErrorResponse>(
-                                                   requestParams(), cancellation); 
+                                                   requestParams, cancellation); 
          }
          catch (Exception ex)
          {
@@ -42,16 +41,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             {
                parameters.time = null;
                response = await MakeRequestAsync<InstrumentOrderBookResponse, InstrumentOrderBookErrorResponse>(
-                                                   requestParams(), cancellation);
+                                                   requestParams, cancellation);
             }
             else
                throw ex;
          }
-         Rest20.TransformObjectValues(response.orderBook);
-         return response.orderBook;
+
+         return response;
       }
 
-      public class InstrumentOrderBookParameters : ApiParameters
+      public class InstrumentOrderBookParameters : InstrumentParameters
       {
          public InstrumentOrderBookParameters(bool getLastTimeOnFailure = true)
          {

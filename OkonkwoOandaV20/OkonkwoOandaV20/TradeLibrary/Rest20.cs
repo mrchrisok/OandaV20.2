@@ -266,7 +266,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
                var json = reader.ReadToEnd();
                var result = JsonConvert.DeserializeObject<T>(json, JsonSettingsResponse);
 
-               if (!parameters.ForInternalRequest)
+               if (!parameters.ForInternalResponse)
                   TransformObjectValues(result, HttpAction.Response);
 
                return result;

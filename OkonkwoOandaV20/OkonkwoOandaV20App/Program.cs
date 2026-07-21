@@ -78,8 +78,9 @@ namespace OkonkwoOandaV20App
                TradeCloseResponse closeResponse = null;
                try
                {
-                  var parameters = new TradeCloseParameters() { units = "ALL" };
-                  closeResponse = await Rest20.PutTradeCloseAsync(AccountID, tradeID.Value, parameters);
+                  var parameters = new TradeCloseParameters() { accountID = AccountID
+                     , tradeSpecifier = tradeID.Value, units = "ALL" };
+                  closeResponse = await Rest20.PutTradeCloseAsync(parameters);
                }
                catch
                {
@@ -118,8 +119,9 @@ namespace OkonkwoOandaV20App
       {
          WriteNewLine("Creating a EUR_USD market BUY order ...");
 
-         var parameters = new AccountInstrumentsParameters() { instruments = new List<string>() { INSTRUMENT } };
-         var oandaInstrument = (await Rest20.GetAccountInstrumentsAsync(AccountID, parameters)).First();
+         var parameters = new AccountInstrumentsParameters() { 
+            accountID = AccountID, instruments = new List<string>() { INSTRUMENT } };
+         var oandaInstrument = (await Rest20.GetAccountInstrumentsAsync(parameters))?.instruments.First();
          decimal orderUnits = side == "buy" ? 10 : -10;
 
          var request = new MarketOrderRequest(oandaInstrument)
@@ -130,7 +132,8 @@ namespace OkonkwoOandaV20App
          PostOrderResponse response = null;
          try
          {
-            response = await Rest20.PostOrderAsync(AccountID, request);
+            var parameters2 = new PostOrderParameters() { accountID = AccountID, order = request };
+            response = await Rest20.PostOrderAsync(parameters2);
             WriteNewLine("Congrats! You've put on a trade! Let it run! :)");
          }
          catch (Exception ex)

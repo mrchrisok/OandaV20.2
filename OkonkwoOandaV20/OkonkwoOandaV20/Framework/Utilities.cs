@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using Azure.Identity;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json.Linq;
 using OkonkwoOandaV20.TradeLibrary.REST;
 using System.Collections.Generic;
@@ -44,19 +45,21 @@ namespace OkonkwoOandaV20.Framework
       /// <returns>True if trading is halted, false if trading is not halted.</returns>
       public static async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD, bool throwIfHalted = false)
       {
-         var parameters = new PricingParameters() { instruments = new List<string>() { instrument }
+         var accountId = Credentials.GetCredentials().AccountId;
+
+         var parameters = new PricingParameters() { 
+            accountID = accountId , instruments = new List<string>() { instrument }
             , ForInternalRequest = true };
 
-         var accountId = Credentials.GetCredentials().AccountId;
-         var prices = await Rest20.GetPricingAsync(accountId, parameters);
+         var response = await Rest20.GetPricingAsync(parameters);
 
          bool isTradeable = false, hasBids = false, hasAsks = false;
 
-         if (prices[0] != null)
+         if (response.prices[0] != null)
          {
-            isTradeable = prices[0].tradeable;
-            hasBids = prices[0].bids.Count > 0;
-            hasAsks = prices[0].asks.Count > 0;
+            isTradeable = response.prices[0].tradeable;
+            hasBids = response.prices[0].bids.Count > 0;
+            hasAsks = response.prices[0].asks.Count > 0;
          }
 
          if (isTradeable && hasBids && hasAsks)  // not halted

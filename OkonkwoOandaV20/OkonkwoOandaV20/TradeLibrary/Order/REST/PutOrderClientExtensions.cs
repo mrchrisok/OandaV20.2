@@ -13,16 +13,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Modify the Client Extensions for the order in the given account.
       /// http://developer.oanda.com/rest-live-v20/order-ep/
       /// </summary>
-      /// <param name="accountId">the identifier of the account to post on</param>
-      /// <param name="orderSpecifier">the orderSpecifier to update extensions for</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an OrderClientExtensionsModifyResponse (throws an OrderClientExtensionsModifyErrorResponse if the request fails.)</returns>
-      public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(string accountID, long orderSpecifier, OrderClientExtensionsParameters parameters, CancellationToken cancellation = default)
+      public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(OrderClientExtensionsParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{accountID}/orders/{orderSpecifier}/clientExtensions"),
+            Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{parameters.accountID}/orders/{parameters.orderSpecifier}/clientExtensions"),
             Binding = HttpParametersBinding.Body
          };
 
@@ -31,7 +30,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class OrderClientExtensionsParameters : ApiParameters
+      public class OrderClientExtensionsParameters : OrderParameters
       {
          /// <summary>
          /// The Client Extensions to update for the Order. Do not set, modify, or

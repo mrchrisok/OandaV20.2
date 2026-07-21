@@ -3,6 +3,7 @@ using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -17,20 +18,30 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Get a stream of Transactions for an Account starting from when the request is made
       /// </summary>
-      /// <param name="accountID">the account ID you want to stream on</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>the HttpResponseMessage that can be used to retrieve the events as they stream</returns>
-      public static async Task<HttpResponseMessage> GetTransactionsStream(string accountID, CancellationToken cancellation = default)
+      public static async Task<HttpResponseMessage> GetTransactionsStream(TransactionsStreamParameters parameters, CancellationToken cancellation = default)
       {
-         var parameters = new HttpParameters()
+         var requestParameters = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.TransactionsStream) + $"accounts/{accountID}/transactions/stream"),
+            Uri = new Uri(ServerUri(EServer.TransactionsStream) + $"accounts/{parameters.accountID}/transactions/stream"),
          };
 
-         return await MakeStreamRequestAsync<TransactionsStreamErrorResponse>(parameters, cancellation);
+         return await MakeStreamRequestAsync<TransactionsStreamErrorResponse>(requestParameters, cancellation);
       }
    }
 
+   public class TransactionsStreamParameters : ApiParameters
+   {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
+   }
 
    //[JsonConverter(typeof(TransactionsStreamResponseConverter))]
    public class TransactionsStreamResponse : StreamResponse
@@ -61,7 +72,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       protected override async Task<HttpResponseMessage> GetSession()
       {
-         return await Rest20.GetTransactionsStream(_accountID);
+         return await Rest20.GetTransactionsStream(new TransactionsStreamParameters() { 
+            accountID = _accountID 
+         });
       }
    }
 }

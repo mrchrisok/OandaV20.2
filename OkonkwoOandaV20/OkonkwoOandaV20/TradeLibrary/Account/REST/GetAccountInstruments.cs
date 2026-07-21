@@ -1,9 +1,6 @@
-using Newtonsoft.Json.Linq;
-using OkonkwoOandaV20.Framework;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,26 +14,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// a single user.
       /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_5
       /// </summary>
-      /// <param name="accountID">details will be retrieved for this account id</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>a List of the tradeable instruments specified. If none are specified, all tradeable instruments for 
       /// the account are returned.</returns>
-      public static async Task<List<Instrument.Instrument>> GetAccountInstrumentsAsync(string accountID, AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
+      public static async Task<AccountInstrumentsResponse> GetAccountInstrumentsAsync(AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters ?? new AccountInstrumentsParameters())
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/instruments"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/instruments"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalRequest = true
          };
 
-         var response = await MakeRequestAsync<AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(requestParams, cancellation);
-         Rest20.TransformObjectValues(response.instruments);
-         return response.instruments;
+         var response = await MakeRequestAsync
+            <AccountInstrumentsResponse, AccountInstrumentsErrorResponse>(requestParams, cancellation);
+
+         return response;
       }
 
-      public class AccountInstrumentsParameters : ApiParameters
+      public class AccountInstrumentsParameters : AccountParameters
       {
          /// <summary>
          /// List of instruments to query specifically.
