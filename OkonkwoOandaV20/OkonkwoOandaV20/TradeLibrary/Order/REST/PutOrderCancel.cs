@@ -1,8 +1,10 @@
+using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -29,9 +31,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class OrderCancelParameters : OrderParameters
+   public class OrderCancelParameters : ApiParameters
    {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
 
+      /// <summary>
+      /// The order ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public long orderSpecifier { get; set; }
    }
 
    /// <summary>

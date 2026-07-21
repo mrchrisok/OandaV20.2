@@ -1,6 +1,8 @@
 ﻿
+using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,8 +32,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class OrderClientExtensionsParameters : OrderParameters
+      public class OrderClientExtensionsParameters : ApiParameters
       {
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string accountID { get; set; }
+
+         /// <summary>
+         /// The order ID
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public long orderSpecifier { get; set; }
+
          /// <summary>
          /// The Client Extensions to update for the Order. Do not set, modify, or
          /// delete clientExtensions if your account is associated with MT4.
