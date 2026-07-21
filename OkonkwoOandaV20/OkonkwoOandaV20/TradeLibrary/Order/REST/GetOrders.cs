@@ -1,12 +1,13 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Order;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using Newtonsoft.Json.Linq;
-using System;
 
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -36,8 +37,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class OrdersParameters : OrderParameters
+      public class OrdersParameters : ApiParameters
       {
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string accountID { get; set; }
+
          /// <summary>
          /// Comma separated list of Order IDs to retrieve
          /// </summary>

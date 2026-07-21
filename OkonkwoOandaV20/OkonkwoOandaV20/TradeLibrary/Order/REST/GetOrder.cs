@@ -47,7 +47,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       [JsonIgnore]
       [Required]
-      public string orderSpecifier { get; set; }
+      public long orderSpecifier { get; set; }
    }
 
    /// <summary>

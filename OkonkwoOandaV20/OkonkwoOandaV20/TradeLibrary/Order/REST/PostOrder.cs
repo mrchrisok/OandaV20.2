@@ -2,11 +2,12 @@ using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -33,8 +34,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class PostOrderParameters : OrderParameters
+   public class PostOrderParameters : ApiParameters
    {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
+
       /// <summary>
       /// the order request to post
       /// </summary>

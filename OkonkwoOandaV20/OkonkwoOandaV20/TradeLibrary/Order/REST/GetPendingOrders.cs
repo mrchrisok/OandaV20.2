@@ -1,6 +1,8 @@
-﻿using OkonkwoOandaV20.TradeLibrary.Order;
+﻿using Newtonsoft.Json;
+using OkonkwoOandaV20.TradeLibrary.Order;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,9 +34,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class PendingOrdersParameters : OrderParameters
+   public class PendingOrdersParameters : ApiParameters
    {
-
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
    }
 
    /// <summary>

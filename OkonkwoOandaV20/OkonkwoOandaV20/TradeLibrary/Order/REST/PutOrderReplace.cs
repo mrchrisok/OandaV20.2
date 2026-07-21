@@ -4,6 +4,7 @@ using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading;
@@ -37,8 +38,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class OrderReplaceParameters : OrderParameters
+   public class OrderReplaceParameters : ApiParameters
    {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
+
+      /// <summary>
+      /// The order ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public long orderSpecifier { get; set; }
+
       /// <summary>
       /// 
       /// </summary>
