@@ -17,21 +17,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="accountID">the identifier of the account to retrieve the list for</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
-      public static async Task<List<IOrder>> GetPendingOrdersAsync(string accountID, CancellationToken cancellation = default)
+      public static async Task<PendingOrdersResponse> GetPendingOrdersAsync(PendingOrdersParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters()
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/pendingOrders"),
-            ForInternalResponse = true,
+            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + parameters.accountID + "/pendingOrders"),
          };
 
          var response = await MakeRequestAsync<PendingOrdersResponse, PendingOrdersErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.orders);
-
-         return new List<IOrder>(response.orders);
+         return response;
       }
+   }
+
+   public class PendingOrdersParameters : OrderParameters_
+   {
+
    }
 
    /// <summary>

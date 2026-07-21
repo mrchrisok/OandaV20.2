@@ -33,7 +33,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class OrderParameters : ApiParameters
+   public class OrderParameters : OrderParameters_
+   {
+      /// <summary>
+      /// The order ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string orderSpecifier { get; set; }
+   }
+
+   public class OrderParameters_ : ApiParameters
    {
       /// <summary>
       /// The account ID
@@ -41,13 +51,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       [JsonIgnore]
       [Required]
       public string accountID { get; set; }
-
-      /// <summary>
-      /// The order ID
-      /// </summary>
-      [JsonIgnore]
-      [Required]
-      public string orderSpecifier { get; set; }
    }
 
    /// <summary>

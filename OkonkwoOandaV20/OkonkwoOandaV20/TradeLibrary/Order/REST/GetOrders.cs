@@ -29,7 +29,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/orders"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalResponse = true
          };
 
          var response = await MakeRequestAsync<OrdersResponse, OrdersErrorResponse>(requestParams, cancellation);
@@ -37,7 +36,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class OrdersParameters : OrderParameters
+      public class OrdersParameters : OrderParameters_
       {
          /// <summary>
          /// Comma separated list of Order IDs to retrieve
