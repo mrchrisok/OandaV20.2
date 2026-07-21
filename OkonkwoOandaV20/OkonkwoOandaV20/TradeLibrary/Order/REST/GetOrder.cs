@@ -16,8 +16,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Retrieves an order belonging to the account
       /// </summary>
-      /// <param name="accountID">the identifier of the account to retrieve the list for</param>
-      /// <param name="orderSpecifier">The Order Specifier (orderId) [required]</param>
+      /// <param name="parameters">The Order parameters</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
       public static async Task<OrderResponse> GetOrderAsync(OrderParameters parameters, CancellationToken cancellation = default)
       {
@@ -33,17 +32,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class OrderParameters : OrderParameters_
-   {
-      /// <summary>
-      /// The order ID
-      /// </summary>
-      [JsonIgnore]
-      [Required]
-      public string orderSpecifier { get; set; }
-   }
-
-   public class OrderParameters_ : ApiParameters
+   public class OrderParameters : ApiParameters
    {
       /// <summary>
       /// The account ID
@@ -51,6 +40,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       [JsonIgnore]
       [Required]
       public string accountID { get; set; }
+
+      /// <summary>
+      /// The order ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string orderSpecifier { get; set; }
    }
 
    /// <summary>

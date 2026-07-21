@@ -17,12 +17,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="orderSpecifier">the orderSpecifier to update extensions for</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>an OrderClientExtensionsModifyResponse (throws an OrderClientExtensionsModifyErrorResponse if the request fails.)</returns>
-      public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(string accountID, long orderSpecifier, OrderClientExtensionsParameters parameters, CancellationToken cancellation = default)
+      public static async Task<OrderClientExtensionsResponse> PutOrderClientExtensionsAsync(OrderClientExtensionsParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{accountID}/orders/{orderSpecifier}/clientExtensions"),
+            Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{parameters.accountID}/orders/{parameters.orderSpecifier}/clientExtensions"),
             Binding = HttpParametersBinding.Body
          };
 
@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class OrderClientExtensionsParameters : ApiParameters
+      public class OrderClientExtensionsParameters : OrderParameters
       {
          /// <summary>
          /// The Client Extensions to update for the Order. Do not set, modify, or

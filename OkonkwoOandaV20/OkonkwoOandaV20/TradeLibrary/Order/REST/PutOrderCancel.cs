@@ -15,18 +15,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the identifier of the account to post on</param>
       /// <param name="orderSpecifier">The Order Specifier (orderId) [required]</param>
       /// <returns>a PutCancelOrderResponse with details of the cancelled order</returns>
-      public static async Task<OrderCancelResponse> PutOrderCancelAsync(string accountID, long orderSpecifier, CancellationToken cancellation = default)
+      public static async Task<OrderCancelResponse> PutOrderCancelAsync(OrderCancelParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders/{orderSpecifier}/cancel"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/orders/{parameters.orderSpecifier}/cancel"),
          };
 
          var response = await MakeRequestAsync<OrderCancelResponse, OrderCancelErrorResponse>(requestParams, cancellation);
 
          return response;
       }
+   }
+
+   public class OrderCancelParameters : OrderParameters
+   {
+
    }
 
    /// <summary>

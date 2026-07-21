@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class PendingOrdersParameters : OrderParameters_
+   public class PendingOrdersParameters : OrderParameters
    {
 
    }

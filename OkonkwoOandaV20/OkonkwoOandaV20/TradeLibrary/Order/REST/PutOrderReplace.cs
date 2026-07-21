@@ -23,12 +23,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="orderSpecifier">the orderSpecifier of the order to cancel</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
-      public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(string accountID, long orderSpecifier, IOrderRequest request, CancellationToken cancellation = default)
+      public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(OrderReplaceParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(new { order = request })
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier),
+            Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{parameters.accountID}/orders/{parameters.orderSpecifier}"),
             Binding = HttpParametersBinding.Body
          };
 
@@ -36,6 +36,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          return response;
       }
+   }
+
+   public class OrderReplaceParameters : OrderParameters
+   {
+      /// <summary>
+      /// 
+      /// </summary>
+      public IOrderRequest Request { get; set; }
    }
 
    /// <summary>

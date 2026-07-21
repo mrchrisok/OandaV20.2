@@ -22,7 +22,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the identifier of the account to retrieve the list for</param>
       /// <param name="parameters">the parameters for the request</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
-      public static async Task<OrdersResponse> GetOrdersAsync(OrdersParameters parameters = null, CancellationToken cancellation = default)
+      public static async Task<OrdersResponse> GetOrdersAsync(OrdersParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
@@ -36,7 +36,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class OrdersParameters : OrderParameters_
+      public class OrdersParameters : OrderParameters
       {
          /// <summary>
          /// Comma separated list of Order IDs to retrieve

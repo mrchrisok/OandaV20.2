@@ -18,12 +18,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="accountID">the identifier of the account to post on</param>
       /// <param name="request">the order request to post</param>
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
-      public static async Task<PostOrderResponse> PostOrderAsync(string accountID, IOrderRequest request, CancellationToken cancellation = default)
+      public static async Task<PostOrderResponse> PostOrderAsync(PostOrderParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(new { order = request })
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Post,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/orders"),
             Binding = HttpParametersBinding.Body,
          };
 
@@ -31,6 +31,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          return response;
       }
+   }
+
+   public class PostOrderParameters : OrderParameters
+   {
+      /// <summary>
+      /// the order request to post
+      /// </summary>
+      public IOrderRequest Request { get; set; }
    }
 
    /// <summary>
