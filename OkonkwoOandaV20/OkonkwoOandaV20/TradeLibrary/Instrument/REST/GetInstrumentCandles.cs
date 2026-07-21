@@ -1,8 +1,8 @@
-﻿
-using OkonkwoOandaV20.Framework;
+﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.TradeLibrary.Instrument;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,33 +17,33 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Fetch candlestick data for an instrument
       /// </summary>
-      /// <param name="instrument">Name of the Instrument [required]</param>
-      /// <param name="parameters">The parameters for the request</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>List of Candlestick objects (or empty list) </returns>
-      public static async Task<List<CandlestickPlus>> GetInstrumentCandlesAsync(string instrument, InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
+      public static async Task<InstrumentCandlesResponse> GetInstrumentCandlesAsync(InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + instrument + "/candles"),
+            Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/candles"),
             Binding = HttpParametersBinding.QueryString,
-            ForInternalRequest = true
+            ForInternalResponse = true
          };
 
          var response = await MakeRequestAsync<InstrumentCandlesResponse, InstrumentCandlesErrorResponse>(requestParams, cancellation);
 
-         var candles = new List<CandlestickPlus>();
          foreach (var candle in response.candles)
          {
-            candles.Add(new CandlestickPlus(candle) { instrument = instrument, granularity = response.granularity });
+            candle.instrument = parameters.instrument;
+            candle.granularity = parameters.granularity;
          }
 
-         Rest20.TransformObjectValues(candles);
+         Rest20.TransformObjectValues(response);
 
-         return candles;
+         return response;
       }
 
-      public class InstrumentCandlesParameters : ApiParameters
+      public class InstrumentCandlesParameters : InstrumentParameters
       {
          /// <summary>
          /// The Price component(s) to get candlestick data for. Can contain any combination 
@@ -114,33 +114,44 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// Valid values are specified in the WeeklyAlignment class.
          public string weeklyAlignment { get; set; }
       }
-   }
 
-   /// <summary>
-   /// The GET success response received from instruments/instrument/candles
-   /// </summary>
-   public class InstrumentCandlesResponse : Response
-   {
-      /// <summary>
-      /// The instrument whose Prices are represented by the candlesticks.
-      /// </summary>
-      public string instrument;
+      public class InstrumentParameters : ApiParameters
+      {
+         /// <summary>
+         /// Name of the instrument
+         /// </summary>
+         [Required]
+         [JsonIgnore]
+         public string instrument { get; set; }
 
-      /// <summary>
-      /// The granularity of the candlesticks provided.
-      /// </summary>
-      public string granularity;
+      }
 
       /// <summary>
-      /// The list of candlesticks that satisfy the request.
+      /// The GET success response received from instruments/instrument/candles
       /// </summary>
-      public List<Candlestick> candles;
-   }
+      public class InstrumentCandlesResponse : Response
+      {
+         /// <summary>
+         /// The instrument whose Prices are represented by the candlesticks.
+         /// </summary>
+         public string instrument;
 
-   /// <summary>
-   /// The GET error response received from instruments/instrument/candles
-   /// </summary>
-   public class InstrumentCandlesErrorResponse : ErrorResponse
-   {
+         /// <summary>
+         /// The granularity of the candlesticks provided.
+         /// </summary>
+         public string granularity;
+
+         /// <summary>
+         /// The list of candlesticks that satisfy the request.
+         /// </summary>
+         public List<Candlestick> candles;
+      }
+
+      /// <summary>
+      /// The GET error response received from instruments/instrument/candles
+      /// </summary>
+      public class InstrumentCandlesErrorResponse : ErrorResponse
+      {
+      }
    }
 }

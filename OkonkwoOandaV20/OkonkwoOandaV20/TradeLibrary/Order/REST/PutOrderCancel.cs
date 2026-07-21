@@ -12,21 +12,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Cancel a pending order in an Account
       /// http://developer.oanda.com/rest-live-v20/order-ep/#_collapse_endpoint_7
       /// </summary>
-      /// <param name="accountID">the identifier of the account to post on</param>
-      /// <param name="orderSpecifier">The Order Specifier (orderId) [required]</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>a PutCancelOrderResponse with details of the cancelled order</returns>
-      public static async Task<OrderCancelResponse> PutOrderCancelAsync(string accountID, long orderSpecifier, CancellationToken cancellation = default)
+      public static async Task<OrderCancelResponse> PutOrderCancelAsync(OrderCancelParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders/{orderSpecifier}/cancel"),
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/orders/{parameters.orderSpecifier}/cancel"),
          };
 
          var response = await MakeRequestAsync<OrderCancelResponse, OrderCancelErrorResponse>(requestParams, cancellation);
 
          return response;
       }
+   }
+
+   public class OrderCancelParameters : OrderParameters
+   {
+
    }
 
    /// <summary>

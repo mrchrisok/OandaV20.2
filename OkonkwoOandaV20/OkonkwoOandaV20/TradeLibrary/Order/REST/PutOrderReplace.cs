@@ -19,16 +19,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Replace an order by simultaneously cancelling it and replacing it with the given order request
       /// </summary>
-      /// <param name="accountID">the identifier of the account to post on</param>
-      /// <param name="orderSpecifier">the orderSpecifier of the order to cancel</param>
       /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>PostOrderResponse with details of the results (throws if if fails)</returns>
-      public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(string accountID, long orderSpecifier, IOrderRequest request, CancellationToken cancellation = default)
+      public static async Task<OrderReplaceResponse> PutOrderReplaceAsync(OrderReplaceParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(new { order = request })
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + accountID + "/orders/" + orderSpecifier),
+            Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{parameters.accountID}/orders/{parameters.orderSpecifier}"),
             Binding = HttpParametersBinding.Body
          };
 
@@ -36,6 +35,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          return response;
       }
+   }
+
+   public class OrderReplaceParameters : OrderParameters
+   {
+      /// <summary>
+      /// 
+      /// </summary>
+      public IOrderRequest order { get; set; }
    }
 
    /// <summary>

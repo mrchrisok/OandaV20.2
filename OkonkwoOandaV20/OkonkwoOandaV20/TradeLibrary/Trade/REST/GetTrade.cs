@@ -1,7 +1,9 @@
+using Newtonsoft.Json;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -10,22 +12,38 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Gets the details for a specific Trade in an Account
       /// </summary>
-      /// <param name="accountID">Account identifier</param>
-      /// <param name="tradeSpecifier">Specifier for the Trade</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>TradeData object containing the details of the trade</returns>
-      public static async Task<Trade.Trade> GetTradeAsync(string accountID, long tradeSpecifier, CancellationToken cancellation = default)
+      public static async Task<TradeResponse> GetTradeAsync(TradeParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/trades/{tradeSpecifier}"),
-            ForInternalRequest = true,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/trades/{parameters.tradeSpecifier}"),
          };
 
          var response = await MakeRequestAsync<TradeResponse, TradeErrorResponse>(requestParams, cancellation);
-         Rest20.TransformObjectValues(response.trade);
-         return response.trade;
+
+         return response;
       }
+   }
+
+   public class TradeParameters : ApiParameters
+   {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
+
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public long tradeSpecifier { get; set; }
    }
 
    /// <summary>

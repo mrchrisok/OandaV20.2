@@ -1,8 +1,7 @@
 using Newtonsoft.Json;
-using OkonkwoOandaV20.Framework;
-using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.Order;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,24 +16,38 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Retrieves an order belonging to the account
       /// </summary>
-      /// <param name="accountID">the identifier of the account to retrieve the list for</param>
-      /// <param name="orderSpecifier">The Order Specifier (orderId) [required]</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>a List of Order objects (or empty list, if no orders)</returns>
-      public static async Task<IOrder> GetOrderAsync(string accountID, long orderSpecifier, CancellationToken cancellation = default)
+      public static async Task<OrderResponse> GetOrderAsync(OrderParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/orders/{orderSpecifier}"),
-            ForInternalRequest = true
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/orders/{parameters.orderSpecifier}"),
          };
 
          var response = await MakeRequestAsync<OrderResponse, OrderErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.order);
-
-         return response.order;
+         return response;
       }
+   }
+
+   public class OrderParameters : ApiParameters
+   {
+      /// <summary>
+      /// The account ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string accountID { get; set; }
+
+      /// <summary>
+      /// The order ID
+      /// </summary>
+      [JsonIgnore]
+      [Required]
+      public string orderSpecifier { get; set; }
    }
 
    /// <summary>

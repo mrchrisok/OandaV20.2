@@ -34,7 +34,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          Data = parameters is JToken jt ? jt : JToken.FromObject(parameters, jsonSerializer);
       }
 
-      public HttpParameters(object payload) : this(payload, null)
+      public HttpParameters(object payload) 
+         : this(payload, null)
       {
       }
 
@@ -52,6 +53,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       public string ContentType { get; set; } = "application/json";
 
       //public JsonSerializerSettings JsonSettings { get; set; }
-      internal bool ForInternalRequest { get; set; } = false;
+      internal bool ForInternalResponse { get; set; } = false;
    }
 }

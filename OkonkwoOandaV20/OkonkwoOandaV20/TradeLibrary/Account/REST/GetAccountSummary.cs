@@ -13,23 +13,26 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// Get a summary for a single Account that a client has access to.
       /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_4
       /// </summary>
-      /// <param name="accountID">summary will be retrieved for this account id</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an AccountSummary object containing the account details</returns>
-      public static async Task<AccountSummary> GetAccountSummaryAsync(string accountID, CancellationToken cancellation = default)
+      public static async Task<AccountSummaryResponse> GetAccountSummaryAsync(AccountSummaryParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters()
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{accountID}/summary"),
-            ForInternalRequest = true,
+            Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/summary"),
          };
 
          var response = await MakeRequestAsync<AccountSummaryResponse, AccountSummaryErrorResponse>(requestParams, cancellation);
 
-         Rest20.TransformObjectValues(response.account);
-
-         return response.account;
+         return response;
       }
+   }
+
+   public class AccountSummaryParameters: AccountParameters
+   {
+
    }
 
    /// <summary>

@@ -3,6 +3,7 @@ using OkonkwoOandaV20.TradeLibrary.Pricing;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,20 +15,20 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Get a pricing stream for the specified account and instrument list.
       /// </summary>
-      /// <param name="accountID"></param>
-      /// <param name="parameters">The parameters for the request</param>
+      /// <param name="parameters">the parameters for the request</param>
+      /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>The HttpResponseMessage that can be used to retrieve the prices as they stream</returns>
-      public static async Task<HttpResponseMessage> GetPricingStream(string accountID, PricingStreamParameters parameters, CancellationToken cancellation = default)
+      public static async Task<HttpResponseMessage> GetPricingStream(PricingStreamParameters parameters, CancellationToken cancellation = default)
       {
-         var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
-         {
-            { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
-         };
+         //var requestDict = new Dictionary<string, string>(ConvertToDictionary(parameters))
+         //{
+         //   { "instruments", GetCommaSeparatedString(parameters.instruments ?? new List<string>()) }
+         //};
 
-         var requestParams = new HttpParameters(requestDict)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Get,
-            Uri = new Uri(ServerUri(EServer.PricingStream) + $"accounts/{accountID}/pricing/stream"),
+            Uri = new Uri(ServerUri(EServer.PricingStream) + $"accounts/{parameters.accountID}/pricing/stream"),
             Binding = HttpParametersBinding.QueryString,
          };
 
@@ -36,12 +37,18 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public class PricingStreamParameters : ApiParameters
       {
+         /// <summary>
+         /// The account ID
+         /// </summary>
+         [JsonIgnore]
+         [Required]
+         public string accountID { get; set; }
+
          public PricingStreamParameters() { snapshot = true; }
 
          /// <summary>
          /// List of Instruments to stream Prices for. [required]
          /// </summary>
-         [JsonIgnore]
          public List<string> instruments { get; set; }
 
          /// <summary>
@@ -60,7 +67,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public bool IsHeartbeat()
       {
-         return (heartbeat != null);
+         return heartbeat != null;
       }
    }
 
@@ -92,11 +99,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          var parameters = new Rest20.PricingStreamParameters()
          {
+            accountID = _accountID,
             instruments = instruments,
             snapshot = _snapshot
          };
 
-         return await Rest20.GetPricingStream(_accountID, parameters);
+         return await Rest20.GetPricingStream(parameters);
       }
    }
 }
