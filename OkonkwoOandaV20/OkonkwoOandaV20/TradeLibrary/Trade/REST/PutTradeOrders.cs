@@ -1,5 +1,4 @@
-﻿using Microsoft.Identity.Client;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
@@ -20,12 +19,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>The Transactions associated with the patched dependent orders</returns>
       public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(TradeOrdersParameters parameters, CancellationToken cancellation = default)
       {
-         Rest20.TransformObjectValues(parameters, HttpAction.Request);
-         //
-         var requestParams = new HttpParameters(parameters.Dependents)
+         var requestParams = new HttpParameters(parameters)
          {
             Method = HttpMethod.Put,
-            Uri = new Uri(ServerUri(EServer.Account) + "accounts/" + parameters.accountID + "/trades/" + parameters.tradeSpecifier + "/orders"),
+            Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{parameters.accountID}/trades/{parameters.tradeSpecifier}/orders"),
             Binding = HttpParametersBinding.Body,
          };
 
@@ -43,12 +40,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             trailingStopLossAction = TradeOrdersAction.None;
             //
             Dependents = new Dictionary<string, object>();
-            //
-            JsonSettingsRequest = new JsonSerializerSettings()
-            {
-               TypeNameHandling = TypeNameHandling.None,
-               NullValueHandling = NullValueHandling.Include
-            };
          }
 
          public string accountID { get; set; }
@@ -142,7 +133,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          }
          #endregion
 
-         internal Dictionary<string, object> Dependents { get; private set; }
+         [Body]
+         public Dictionary<string, object> Dependents { get; private set; }
       }
 
       public class TradeOrdersAction

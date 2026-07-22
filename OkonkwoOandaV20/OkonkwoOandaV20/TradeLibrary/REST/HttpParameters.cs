@@ -3,9 +3,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using OkonkwoOandaV20.Framework;
-
+using OkonkwoOandaV20.TradeLibrary.Transaction;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Cryptography;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -23,18 +27,28 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          if (parameters == null) return;
 
-         if (!(parameters is ApiParameters apiParameters && apiParameters.ForInternalRequest))
+         if (parameters is ApiParameters apiParameters && !apiParameters.ForInternalRequest)
+         {
             Rest20.TransformObjectValues(parameters, HttpAction.Request);
+            SimpleObjectValidator.Validate(parameters);
+         }
 
          jsonSettings = jsonSettings ?? (parameters as ApiParameters)?.JsonSettingsRequest;
          jsonSettings = jsonSettings ?? Rest20.JsonSettingsRequest;
-         //jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
          var jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);
+
+         if (parameters.GetType().GetProperties().FirstOrDefault(
+               p => Attribute.IsDefined(p, typeof(BodyAttribute))) is PropertyInfo bodyProperty)
+         {
+            Data = JToken.FromObject(bodyProperty.GetValue(parameters), jsonSerializer);
+            return;
+         }
 
          Data = parameters is JToken jt ? jt : JToken.FromObject(parameters, jsonSerializer);
       }
 
-      public HttpParameters(object payload) 
+      public HttpParameters(object payload)
          : this(payload, null)
       {
       }
@@ -51,8 +65,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public string AcceptType { get; set; } = "application/json";
       public string ContentType { get; set; } = "application/json";
-
-      //public JsonSerializerSettings JsonSettings { get; set; }
       internal bool ForInternalResponse { get; set; } = false;
    }
 }
