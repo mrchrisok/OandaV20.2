@@ -38,6 +38,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             var bodyPropertyValue = bodyProperty.GetValue(parameters);
             var bodyPropertyType = bodyProperty.PropertyType;
+            var settings = new JsonSerializerSettings
+            {
+               TypeNameHandling = TypeNameHandling.Auto
+            };
+            var serializer = JsonSerializer.Create(settings);
+            Data = JToken.FromObject(bodyPropertyValue, jsonSerializer);
+            return;
+            //var jsonSettingsBody = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto };
+            jsonSerializer.FloatFormatHandling = FloatFormatHandling.String;
             Data = JToken.FromObject(Convert.ChangeType(bodyPropertyValue, bodyPropertyType), jsonSerializer);
             return;
          }
