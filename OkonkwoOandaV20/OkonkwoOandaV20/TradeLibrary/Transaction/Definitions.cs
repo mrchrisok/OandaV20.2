@@ -363,6 +363,8 @@ namespace OkonkwoOandaV20.TradeLibrary.Transaction
       /// <summary>
       /// The price that the Take Profit Order will be triggered at.
       /// </summary>
+      //[JsonProperty(NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+      //[JsonConverter(typeof(StringDecimalConverter))]
       public decimal price { get; set; }
    }
 
