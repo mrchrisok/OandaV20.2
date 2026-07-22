@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
@@ -33,21 +34,21 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
          _accountID = accountID;
       }
 
-      protected abstract Task<HttpResponseMessage> GetSession();
+      protected abstract Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default);
 
-      public virtual async Task StartSession()
+      public virtual async Task StartSession(CancellationToken cancellation = default)
       {
          _shutdown = false;
 
          try
          {
-            _response = await GetSession();
+            _response = await GetSession(cancellation);
 
             using (_response)
             using (var stream = await _response.Content.ReadAsStreamAsync())
             using (var reader = new StreamReader(stream))
             {
-               while (!reader.EndOfStream && !_shutdown)
+               while (!reader.EndOfStream && !_shutdown && !cancellation.IsCancellationRequested)
                {
                   string line = reader.ReadLine();
                   var data = JsonConvert.DeserializeObject<T>(line, Rest20.JsonSettingsResponse);

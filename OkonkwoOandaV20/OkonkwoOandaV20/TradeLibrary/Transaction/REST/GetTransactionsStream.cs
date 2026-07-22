@@ -70,11 +70,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
       }
 
-      protected override async Task<HttpResponseMessage> GetSession()
+      protected override async Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default)
       {
          return await Rest20.GetTransactionsStream(new TransactionsStreamParameters() { 
             accountID = _accountID 
-         });
+         }, cancellation);
       }
    }
 }

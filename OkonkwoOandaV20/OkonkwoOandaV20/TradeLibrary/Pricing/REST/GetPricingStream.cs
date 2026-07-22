@@ -87,7 +87,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          _snapshot = snapshot;
       }
 
-      protected override async Task<HttpResponseMessage> GetSession()
+      protected override async Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default)
       {
          var instruments = new List<string>();
          _instruments.ForEach(instrument => instruments.Add(instrument.name));
@@ -99,7 +99,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             snapshot = _snapshot
          };
 
-         return await Rest20.GetPricingStream(parameters);
+         return await Rest20.GetPricingStream(parameters, cancellation);
       }
    }
 }

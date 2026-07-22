@@ -247,8 +247,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       private static async Task<T> GetObjectResponseAsync<T, E>(HttpRequestMessage request, HttpParameters parameters, CancellationToken cancellation)
          where E : IErrorResponse
       {
-         if (request == null) return default;
-
          while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
          {
          }
