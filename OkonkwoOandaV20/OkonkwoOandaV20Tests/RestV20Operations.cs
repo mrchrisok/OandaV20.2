@@ -49,8 +49,9 @@ namespace OkonkwoOandaV20Tests
 
       #endregion
 
-      //static string AccountID { get { return Credentials.GetDefaultCredentials().DefaultAccountId; } }
       static string AccountID { get { return m_TestAccount; } }
+      private static CancellationTokenSource m_CancellationSource = new CancellationTokenSource();
+      private static CancellationToken m_CancellationToken = m_CancellationSource.Token;
 
       [ClassInitialize]
       public static async void RunApiOperations(TestContext context)
@@ -156,7 +157,7 @@ namespace OkonkwoOandaV20Tests
       {
          short count = 0;
 
-         var accountsResponse = await Rest20.GetAccountsAsync();
+         var accountsResponse = await Rest20.GetAccountsAsync(m_CancellationToken);
          List<AccountProperties> result = accountsResponse.accounts;
          m_Results.Verify("01.0", result.Count > 0, "Account list received.");
 
@@ -185,13 +186,13 @@ namespace OkonkwoOandaV20Tests
       {
          // first, kill all open trades
          var openTradesResponse = await Rest20.GetOpenTradesAsync(
-            new OpenTradesParameters() { accountID = AccountID }
+            new OpenTradesParameters() { accountID = AccountID }, m_CancellationToken
             );
          var closeList = openTradesResponse.trades;
 
          foreach (var trade in closeList)
             Rest20.PutTradeCloseAsync(new Rest20.TradeCloseParameters() { 
-               accountID = AccountID, tradeSpecifier = trade.id }
+               accountID = AccountID, tradeSpecifier = trade.id }, m_CancellationToken
             ).Wait();
 
          var accountResponse = await Rest20.GetAccountAsync(new AccountParameters() { accountID = AccountID });
@@ -212,6 +213,7 @@ namespace OkonkwoOandaV20Tests
          // Get an instrument list (basic)
          var instrumentsResponse = await Rest20.GetAccountInstrumentsAsync(
             new Rest20.AccountInstrumentsParameters() { accountID = AccountID }
+            , m_CancellationToken
             );
          List<Instrument> result = instrumentsResponse.instruments;
          m_Results.Verify("02.0", result.Count > 0, "Instrument list received");
@@ -230,7 +232,7 @@ namespace OkonkwoOandaV20Tests
          string type = InstrumentType.Currency;
          var parameters = new Rest20.AccountInstrumentsParameters() { instruments = instruments, accountID = AccountID };
 
-         var instrumentsResponse = await Rest20.GetAccountInstrumentsAsync(parameters);
+         var instrumentsResponse = await Rest20.GetAccountInstrumentsAsync(parameters, m_CancellationToken);
          List<Instrument> result = instrumentsResponse.instruments;
 
          m_Results.Verify("03.0", result.Count == 1, string.Format("{0} info received.", instruments[0]));
@@ -245,7 +247,7 @@ namespace OkonkwoOandaV20Tests
       {
          // 04
          var summaryResponse = await Rest20.GetAccountSummaryAsync(
-            new AccountSummaryParameters() { accountID = AccountID }
+            new AccountSummaryParameters() { accountID = AccountID }, m_CancellationToken
             );
          AccountSummary result = summaryResponse.account;
          m_Results.Verify("04.0", result != null, string.Format("Account {0} info received.", AccountID));
@@ -261,7 +263,7 @@ namespace OkonkwoOandaV20Tests
          // 05
          var summaryResp = await Rest20.GetAccountSummaryAsync(
             new AccountSummaryParameters() { accountID = AccountID 
-            });
+            }, m_CancellationToken);
          AccountSummary summary = summaryResp.account;
 
          m_FirstTransactionID = summary.lastTransactionID;
@@ -284,7 +286,9 @@ namespace OkonkwoOandaV20Tests
          AccountConfigurationResponse response = null;
 
          // error test
-         try { parameters.accountID = "fakeId"; response = await Rest20.PatchAccountConfigurationAsync(parameters); }
+         try { parameters.accountID = "fakeId"; 
+            response = await Rest20.PatchAccountConfigurationAsync(parameters, m_CancellationToken); 
+         }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as AccountConfigurationErrorResponse;
@@ -293,7 +297,7 @@ namespace OkonkwoOandaV20Tests
 
          // response test
          parameters.accountID = AccountID;
-         response = await Rest20.PatchAccountConfigurationAsync(parameters);
+         response = await Rest20.PatchAccountConfigurationAsync(parameters, m_CancellationToken);
          ClientConfigureTransaction newConfig = response.clientConfigureTransaction;
 
          m_Results.Verify("05.0", newConfig != null, "Account configuration retrieved successfully.");
@@ -303,7 +307,8 @@ namespace OkonkwoOandaV20Tests
          parameters.alias = alias;
          parameters.marginRate = marginRate ?? (decimal)1.0;
          parameters.accountID = AccountID;
-         AccountConfigurationResponse response2 = await Rest20.PatchAccountConfigurationAsync(parameters);
+         AccountConfigurationResponse response2 = await Rest20.PatchAccountConfigurationAsync(
+            parameters, m_CancellationToken);
          ClientConfigureTransaction newConfig2 = response2.clientConfigureTransaction;
 
          m_Results.Verify("05.3", newConfig2.alias == alias, string.Format("Account alias {0} reverted successfully.", newConfig2.alias));
@@ -313,8 +318,9 @@ namespace OkonkwoOandaV20Tests
       private static async Task Account_GetAccountChanges()
       {
          //17
-         var parameters = new Rest20.AccountChangesParameters() { sinceTransactionID = m_FirstTransactionID, accountID = AccountID };
-         AccountChangesResponse result = await Rest20.GetAccountChangesAsync(parameters);
+         var parameters = new Rest20.AccountChangesParameters() { 
+            sinceTransactionID = m_FirstTransactionID, accountID = AccountID };
+         AccountChangesResponse result = await Rest20.GetAccountChangesAsync(parameters, m_CancellationToken);
 
          var changes = result.changes;
 
@@ -350,7 +356,7 @@ namespace OkonkwoOandaV20Tests
             instrument = instrument
          };
 
-         var candlesResponse = await Rest20.GetInstrumentCandlesAsync(parameters);
+         var candlesResponse = await Rest20.GetInstrumentCandlesAsync(parameters, m_CancellationToken);
          var result = candlesResponse.candles;
          var candle = result.FirstOrDefault();
 
@@ -378,7 +384,8 @@ namespace OkonkwoOandaV20Tests
             time = unavailableSnapshotTime,
             getLastTimeOnFailure = false
          };
-         try { parameters.instrument = m_TestInstrument; result = (await Rest20.GetInstrumentOrderBookAsync(parameters)).orderBook; }
+         try { parameters.instrument = m_TestInstrument; 
+            result = (await Rest20.GetInstrumentOrderBookAsync(parameters, m_CancellationToken)).orderBook; }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message);
@@ -389,7 +396,7 @@ namespace OkonkwoOandaV20Tests
          string availableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
          parameters.time = availableSnapshotTime;
          parameters.getLastTimeOnFailure = true;
-         result = (await Rest20.GetInstrumentOrderBookAsync(parameters)).orderBook;
+         result = (await Rest20.GetInstrumentOrderBookAsync(parameters, m_CancellationToken)).orderBook;
 
          m_Results.Verify("19.0", result != null, "Order book snapshot was received.");
          m_Results.Verify("19.1", result.time == availableSnapshotTime, "Order book snapshot time is correct.");
@@ -411,7 +418,7 @@ namespace OkonkwoOandaV20Tests
             time = unavailableSnapshotTime,
             getLastTimeOnFailure = false
          };
-         try { parameters.instrument = m_TestInstrument; result = (await Rest20.GetInstrumentPositionBookAsync(parameters)).positionBook; }
+         try { parameters.instrument = m_TestInstrument; result = (await Rest20.GetInstrumentPositionBookAsync(parameters, m_CancellationToken)).positionBook; }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message);
@@ -422,7 +429,7 @@ namespace OkonkwoOandaV20Tests
          string availableSnapshotTime = $"{ConvertDateTimeToAcceptDateFormat(DateTime.UtcNow).Split(':')[0]}:00:00Z";
          parameters.time = availableSnapshotTime;
          parameters.getLastTimeOnFailure = true;
-         result = (await Rest20.GetInstrumentPositionBookAsync(parameters)).positionBook;
+         result = (await Rest20.GetInstrumentPositionBookAsync(parameters, m_CancellationToken)).positionBook;
 
          m_Results.Verify("20.0", result != null, "Position book snapshot was received.");
          m_Results.Verify("20.1", result.time == availableSnapshotTime, "Position book snapshot time is correct.");
@@ -466,17 +473,17 @@ namespace OkonkwoOandaV20Tests
 
          // first, kill any open orders
          var openOrders = (await Rest20.GetPendingOrdersAsync(
-            new PendingOrdersParameters() { accountID = AccountID }
+            new PendingOrdersParameters() { accountID = AccountID }, m_CancellationToken
             )).orders;
          openOrders.ForEach(async x => await Rest20.PutOrderCancelAsync(
-            new OrderCancelParameters() { accountID = AccountID, orderSpecifier = x.id }
+            new OrderCancelParameters() { accountID = AccountID, orderSpecifier = x.id }, m_CancellationToken
             ));
 
          // error test - create order
          PostOrderResponse response1 = null;
          request1.price = -1;
          try { response1 = await Rest20.PostOrderAsync(
-            new PostOrderParameters() { accountID = AccountID, order = request1 }); 
+            new PostOrderParameters() { accountID = AccountID, order = request1 }, m_CancellationToken); 
          }
          catch (Exception ex)
          {
@@ -487,7 +494,7 @@ namespace OkonkwoOandaV20Tests
          // create order1
          request1.price = price;
          response1 = await Rest20.PostOrderAsync(
-            new PostOrderParameters() { accountID = AccountID, order = request1 }
+            new PostOrderParameters() { accountID = AccountID, order = request1 }, m_CancellationToken
             );
          var orderTransaction1 = response1.orderCreateTransaction;
 
@@ -516,18 +523,19 @@ namespace OkonkwoOandaV20Tests
          };
          request2.price = price;
          PostOrderResponse response2 = await Rest20.PostOrderAsync(
-            new PostOrderParameters() { accountID = AccountID, order = request2 }
+            new PostOrderParameters() { accountID = AccountID, order = request2 }, m_CancellationToken
             );
          var orderTransaction2 = response2.orderCreateTransaction;
 
          // Get all orders
-         var allOrders = (await Rest20.GetOrdersAsync(new Rest20.OrdersParameters() { accountID = AccountID })).orders;
+         var allOrders = (await Rest20.GetOrdersAsync(new Rest20.OrdersParameters() { 
+            accountID = AccountID }, m_CancellationToken)).orders;
          m_Results.Verify("11.2", allOrders != null && allOrders.Count > 0, "All orders list successfully retrieved");
          m_Results.Verify("11.3", allOrders.Where(x => x.id == orderTransaction1.id || x.id == orderTransaction2.id).Count() == 2, "Test orders in all orders return.");
 
          // Get pending orders
          var pendingOrders = (await Rest20.GetPendingOrdersAsync(
-            new PendingOrdersParameters() { accountID = AccountID })
+            new PendingOrdersParameters() { accountID = AccountID }, m_CancellationToken)
             ).orders;
          m_Results.Verify("11.4", pendingOrders != null && pendingOrders.Count > 0, "Pending orders list successfully retrieved");
          m_Results.Verify("11.5", pendingOrders.Where(x => x.state != OrderState.Pending).Count() == 0, "Only pending orders returned.");
@@ -537,7 +545,7 @@ namespace OkonkwoOandaV20Tests
          var pendingOrderParameters = new Rest20.OrdersParameters() { ids = new List<string>() };
          pendingOrders.ForEach(pendingOrder => pendingOrderParameters.ids.Add(pendingOrder.id.ToString()));
          pendingOrderParameters.accountID = AccountID;
-         var allPendingOrders = (await Rest20.GetOrdersAsync(pendingOrderParameters)).orders;
+         var allPendingOrders = (await Rest20.GetOrdersAsync(pendingOrderParameters, m_CancellationToken)).orders;
          m_Results.Verify("11.29", allPendingOrders.Where(x => x.id == orderTransaction1.id || x.id == orderTransaction2.id).Count() == 2, "Test orders in orders by ID list return.");
          // kill orderTransaction2 because it is no longer needed
          await Rest20.PutOrderCancelAsync(new OrderCancelParameters() { 
@@ -547,6 +555,7 @@ namespace OkonkwoOandaV20Tests
          // Get order details
          var orderResp = await Rest20.GetOrderAsync(
             new OrderParameters() { accountID = AccountID, orderSpecifier = orderTransaction1.id }
+               , m_CancellationToken
             );
          var order1 = orderResp.order as MarketIfTouchedOrder;
          m_Results.Verify("11.7", order1 != null && order1.id == orderTransaction1.id, "Order details successfully retrieved.");
@@ -566,7 +575,7 @@ namespace OkonkwoOandaV20Tests
             clientExtensions = newOrderExtensions,
             tradeClientExtensions = newTradeExtensions
          };
-         try { extensionsModifyResponse = await Rest20.PutOrderClientExtensionsAsync(new Rest20.OrderClientExtensionsParameters() { accountID = AccountID, orderSpecifier = -1, clientExtensions = newOrderExtensions, tradeClientExtensions = newTradeExtensions }); }
+         try { extensionsModifyResponse = await Rest20.PutOrderClientExtensionsAsync(new Rest20.OrderClientExtensionsParameters() { accountID = AccountID, orderSpecifier = -1, clientExtensions = newOrderExtensions, tradeClientExtensions = newTradeExtensions }, m_CancellationToken); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as OrderClientExtensionsErrorResponse;
@@ -581,7 +590,7 @@ namespace OkonkwoOandaV20Tests
             clientExtensions = newOrderExtensions,
             tradeClientExtensions = newTradeExtensions
          };
-         extensionsModifyResponse = await Rest20.PutOrderClientExtensionsAsync(extensionsParameters);
+         extensionsModifyResponse = await Rest20.PutOrderClientExtensionsAsync(extensionsParameters, m_CancellationToken);
 
          m_Results.Verify("11.10", extensionsModifyResponse != null, "Order extensions update received successfully.");
          m_Results.Verify("11.11", extensionsModifyResponse.orderClientExtensionsModifyTransaction.orderID == order1.id, "Correct order extensions updated.");
@@ -595,7 +604,7 @@ namespace OkonkwoOandaV20Tests
             var replaceParamsErr = new OrderReplaceParameters() { 
                accountID = AccountID, orderSpecifier = -1, order = request1 
             };
-            cancelReplaceResponse = await Rest20.PutOrderReplaceAsync(replaceParamsErr);
+            cancelReplaceResponse = await Rest20.PutOrderReplaceAsync(replaceParamsErr, m_CancellationToken);
          }
          catch (Exception ex)
          {
@@ -609,7 +618,7 @@ namespace OkonkwoOandaV20Tests
          var replaceParams = new OrderReplaceParameters() { 
             accountID = AccountID, orderSpecifier = order1.id, order = request1 
          };
-         cancelReplaceResponse = await Rest20.PutOrderReplaceAsync(replaceParams);
+         cancelReplaceResponse = await Rest20.PutOrderReplaceAsync(replaceParams, m_CancellationToken);
          var cancelTransaction = cancelReplaceResponse.orderCancelTransaction;
          var newOrderTransaction = cancelReplaceResponse.orderCreateTransaction;
 
@@ -618,7 +627,7 @@ namespace OkonkwoOandaV20Tests
 
          // Get new order details
          var newOrderResp = await Rest20.GetOrderAsync(new OrderParameters() { 
-            accountID = AccountID, orderSpecifier = newOrderTransaction.id }
+            accountID = AccountID, orderSpecifier = newOrderTransaction.id }, m_CancellationToken
          );
          var newOrder = newOrderResp.order as MarketIfTouchedOrder;
          m_Results.Verify("11.16", newOrder != null && newOrder.units == request1.units, "New order details are correct.");
@@ -626,7 +635,8 @@ namespace OkonkwoOandaV20Tests
          // error test - cancel an order
          OrderCancelResponse cancelOrderResponse = null;
          try { cancelOrderResponse = await Rest20.PutOrderCancelAsync(
-            new OrderCancelParameters() { accountID = AccountID, orderSpecifier = -1 }); 
+            new OrderCancelParameters() { accountID = AccountID, orderSpecifier = -1 }
+               , m_CancellationToken); 
          }
          catch (Exception ex)
          {
@@ -637,6 +647,7 @@ namespace OkonkwoOandaV20Tests
          // Cancel an order
          cancelOrderResponse = await Rest20.PutOrderCancelAsync(
             new OrderCancelParameters() { accountID = AccountID, orderSpecifier = newOrder.id }
+               , m_CancellationToken
             );
          m_Results.Verify("11.17", cancelOrderResponse != null, "Cancelled order retrieved successfully.");
          var cancelTransaction2 = cancelOrderResponse.orderCancelTransaction;
@@ -674,6 +685,7 @@ namespace OkonkwoOandaV20Tests
          // create order with exit orders
          var owxResponse = await Rest20.PostOrderAsync(
             new PostOrderParameters() { accountID = AccountID, order = owxRequest }
+               , m_CancellationToken
             );
          var owxOrderTransaction = owxResponse.orderCreateTransaction;
          m_Results.Verify("11.19", owxOrderTransaction != null && owxOrderTransaction.id > 0, "Order with exit orders successfully opened");
@@ -681,7 +693,7 @@ namespace OkonkwoOandaV20Tests
 
          // get order with exit orders details
          var pendingOrders2 = (await Rest20.GetPendingOrdersAsync(
-            new PendingOrdersParameters() { accountID = AccountID })
+            new PendingOrdersParameters() { accountID = AccountID }, m_CancellationToken)
             ).orders;
          var order2Resp = await Rest20.GetOrderAsync(
             new OrderParameters() { accountID = AccountID, orderSpecifier = pendingOrders2[0].id }
@@ -700,7 +712,7 @@ namespace OkonkwoOandaV20Tests
          var owxReplaceParams = new OrderReplaceParameters() { 
             accountID = AccountID, orderSpecifier = order2.id, order = owxRequest 
          };
-         var owxReplaceResponse = await Rest20.PutOrderReplaceAsync(owxReplaceParams);
+         var owxReplaceResponse = await Rest20.PutOrderReplaceAsync(owxReplaceParams, m_CancellationToken);
          var owxCancelTransaction = owxReplaceResponse.orderCancelTransaction;
          var owxNewOrderTransaction = owxReplaceResponse.orderCreateTransaction;
 
@@ -732,14 +744,15 @@ namespace OkonkwoOandaV20Tests
          {
             var closeList = (await Rest20.GetOpenTradesAsync(
                new OpenTradesParameters() { accountID = AccountID })).trades;
-            closeList.ForEach(async x => await Rest20.PutTradeCloseAsync(new Rest20.TradeCloseParameters() { accountID = AccountID, tradeSpecifier = x.id }));
+            closeList.ForEach(async x => await Rest20.PutTradeCloseAsync(new Rest20.TradeCloseParameters() { accountID = AccountID, tradeSpecifier = x.id }, m_CancellationToken));
          }
          if (closeAllOrders)
          {
             var openOrders = (await Rest20.GetPendingOrdersAsync(
-               new PendingOrdersParameters() { accountID = AccountID })).orders;
+               new PendingOrdersParameters() { accountID = AccountID }, m_CancellationToken)).orders;
             openOrders.ForEach(async x => await Rest20.PutOrderCancelAsync(
-               new OrderCancelParameters() { accountID = AccountID, orderSpecifier = x.id })
+               new OrderCancelParameters() { accountID = AccountID, orderSpecifier = x.id }
+                  , m_CancellationToken)
             );
          }
 
@@ -765,7 +778,7 @@ namespace OkonkwoOandaV20Tests
          };
 
          var response = await Rest20.PostOrderAsync(new PostOrderParameters() { 
-            accountID = AccountID, order = request }
+            accountID = AccountID, order = request }, m_CancellationToken
          );
          var createTransaction = response.orderCreateTransaction;
          var fillTransaction = response.orderFillTransaction;
@@ -798,6 +811,7 @@ namespace OkonkwoOandaV20Tests
          // get details for a trade
          var tradeResp = await Rest20.GetTradeAsync(
             new TradeParameters() { accountID = AccountID, tradeSpecifier = openTrades[0].id }
+               , m_CancellationToken
             );
          var trade = tradeResp.trade;
          m_Results.Verify("13.4", trade.id > 0 && trade.price > 0 && trade.initialUnits != 0, "Trade details retrieved");
@@ -809,7 +823,8 @@ namespace OkonkwoOandaV20Tests
          // error test - update extensions
          TradeClientExtensionsResponse extensionsModifyResponse = null;
          var clientExtensionsParameters = new Rest20.TradeClientExtensionsParameters() { clientExtensions = updatedExtensions, accountID = AccountID, tradeSpecifier = -1 };
-         try { extensionsModifyResponse = await Rest20.PutTradeClientExtensionsAsync(clientExtensionsParameters); }
+         try { extensionsModifyResponse = await Rest20.PutTradeClientExtensionsAsync(
+              clientExtensionsParameters, m_CancellationToken); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeClientExtensionsErrorResponse;
@@ -818,7 +833,8 @@ namespace OkonkwoOandaV20Tests
 
          // update extensions
          clientExtensionsParameters = new Rest20.TradeClientExtensionsParameters() { clientExtensions = updatedExtensions, accountID = AccountID, tradeSpecifier = trade.id };
-         extensionsModifyResponse = await Rest20.PutTradeClientExtensionsAsync(clientExtensionsParameters);
+         extensionsModifyResponse = await Rest20.PutTradeClientExtensionsAsync(
+            clientExtensionsParameters, m_CancellationToken);
 
          m_Results.Verify("13.5", extensionsModifyResponse != null, "Order extensions update received successfully.");
          m_Results.Verify("13.6", extensionsModifyResponse.tradeClientExtensionsModifyTransaction.tradeID == trade.id, "Correct trade extensions updated.");
@@ -849,7 +865,7 @@ namespace OkonkwoOandaV20Tests
          // error test - patch open trade
          TradeOrdersResponse response = null;
          patch1.takeProfit.price = -1;
-         try { response = await Rest20.PutTradeOrdersAsync(patch1); }
+         try { response = await Rest20.PutTradeOrdersAsync(patch1, m_CancellationToken); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeOrdersErrorResponse;
@@ -858,7 +874,7 @@ namespace OkonkwoOandaV20Tests
 
          // add a takeProft to an open trade
          patch1.takeProfit.price = takeProfitPrice;
-         var takeProfitPatch = (await Rest20.PutTradeOrdersAsync(patch1)).takeProfitOrderTransaction;
+         var takeProfitPatch = (await Rest20.PutTradeOrdersAsync(patch1, m_CancellationToken)).takeProfitOrderTransaction;
          m_Results.Verify("13.8", takeProfitPatch != null && takeProfitPatch.id > 0, "Take profit patch received.");
          m_Results.Verify("13.9", takeProfitPatch.price == takeProfitPrice, "Trade patched with take profit.");
 
@@ -879,7 +895,7 @@ namespace OkonkwoOandaV20Tests
          patch2.accountID = AccountID;
          patch2.tradeSpecifier = trade.id;
          patch2.SetStopLoss(TradeOrdersAction.Create, stopLoss);
-         var stopLossPatch = (await Rest20.PutTradeOrdersAsync(patch2)).stopLossOrderTransaction;
+         var stopLossPatch = (await Rest20.PutTradeOrdersAsync(patch2, m_CancellationToken)).stopLossOrderTransaction;
          m_Results.Verify("13.10", takeProfitPatch != null && takeProfitPatch.id > 0, "Stop loss patch received.");
          m_Results.Verify("13.11", stopLossPatch.price == stopLossPrice, "Trade patched with stop loss.");
 
@@ -906,7 +922,7 @@ namespace OkonkwoOandaV20Tests
          patch3.SetStopLoss(TradeOrdersAction.Cancel, null);
          patch3.SetTrailingStopLoss(TradeOrdersAction.Create, trailingStopLoss);
 
-         var trailingStopLossPatch = (await Rest20.PutTradeOrdersAsync(patch3));
+         var trailingStopLossPatch = (await Rest20.PutTradeOrdersAsync(patch3, m_CancellationToken));
          var trailingStopLossOrderTransaction = trailingStopLossPatch.trailingStopLossOrderTransaction;
          m_Results.Verify("13.12", trailingStopLossPatch.stopLossOrderCancelTransaction != null, "Stop loss cancelled.");
          m_Results.Verify("13.13", trailingStopLossOrderTransaction != null && trailingStopLossOrderTransaction.id > 0, "Trailing stop loss patch created.");
@@ -919,7 +935,7 @@ namespace OkonkwoOandaV20Tests
          tradeOrdersParameters.SetTakeProfit(TradeOrdersAction.Cancel, null);
          tradeOrdersParameters.SetTrailingStopLoss(TradeOrdersAction.Cancel, null);
 
-         var result = await Rest20.PutTradeOrdersAsync(tradeOrdersParameters);
+         var result = await Rest20.PutTradeOrdersAsync(tradeOrdersParameters, m_CancellationToken);
          m_Results.Verify("13.15", result.takeProfitOrderCancelTransaction != null, "Take profit cancelled.");
          //m_Results.Verify("13.15", result.stopLossOrderCancelTransaction != null, "Stop loss cancelled.");
          m_Results.Verify("13.16", result.trailingStopLossOrderCancelTransaction != null, "Trailing stop loss cancelled.");
@@ -932,7 +948,7 @@ namespace OkonkwoOandaV20Tests
          var tradeCloseParameters = new Rest20.TradeCloseParameters();
          tradeCloseParameters.accountID = AccountID;
          tradeCloseParameters.tradeSpecifier = -1;
-         try { tradeCloseResponse = await Rest20.PutTradeCloseAsync(tradeCloseParameters); }
+         try { tradeCloseResponse = await Rest20.PutTradeCloseAsync(tradeCloseParameters, m_CancellationToken); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as TradeCloseErrorResponse;
@@ -941,7 +957,7 @@ namespace OkonkwoOandaV20Tests
 
          // close an open trade
          tradeCloseParameters.tradeSpecifier = trade.id;
-         var closedDetails = (await Rest20.PutTradeCloseAsync(tradeCloseParameters)).orderFillTransaction;
+         var closedDetails = (await Rest20.PutTradeCloseAsync(tradeCloseParameters, m_CancellationToken)).orderFillTransaction;
          m_Results.Verify("13.17", closedDetails.id > 0, "Trade closed");
          m_Results.Verify("13.18", !string.IsNullOrEmpty(closedDetails.time), "Trade close details has time.");
          m_Results.Verify("13.19", !string.IsNullOrEmpty(closedDetails.instrument), "Trade close details instrument correct.");
@@ -981,12 +997,12 @@ namespace OkonkwoOandaV20Tests
          // get list of historical positions
          // only open positions will have units > 0
          var positions = (await Rest20.GetPositionsAsync(
-            new PositionsParameters() { accountID = AccountID })).positions;
+            new PositionsParameters() { accountID = AccountID }, m_CancellationToken)).positions;
          m_Results.Verify("14.2", positions.Count > 0, "All historical positions retrieved");
 
          // get list of open positions
          var openPositions = (await Rest20.GetOpenPositionsAsync(new OpenPositionsParameters() { 
-            accountID = AccountID })).positions;
+            accountID = AccountID }, m_CancellationToken)).positions;
          m_Results.Verify("14.3", openPositions.Count > 0, "Open positions retrieved");
 
          short increment = 4;
@@ -997,14 +1013,14 @@ namespace OkonkwoOandaV20Tests
 
          // get position for a given instrument
          var onePositionResp = await Rest20.GetPositionAsync(new PositionParameters() { 
-            accountID = AccountID, instrument = m_TestInstrument });
+            accountID = AccountID, instrument = m_TestInstrument }, m_CancellationToken);
          var onePosition = onePositionResp.position;
          increment = verifyPosition(onePosition, increment);
 
          // error test - close open position
          var parameters = new Rest20.PositionCloseParameters() { longUnits = "FAKE", accountID = AccountID, instrument = m_TestInstrument };
          PositionCloseResponse response = null;
-         try { response = await Rest20.PutPositionCloseAsync(parameters); }
+         try { response = await Rest20.PutPositionCloseAsync(parameters, m_CancellationToken); }
          catch (Exception ex)
          {
             var errorResponse = ErrorResponseFactory.Create(ex.Message) as PositionCloseErrorResponse;
@@ -1013,7 +1029,7 @@ namespace OkonkwoOandaV20Tests
 
          // closeout open position 
          parameters.longUnits = "ALL";
-         response = await Rest20.PutPositionCloseAsync(parameters);
+         response = await Rest20.PutPositionCloseAsync(parameters, m_CancellationToken);
          m_LastTransactionID = response.lastTransactionID;
          m_Results.Verify("14." + increment.ToString(), response.longOrderCreateTransaction != null && response.longOrderCreateTransaction.id > 0, "Position close order created.");
          m_Results.Verify("14." + (increment + 1).ToString(), response.longOrderFillTransaction != null && response.longOrderFillTransaction.id > 0, "Position close fill order created.");
@@ -1033,7 +1049,7 @@ namespace OkonkwoOandaV20Tests
             type = new List<string>(new[] { TransactionType.ClientConfigure })
          };
 
-         var results = (await Rest20.GetTransactionsAsync(parameters)).transactions;
+         var results = (await Rest20.GetTransactionsAsync(parameters, m_CancellationToken)).transactions;
 
          m_Results.Verify("09.0", results != null, string.Format("Transactions info received.", AccountID));
          m_Results.Verify("09.1", results.Where(x => x.type == TransactionType.ClientConfigure).Count() > 0, "Client configure transactions returned.");
@@ -1044,7 +1060,7 @@ namespace OkonkwoOandaV20Tests
       {
          //15
          var transactionResp = await Rest20.GetTransactionAsync(new TransactionParameters() { 
-            accountID = AccountID, transactionID = m_LastTransactionID }
+            accountID = AccountID, transactionID = m_LastTransactionID }, m_CancellationToken
          );
          ITransaction result = transactionResp.transaction;
 
@@ -1064,7 +1080,7 @@ namespace OkonkwoOandaV20Tests
             to = m_LastTransactionID
          };
 
-         var results = (await Rest20.GetTransactionsByIdRangeAsync(parameters)).transactions;
+         var results = (await Rest20.GetTransactionsByIdRangeAsync(parameters, m_CancellationToken)).transactions;
          results.OrderBy(x => x.id);
 
          m_Results.Verify("16.0", results != null, string.Format("Transactions info received.", AccountID));
@@ -1078,7 +1094,7 @@ namespace OkonkwoOandaV20Tests
       {
          // 10
          var results = (await Rest20.GetTransactionsSinceIdAsync(new TransactionsSinceIdParameters() { 
-            accountID = AccountID, id = m_LastTransactionID })).transactions;
+            accountID = AccountID, id = m_LastTransactionID }, m_CancellationToken)).transactions;
          results.OrderBy(x => x.id);
 
          m_Results.Verify("10.0", results != null, string.Format("Transactions info received.", AccountID));
@@ -1095,7 +1111,7 @@ namespace OkonkwoOandaV20Tests
          m_OandaInstruments.ForEach(x => parameters.instruments.Add(x.name));
          parameters.accountID = AccountID;
 
-         var pricingResponse = await Rest20.GetPricingAsync(parameters);
+         var pricingResponse = await Rest20.GetPricingAsync(parameters, m_CancellationToken);
          List<Price> prices = pricingResponse.prices;
 
          m_Results.Verify("06.0", prices != null, string.Format("Prices retrieved successfully."));
@@ -1113,7 +1129,7 @@ namespace OkonkwoOandaV20Tests
          TransactionsSession session = new TransactionsSession(AccountID);
          _transactionReceived = new Semaphore(0, 100);
          session.DataReceived += OnTransactionReceived;
-         session.StartSession();
+         session.StartSession(m_CancellationToken);
 
          // wait 10secs or until a message is received
          bool success = _transactionReceived.WaitOne(10000);
@@ -1156,7 +1172,7 @@ namespace OkonkwoOandaV20Tests
          PricingSession session = new PricingSession(AccountID, m_OandaInstruments);
          _tickReceived = new Semaphore(0, 100);
          session.DataReceived += OnPricingReceived;
-         session.StartSession();
+         session.StartSession(m_CancellationToken);
          bool success = _tickReceived.WaitOne(10000);
          session.StopSession();
          m_Results.Verify("18.0", success, "Pricing stream is functioning.");
