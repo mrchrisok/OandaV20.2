@@ -5,7 +5,9 @@ using Newtonsoft.Json.Serialization;
 using OkonkwoOandaV20.Framework;
 
 using System;
+using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Cryptography;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
@@ -30,6 +32,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          jsonSettings = jsonSettings ?? Rest20.JsonSettingsRequest;
          //jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
          var jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);
+
+         if (parameters.GetType().GetProperties().FirstOrDefault(
+            p => Attribute.IsDefined(p, typeof(BodyAttribute))) is PropertyInfo bodyProperty)
+         {
+            Data = JToken.FromObject(bodyProperty.GetValue(parameters), jsonSerializer);
+            return;
+         }
 
          Data = parameters is JToken jt ? jt : JToken.FromObject(parameters, jsonSerializer);
       }
