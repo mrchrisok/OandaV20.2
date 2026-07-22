@@ -25,7 +25,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          if (parameters == null) return;
 
-         if (!(parameters is ApiParameters apiParameters && apiParameters.ForInternalRequest))
+         if (parameters is ApiParameters apiParameters && !apiParameters.ForInternalRequest)
             Rest20.TransformObjectValues(parameters, HttpAction.Request);
 
          jsonSettings = jsonSettings ?? (parameters as ApiParameters)?.JsonSettingsRequest;
