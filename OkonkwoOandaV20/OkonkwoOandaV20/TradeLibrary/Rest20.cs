@@ -172,7 +172,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          HttpRequestMessage request = await CreateHttpRequestAsync(parameters, cancellation);
 
-         return await GetStreamResponseAsync<E>(request, parameters);
+         return await GetStreamResponseAsync<E>(request, parameters, cancellation);
       }
 
       /// <summary>
@@ -255,7 +255,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          try
          {
-            using (HttpResponseMessage response = await _requestClient.SendAsync(request, completionOption))
+            using (var response = await _requestClient.SendAsync(request, completionOption, cancellation))
             {
                response.EnsureSuccessStatusCode();
 
@@ -288,7 +288,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Sends an Http request to a remote service and returns the HttpResponseMessage for streaming consumption
       /// </summary>
-      private static async Task<HttpResponseMessage> GetStreamResponseAsync<E>(HttpRequestMessage request, HttpParameters parameters)
+      private static async Task<HttpResponseMessage> GetStreamResponseAsync<E>(HttpRequestMessage request, HttpParameters parameters, CancellationToken cancellation = default)
          where E : IErrorResponse
       {
          while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
@@ -298,7 +298,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          try
          {
             var completionOption = parameters?.CompletionOption ?? HttpCompletionOption.ResponseHeadersRead;
-            var response = await _streamsClient.SendAsync(request, completionOption);
+            var response = await _streamsClient.SendAsync(request, completionOption, cancellation);
             response.EnsureSuccessStatusCode();
 
             return response;
