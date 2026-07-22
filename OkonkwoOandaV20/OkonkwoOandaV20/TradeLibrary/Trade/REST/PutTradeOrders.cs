@@ -40,12 +40,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             trailingStopLossAction = TradeOrdersAction.None;
             //
             Dependents = new Dictionary<string, object>();
-            //
-            JsonSettingsRequest = new JsonSerializerSettings()
-            {
-               TypeNameHandling = TypeNameHandling.None,
-               NullValueHandling = NullValueHandling.Include
-            };
          }
 
          public string accountID { get; set; }

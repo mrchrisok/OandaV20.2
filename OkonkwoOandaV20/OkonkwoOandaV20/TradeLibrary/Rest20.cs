@@ -397,6 +397,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             if (ValueTransformers.TryGetValue(httpAction, out var valueTransformer))
                valueTransformer.Invoke(inputObject);
 
+            if (httpAction == HttpAction.Request)
+               SimpleObjectValidator.Validate(inputObject);
+
             return;
          }
 
