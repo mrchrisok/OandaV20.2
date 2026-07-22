@@ -36,7 +36,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          if (parameters.GetType().GetProperties().FirstOrDefault(
             p => Attribute.IsDefined(p, typeof(BodyAttribute))) is PropertyInfo bodyProperty)
          {
-            Data = JToken.FromObject(bodyProperty.GetValue(parameters), jsonSerializer);
+            var bodyPropertyValue = bodyProperty.GetValue(parameters);
+            var bodyPropertyType = bodyProperty.PropertyType;
+            Data = JToken.FromObject(Convert.ChangeType(bodyPropertyValue, bodyPropertyType), jsonSerializer);
             return;
          }
 
