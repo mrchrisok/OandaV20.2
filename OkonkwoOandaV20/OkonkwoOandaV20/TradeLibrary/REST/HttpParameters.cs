@@ -19,23 +19,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
    public class HttpParameters
    {
-      public HttpParameters(object parameters, JsonSerializerSettings jsonSettings)
+      public HttpParameters(Rest20 client, object parameters, JsonSerializerSettings jsonSettings)
       {
          if (parameters == null) return;
 
          if (parameters is ApiParameters apiParameters && !apiParameters.ForInternalRequest)
-            Rest20.TransformObjectValues(parameters, HttpAction.Request);
+            client.TransformObjectValues(parameters, HttpAction.Request);
 
          jsonSettings = jsonSettings ?? (parameters as ApiParameters)?.JsonSettingsRequest;
-         jsonSettings = jsonSettings ?? Rest20.JsonSettingsRequest;
+         jsonSettings = jsonSettings ?? client.JsonSettingsRequest;
          //jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
          var jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);
 
          Data = parameters is JToken jt ? jt : JToken.FromObject(parameters, jsonSerializer);
       }
 
-      public HttpParameters(object payload) 
-         : this(payload, null)
+      public HttpParameters(Rest20 client, object payload) 
+         : this(client, payload, null)
       {
       }
 

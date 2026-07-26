@@ -15,9 +15,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an AccountChangesResponse object</returns>
-      public static async Task<AccountChangesResponse> GetAccountChangesAsync(AccountChangesParameters parameters, CancellationToken cancellation = default)
+      public virtual async Task<AccountChangesResponse> GetAccountChangesAsync(AccountChangesParameters parameters
+         , CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters)
+         var requestParams = new HttpParameters(this, parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/changes"),

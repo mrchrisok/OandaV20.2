@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST
 {
@@ -18,9 +19,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>The HttpResponseMessage that can be used to retrieve the prices as they stream</returns>
-      public static async Task<HttpResponseMessage> GetPricingStream(PricingStreamParameters parameters, CancellationToken cancellation = default)
+      public virtual async Task<HttpResponseMessage> GetPricingStream(PricingStreamParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters)
+         var requestParams = new HttpParameters(this, parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.PricingStream) + $"accounts/{parameters.accountID}/pricing/stream"),
@@ -32,14 +33,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       public class PricingStreamParameters : ApiParameters
       {
+         public PricingStreamParameters() { snapshot = true; }
+
          /// <summary>
          /// Account Identifier [required]
          /// </summary>
          [JsonIgnore]
          [Required]
          public string accountID { get; set; }
-
-         public PricingStreamParameters() { snapshot = true; }
 
          /// <summary>
          /// List of Instruments to stream Prices for. [required]
@@ -77,29 +78,31 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
    public class PricingSession : StreamSession<PricingStreamResponse>
    {
-      private readonly List<Instrument.Instrument> _instruments;
-      private bool _snapshot;
-
-      public PricingSession(string accountID, List<Instrument.Instrument> instruments, bool snapshot = true)
-         : base(accountID)
+      public PricingSession(Rest20 client, PricingSessionParameters parameters)
+         : base(client, parameters.accountID)
       {
-         _instruments = instruments;
-         _snapshot = snapshot;
+         _parameters = parameters;
       }
+
+      protected readonly PricingSessionParameters _parameters;
 
       protected override async Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default)
       {
-         var instruments = new List<string>();
-         _instruments.ForEach(instrument => instruments.Add(instrument.name));
+         //var instruments = new List<string>(_parameters.instruments);
+         //_parameters.instruments.ForEach(instrument => instruments.Add(instrument.name));
 
-         var parameters = new Rest20.PricingStreamParameters()
+         var parameters = new PricingSessionParameters()
          {
-            accountID = _accountID,
-            instruments = instruments,
-            snapshot = _snapshot
+            accountID = _parameters.accountID,
+            instruments = new List<string>(_parameters.instruments),
+            snapshot = _parameters.snapshot
          };
 
-         return await Rest20.GetPricingStream(parameters, cancellation);
+         return await _client.GetPricingStream(_parameters, cancellation);
       }
+   }
+
+   public class PricingSessionParameters : PricingStreamParameters
+   {
    }
 }

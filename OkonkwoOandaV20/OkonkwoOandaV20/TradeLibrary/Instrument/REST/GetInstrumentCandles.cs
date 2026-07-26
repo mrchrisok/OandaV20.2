@@ -20,9 +20,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>List of Candlestick objects (or empty list) </returns>
-      public static async Task<InstrumentCandlesResponse> GetInstrumentCandlesAsync(InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
+      public virtual async Task<InstrumentCandlesResponse> GetInstrumentCandlesAsync(InstrumentCandlesParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters)
+         var requestParams = new HttpParameters(this, parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + "instruments/" + parameters.instrument + "/candles"),
@@ -38,7 +38,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             candle.granularity = parameters.granularity;
          }
 
-         Rest20.TransformObjectValues(response);
+         TransformObjectValues(response);
 
          return response;
       }
