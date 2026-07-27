@@ -52,7 +52,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          if (credentials.HasValue)
          {
-            _credentials = new Credentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
+            _credentials = new Credentials(
+               credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
          }
       }
 
@@ -66,10 +67,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>True, if initialization was successful. False if not successful.</returns>
       public virtual Task<bool> InitializeAsync((EEnvironment environment, string accessToken, string accountId)? credentials)
       {
-         if (credentials.HasValue)
+         if (!credentials.HasValue)
             throw new ArgumentNullException("Credentials are null");
 
-         _credentials = new Credentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
+         _credentials = new Credentials(
+            credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
 
          return Task.FromResult(true);
       }
@@ -297,7 +299,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Sends an Http request to a remote service and returns the HttpResponseMessage for streaming consumption
       /// </summary>
-      protected virtual async Task<HttpResponseMessage> GetStreamResponseAsync<E>(HttpRequestMessage request, HttpParameters parameters)
+      protected virtual async Task<HttpResponseMessage> GetStreamResponseAsync<E>(HttpRequestMessage request, HttpParameters parameters, CancellationToken cancellation = default)
          where E : IErrorResponse
       {
          while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
