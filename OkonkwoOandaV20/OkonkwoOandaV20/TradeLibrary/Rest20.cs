@@ -127,12 +127,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// JsonConverters for request/response from Oanda
       /// </summary>
-      public IList<JsonConverter> JsonConverters { get; protected set; }
+      protected IList<JsonConverter> JsonConverters { get; set; }
 
       /// <summary>
       /// Value transformers for request/response from Oanda
       /// </summary>
-      public IDictionary<string, Action<object>> ValueTransformers { get; protected set; }
+      protected IDictionary<string, Action<object>> ValueTransformers { get; set; }
 
       /// <summary>
       /// The time of the last request made to an Oanda V20 service
