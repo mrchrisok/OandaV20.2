@@ -18,9 +18,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>an AccountConfigurationResponse object containing the updated values that were applied to the account</returns>
-      public static async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(AccountConfigurationParameters parameters, CancellationToken cancellation = default)
+      public virtual async Task<AccountConfigurationResponse> PatchAccountConfigurationAsync(AccountConfigurationParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters)
+         var requestParams = new HttpParameters(this, parameters)
          {
             Method = new HttpMethod("PATCH"),
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/configuration"),

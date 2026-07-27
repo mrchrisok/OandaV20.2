@@ -17,9 +17,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>The Transactions associated with the patched dependent orders</returns>
-      public static async Task<TradeOrdersResponse> PutTradeOrdersAsync(TradeOrdersParameters parameters, CancellationToken cancellation = default)
+      public virtual async Task<TradeOrdersResponse> PutTradeOrdersAsync(TradeOrdersParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters)
+         TransformObjectValues(parameters, HttpAction.Request);
+         //
+         var requestParams = new HttpParameters(this, parameters.Dependents)
          {
             Method = HttpMethod.Put,
             Uri = new Uri($"{ServerUri(EServer.Account)}accounts/{parameters.accountID}/trades/{parameters.tradeSpecifier}/orders"),

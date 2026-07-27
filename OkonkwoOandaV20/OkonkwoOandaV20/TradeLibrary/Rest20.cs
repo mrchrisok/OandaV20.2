@@ -22,8 +22,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// </summary>
    public partial class Rest20
    {
-      #region initialization
-
       /// <summary>
       /// Initialize the middleware that will make calls to Oanda V3 endpoints.
       /// This method is idempotent. Once initialize, any additional calls will have no effect.
@@ -36,36 +34,47 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="credentials">Used to authenticate to Oanda api</param>
       /// <param name="logger">It's a logger.</param>
       /// <returns>True, if initialization was successful. False if not successful.</returns>
-      public static Task<bool> InitializeAsync(HttpClient requestClient = null, HttpClient streamsClient = null
+      public Rest20(HttpClient requestClient = null, HttpClient streamsClient = null
          , JsonSerializerSettings jsonSettingsRequest = null, JsonSerializerSettings jsonSettingsResponse = null
          , IList<JsonConverter> jsonConverters = null, IDictionary<string, Action<object>> valueTransformers = null
          , (EEnvironment environment, string accessToken, string accountId)? credentials = null, ILogger logger = null)
       {
-         if (!_initialized)
+         _requestClient = requestClient ?? new HttpClient();
+         _streamsClient = streamsClient ?? new HttpClient() { Timeout = Timeout.InfiniteTimeSpan };
+
+         JsonConverters = SetJsonConverters(jsonConverters);
+         JsonSettingsRequest = SetJsonSerializerSettings("Request", jsonSettingsRequest);
+         JsonSettingsResponse = SetJsonSerializerSettings("Response", jsonSettingsResponse);
+
+         ValueTransformers = valueTransformers ?? new Dictionary<string, Action<object>>();
+
+         _logger = logger;
+
+         if (credentials.HasValue)
          {
-            _requestClient = requestClient ?? new HttpClient();
-            _streamsClient = streamsClient ?? new HttpClient() { Timeout = Timeout.InfiniteTimeSpan };
-
-            JsonConverters = SetJsonConverters(jsonConverters);
-            JsonSettingsRequest = SetJsonSerializerSettings("Request", jsonSettingsRequest);
-            JsonSettingsResponse = SetJsonSerializerSettings("Response", jsonSettingsResponse);
-
-            ValueTransformers = valueTransformers ?? new Dictionary<string, Action<object>>();
-
-            _logger = logger;
-
-            if (credentials.HasValue)
-            {
-               Credentials.SetCredentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
-            }
-
-            _initialized = true;
+            _credentials = new Credentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
          }
-
-         return Task.FromResult(_initialized);
       }
 
-      private static JsonSerializerSettings SetJsonSerializerSettings(string httpAction
+      #region initialization
+
+      /// <summary>
+      /// Initialize the middleware that will make calls to Oanda V3 endpoints.
+      /// This method is idempotent. Once initialize, any additional calls will have no effect.
+      /// </summary>
+      /// <param name="credentials">Used to authenticate to Oanda api</param>
+      /// <returns>True, if initialization was successful. False if not successful.</returns>
+      public virtual Task<bool> InitializeAsync((EEnvironment environment, string accessToken, string accountId)? credentials)
+      {
+         if (credentials.HasValue)
+            throw new ArgumentNullException("Credentials are null");
+
+         _credentials = new Credentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
+
+         return Task.FromResult(true);
+      }
+
+      protected virtual JsonSerializerSettings SetJsonSerializerSettings(string httpAction
          , JsonSerializerSettings jsonSettings = null)
       {
          jsonSettings = jsonSettings ?? new JsonSerializerSettings();
@@ -83,7 +92,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          };
       }
 
-      private static IList<JsonConverter> SetJsonConverters(IList<JsonConverter> jsonConverters = null)
+      protected virtual IList<JsonConverter> SetJsonConverters(IList<JsonConverter> jsonConverters = null)
       {
          jsonConverters = jsonConverters ?? new List<JsonConverter>();
 
@@ -98,47 +107,47 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       #region properties
 
-      private static bool _initialized = false;
-      private static HttpClient _requestClient;
-      private static HttpClient _streamsClient;
-      private static ILogger _logger;
+      protected Credentials _credentials;
+      protected readonly HttpClient _requestClient;
+      protected readonly HttpClient _streamsClient;
+      protected readonly ILogger _logger;
 
       /// <summary>
       /// JsonSerializerSettings for request to Oanda
       /// </summary>
-      public static JsonSerializerSettings JsonSettingsRequest { get; private set; }
+      public JsonSerializerSettings JsonSettingsRequest { get; private set; }
 
       /// <summary>
       /// JsonSerializerSettings for response from Oanda
       /// </summary>
-      public static JsonSerializerSettings JsonSettingsResponse { get; private set; }
+      public JsonSerializerSettings JsonSettingsResponse { get; private set; }
 
       /// <summary>
       /// JsonConverters for request/response from Oanda
       /// </summary>
-      public static IList<JsonConverter> JsonConverters { get; private set; }
+      public IList<JsonConverter> JsonConverters { get; private set; }
 
       /// <summary>
       /// Value transformers for request/response from Oanda
       /// </summary>
-      public static IDictionary<string, Action<object>> ValueTransformers { get; private set; }
+      public IDictionary<string, Action<object>> ValueTransformers { get; private set; }
 
       /// <summary>
       /// The time of the last request made to an Oanda V20 service
       /// </summary>
-      private static DateTime m_LastRequestTime = DateTime.UtcNow;
+      protected static DateTime m_LastRequestTime = DateTime.UtcNow;
 
       /// <summary>
       /// The V20 access token for the user's or organization's Oanda Account.
       /// The token also authenticates operations on all sub accounts.
       /// </summary>
-      private static string AccessToken { get { return Credentials.GetCredentials().AccessToken; } }
+      protected string AccessToken { get { return _credentials.GetCredentials().AccessToken; } }
 
       /// <summary>
       /// Oanda recommends that requests per Account are throttled to a maximium of 100 requests/second.
       /// http://developer.oanda.com/rest-live-v20/best-practices/
       /// </summary>
-      public static int RequestDelayMilliSeconds = 11;
+      protected static int RequestDelayMilliSeconds = 11;
 
       #endregion
 
@@ -149,12 +158,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="server">The enurmeration for the target service</param>
       /// <returns>Returns the base uri of the target server</returns>
-      private static string ServerUri(EServer server) { return Credentials.GetCredentials().GetServer(server); }
+      protected string ServerUri(EServer server) { return _credentials.GetCredentials().GetServer(server); }
 
       /// <summary>
       /// New: Sends a web request using HttpParameters (object -> querystring/body) and returns a deserialized object.
       /// </summary>
-      private static async Task<T> MakeRequestAsync<T, E>(HttpParameters parameters, CancellationToken cancellation = default)
+      protected virtual async Task<T> MakeRequestAsync<T, E>(HttpParameters parameters, CancellationToken cancellation = default)
          where E : IErrorResponse
       {
          HttpRequestMessage request = await CreateHttpRequestAsync(parameters, cancellation);
@@ -165,7 +174,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// New: Sends a streaming request using HttpParameters and returns the raw HttpResponseMessage for streaming consumption.
       /// </summary>
-      private static async Task<HttpResponseMessage> MakeStreamRequestAsync<E>(HttpParameters parameters, CancellationToken cancellation = default)
+      protected virtual async Task<HttpResponseMessage> MakeStreamRequestAsync<E>(HttpParameters parameters, CancellationToken cancellation = default)
          where E : IErrorResponse
       {
          parameters.AcceptType = parameters.AcceptType ?? "application/json";
@@ -178,7 +187,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// New: Create an HttpRequestMessage from HttpParameters
       /// </summary>
-      private static async Task<HttpRequestMessage> CreateHttpRequestAsync(HttpParameters parameters, CancellationToken cancellation)
+      protected virtual async Task<HttpRequestMessage> CreateHttpRequestAsync(HttpParameters parameters, CancellationToken cancellation)
       {
          if (cancellation.IsCancellationRequested) return default;
 
@@ -244,7 +253,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">The parameters needed to configure the request</param>
       /// <param name="cancellation">The token for cancelling the request</param>
       /// <returns>The object returned in the response.</returns>
-      private static async Task<T> GetObjectResponseAsync<T, E>(HttpRequestMessage request, HttpParameters parameters, CancellationToken cancellation)
+      protected virtual async Task<T> GetObjectResponseAsync<T, E>(HttpRequestMessage request, HttpParameters parameters, CancellationToken cancellation)
          where E : IErrorResponse
       {
          while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
@@ -288,7 +297,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// Sends an Http request to a remote service and returns the HttpResponseMessage for streaming consumption
       /// </summary>
-      private static async Task<HttpResponseMessage> GetStreamResponseAsync<E>(HttpRequestMessage request, HttpParameters parameters, CancellationToken cancellation = default)
+      protected virtual async Task<HttpResponseMessage> GetStreamResponseAsync<E>(HttpRequestMessage request, HttpParameters parameters)
          where E : IErrorResponse
       {
          while (DateTime.UtcNow < m_LastRequestTime.AddMilliseconds(RequestDelayMilliSeconds))
@@ -324,7 +333,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="response">The response received from the remote service</param>
       /// <returns>A stream object. The stream may be a subclass (GZipStream or DeflateStream) if
       /// the response header indicates matched encoding.</returns>
-      private static Stream GetResponseStream(HttpResponseMessage response)
+      protected virtual Stream GetResponseStream(HttpResponseMessage response)
       {
          var stream = response.Content.ReadAsStreamAsync().Result;
 
@@ -350,7 +359,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="items">The list of strings to convert to csv</param>
       /// <returns>A csv string of the list items</returns>
-      private static string GetCommaSeparatedString(List<string> items)
+      protected virtual string GetCommaSeparatedString(List<string> items)
       {
          var stringBuilder = new StringBuilder();
          foreach (var item in items)
@@ -366,7 +375,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="input">The object to convet to a dictionary</param>
       /// <returns>A Dictionary{string,string} object.</returns>
-      public static Dictionary<string, string> ConvertToDictionary(object input)
+      protected virtual Dictionary<string, string> ConvertToDictionary(object input)
       {
          if (input == null)
             return null;
@@ -383,11 +392,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var json = JsonConvert.SerializeObject(input, _dictionarySettings);
          return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
       }
-      private static JsonSerializerSettings _dictionarySettings;
+      protected static JsonSerializerSettings _dictionarySettings;
 
       #endregion
 
-      public static void TransformObjectValues(object inputObject, string httpAction = HttpAction.Response)
+      public virtual void TransformObjectValues(object inputObject, string httpAction = HttpAction.Response)
       {
          if (inputObject == null)
             return;
@@ -405,5 +414,43 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          throw new ArgumentException($"Value transformer type {httpAction} is not supported.");
       }
+
+      /// <summary>
+      /// Determines if trading is halted for the provided instrument.
+      /// </summary>
+      /// <param name="instrument">Instrument to check if halted. Default is EUR_USD.</param>
+      /// <returns>True if trading is halted, false if trading is not halted.</returns>
+      public virtual async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD, bool throwIfHalted = false)
+      {
+         var accountId = _credentials.GetCredentials().AccountId;
+
+         var parameters = new PricingParameters()
+         {
+            accountID = accountId,
+            instruments = new List<string>() { instrument }
+            ,
+            ForInternalRequest = true
+         };
+
+         var response = await GetPricingAsync(parameters);
+
+         bool isTradeable = false, hasBids = false, hasAsks = false;
+
+         if (response.prices[0] != null)
+         {
+            isTradeable = response.prices[0].tradeable;
+            hasBids = response.prices[0].bids.Count > 0;
+            hasAsks = response.prices[0].asks.Count > 0;
+         }
+
+         if (isTradeable && hasBids && hasAsks)  // not halted
+            return false;
+
+         if (throwIfHalted)
+            throw new MarketHaltedException($"Market is halted for this instrument: {instrument}");
+
+         return true;
+      }
+
    }
 }

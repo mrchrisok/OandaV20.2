@@ -18,9 +18,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>a List of the tradeable instruments specified. If none are specified, all tradeable instruments for 
       /// the account are returned.</returns>
-      public static async Task<AccountInstrumentsResponse> GetAccountInstrumentsAsync(AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
+      public virtual async Task<AccountInstrumentsResponse> GetAccountInstrumentsAsync(AccountInstrumentsParameters parameters = null, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters ?? new AccountInstrumentsParameters())
+         var requestParams = new HttpParameters(this, parameters ?? new AccountInstrumentsParameters())
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/instruments"),

@@ -14,7 +14,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// http://developer.oanda.com/rest-live-v20/account-ep/#_collapse_endpoint_2
       /// </summary>
       /// <returns>a List of AccountProperties that includes basic information about the accounts</returns>
-      public static async Task<AccountsResponse> GetAccountsAsync(CancellationToken cancellation = default)
+      public virtual async Task<AccountsResponse> GetAccountsAsync(CancellationToken cancellation = default)
       {
          var requestParams = new HttpParameters()
          {

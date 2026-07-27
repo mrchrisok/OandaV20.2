@@ -38,39 +38,6 @@ namespace OkonkwoOandaV20.Framework
          return queryString.ToString().TrimEnd('&');
       }
 
-      /// <summary>
-      /// Determines if trading is halted for the provided instrument.
-      /// </summary>
-      /// <param name="instrument">Instrument to check if halted. Default is EUR_USD.</param>
-      /// <returns>True if trading is halted, false if trading is not halted.</returns>
-      public static async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD, bool throwIfHalted = false)
-      {
-         var accountId = Credentials.GetCredentials().AccountId;
-
-         var parameters = new PricingParameters() { 
-            accountID = accountId , instruments = new List<string>() { instrument }
-            , ForInternalRequest = true };
-
-         var response = await Rest20.GetPricingAsync(parameters);
-
-         bool isTradeable = false, hasBids = false, hasAsks = false;
-
-         if (response.prices[0] != null)
-         {
-            isTradeable = response.prices[0].tradeable;
-            hasBids = response.prices[0].bids.Count > 0;
-            hasAsks = response.prices[0].asks.Count > 0;
-         }
-
-         if (isTradeable && hasBids && hasAsks)  // not halted
-            return false;
-
-         if (throwIfHalted)
-            throw new MarketHaltedException($"Market is halted for this instrument: {instrument}");
-
-         return true;
-      }
-
       public static TokenCredential GetAzureCredential(bool isLocalEnvironment = true)
       {
          var credentialOptions = new DefaultAzureCredentialOptions

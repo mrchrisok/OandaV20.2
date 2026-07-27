@@ -21,9 +21,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns></returns>
-      public static async Task<TransactionsResponse> GetTransactionsAsync(TransactionsParameters parameters, CancellationToken cancellation = default)
+      public virtual async Task<TransactionsResponse> GetTransactionsAsync(TransactionsParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters)
+         var requestParams = new HttpParameters(this, parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/transactions"),
@@ -46,7 +46,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             await Task.Delay(parameters.pagingDelayMilliSeconds); // throttle these a bit
          }
 
-         Rest20.TransformObjectValues(response);
+         TransformObjectValues(response);
 
          return response;
       }
