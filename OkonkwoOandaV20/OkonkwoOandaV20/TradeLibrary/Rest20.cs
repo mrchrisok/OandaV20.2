@@ -181,7 +181,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          HttpRequestMessage request = await CreateHttpRequestAsync(parameters, cancellation);
 
-         return await GetStreamResponseAsync<E>(request, parameters);
+         return await GetStreamResponseAsync<E>(request, parameters, cancellation);
       }
 
       /// <summary>
@@ -264,7 +264,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          try
          {
-            using (HttpResponseMessage response = await _requestClient.SendAsync(request, completionOption))
+            using (var response = await _requestClient.SendAsync(request, completionOption, cancellation))
             {
                response.EnsureSuccessStatusCode();
 
@@ -307,7 +307,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          try
          {
             var completionOption = parameters?.CompletionOption ?? HttpCompletionOption.ResponseHeadersRead;
-            var response = await _streamsClient.SendAsync(request, completionOption);
+            var response = await _streamsClient.SendAsync(request, completionOption, cancellation);
             response.EnsureSuccessStatusCode();
 
             return response;
@@ -405,6 +405,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          {
             if (ValueTransformers.TryGetValue(httpAction, out var valueTransformer))
                valueTransformer.Invoke(inputObject);
+
+            if (httpAction == HttpAction.Request)
+               SimpleObjectValidator.Validate(inputObject);
 
             return;
          }

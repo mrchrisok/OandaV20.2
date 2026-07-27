@@ -15,14 +15,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// If null, the TSV3 JsonSerialzerSettings (if configured) will be used.
       /// </summary>
       [JsonIgnore]
-      public JsonSerializerSettings JsonSettingsRequest { get; set; }
+      public JsonSerializerSettings JsonSettingsRequest { get; set; } = Rest20.JsonSettingsRequest;
 
       /// <summary>
       /// A JsonSerializerSettings that can be applied for this response only.
       /// If null, the TSV3 JsonSerialzerSettings (if configured) will be used.
       /// </summary>
       [JsonIgnore]
-      public JsonSerializerSettings JsonSettingsResponse { get; set; }
+      public JsonSerializerSettings JsonSettingsResponse { get; set; } = Rest20.JsonSettingsResponse;
 
       internal bool ForInternalRequest { get; set; } = false;
    }
