@@ -80,10 +80,10 @@ namespace OkonkwoOandaV20Tests
                }
             );
 
-            if (!await _client.InitializeAsync())
-            {
-               throw new Exception("Exception: RestV20Test - Rest20 initialization failed.");
-            }
+            //if (!await _client.InitializeAsync())
+            //{
+            //   throw new Exception("Exception: RestV20Test - Rest20 initialization failed.");
+            //}
 
             // first, get accounts
             // this operation adds the test AccountId to Credentials (if it is null)

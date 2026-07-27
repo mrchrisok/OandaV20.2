@@ -52,10 +52,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          if (credentials.HasValue)
          {
-            Credentials.SetCredentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
+            _credentials = new Credentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
          }
-
-         _initialized = true;
       }
 
       #region initialization
@@ -66,21 +64,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="credentials">Used to authenticate to Oanda api</param>
       /// <returns>True, if initialization was successful. False if not successful.</returns>
-      public virtual Task<bool> InitializeAsync((EEnvironment environment, string accessToken, string accountId)? credentials = null)
+      public virtual Task<bool> InitializeAsync((EEnvironment environment, string accessToken, string accountId)? credentials)
       {
-         if (!_initialized)
-         {
-            _credentials = _credentials ?? credentials;
+         if (credentials.HasValue)
+            throw new ArgumentNullException("Credentials are null");
 
-            if (!_credentials.HasValue)
-               throw new ArgumentNullException("Credentials are null");
+         _credentials = new Credentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
 
-            Credentials.SetCredentials(credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
-
-            _initialized = true;
-         }
-
-         return Task.FromResult(_initialized);
+         return Task.FromResult(true);
       }
 
       protected virtual JsonSerializerSettings SetJsonSerializerSettings(string httpAction
@@ -116,8 +107,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       #region properties
 
-      protected static (EEnvironment environment, string accessToken, string accountId)? _credentials;
-      protected static bool _initialized = false;
+      protected Credentials _credentials;
       protected readonly HttpClient _requestClient;
       protected readonly HttpClient _streamsClient;
       protected readonly ILogger _logger;
@@ -151,7 +141,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// The V20 access token for the user's or organization's Oanda Account.
       /// The token also authenticates operations on all sub accounts.
       /// </summary>
-      protected static string AccessToken { get { return Credentials.GetCredentials().AccessToken; } }
+      protected string AccessToken { get { return _credentials.GetCredentials().AccessToken; } }
 
       /// <summary>
       /// Oanda recommends that requests per Account are throttled to a maximium of 100 requests/second.
@@ -168,7 +158,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="server">The enurmeration for the target service</param>
       /// <returns>Returns the base uri of the target server</returns>
-      protected static string ServerUri(EServer server) { return Credentials.GetCredentials().GetServer(server); }
+      protected string ServerUri(EServer server) { return _credentials.GetCredentials().GetServer(server); }
 
       /// <summary>
       /// New: Sends a web request using HttpParameters (object -> querystring/body) and returns a deserialized object.
@@ -429,7 +419,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>True if trading is halted, false if trading is not halted.</returns>
       public virtual async Task<bool> IsMarketHalted(string instrument = InstrumentName.Currency.EURUSD, bool throwIfHalted = false)
       {
-         var accountId = Credentials.GetCredentials().AccountId;
+         var accountId = _credentials.GetCredentials().AccountId;
 
          var parameters = new PricingParameters()
          {

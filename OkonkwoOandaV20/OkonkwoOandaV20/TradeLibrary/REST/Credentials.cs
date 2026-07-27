@@ -18,8 +18,48 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          Trade
       }
 
-      internal class Credentials
+      public class Credentials
       {
+         public Credentials(EEnvironment environment, string accessToken, string accountId)
+         {
+            Environment = environment;
+            AccessToken = accessToken;
+            AccountId = accountId;
+         }
+
+         #region properties
+
+         public string AccessToken { get; private set; }
+         public string AccountId { get; private set; }
+         public EEnvironment Environment { get; private set; }
+
+         #endregion
+
+         private static readonly Dictionary<EEnvironment, Dictionary<EServer, string>> Servers = new Dictionary<EEnvironment, Dictionary<EServer, string>>
+         {
+            {  EEnvironment.Practice, new Dictionary<EServer, string>
+               {
+                  {EServer.Account, "https://api-fxpractice.oanda.com/v3/"},
+                  {EServer.Labs, "https://api-fxpractice.oanda.com/labs/v3/"},
+                  {EServer.PricingStream, "https://stream-fxpractice.oanda.com/v3/"},
+                  {EServer.TransactionsStream, "https://stream-fxpractice.oanda.com/v3/"},
+               }
+            },
+            {  EEnvironment.Trade, new Dictionary<EServer, string>
+               {
+                  {EServer.Account, "https://api-fxtrade.oanda.com/v3/"},
+                  {EServer.Labs, "https://api-fxtrade.oanda.com/labs/v3/"},
+                  {EServer.PricingStream, "https://stream-fxtrade.oanda.com/v3/"},
+                  {EServer.TransactionsStream, "https://stream-fxtrade.oanda.com/v3/"}
+               }
+            }
+         };
+
+         public Credentials GetCredentials()
+         {
+            return (Credentials)this.MemberwiseClone();
+         }
+
          public bool HasServer(EServer server)
          {
             return Servers[Environment].ContainsKey(server);
@@ -32,47 +72,6 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
                return Servers[Environment][server];
             }
             return null;
-         }
-
-         private static readonly Dictionary<EEnvironment, Dictionary<EServer, string>> Servers = new Dictionary<EEnvironment, Dictionary<EServer, string>>
-      {
-         {  EEnvironment.Practice, new Dictionary<EServer, string>
-            {
-               {EServer.Account, "https://api-fxpractice.oanda.com/v3/"},
-               {EServer.Labs, "https://api-fxpractice.oanda.com/labs/v3/"},
-               {EServer.PricingStream, "https://stream-fxpractice.oanda.com/v3/"},
-               {EServer.TransactionsStream, "https://stream-fxpractice.oanda.com/v3/"},
-            }
-         },
-         {  EEnvironment.Trade, new Dictionary<EServer, string>
-            {
-               {EServer.Account, "https://api-fxtrade.oanda.com/v3/"},
-               {EServer.Labs, "https://api-fxtrade.oanda.com/labs/v3/"},
-               {EServer.PricingStream, "https://stream-fxtrade.oanda.com/v3/"},
-               {EServer.TransactionsStream, "https://stream-fxtrade.oanda.com/v3/"}
-            }
-         }
-      };
-
-         private static Credentials m_Credentials;
-
-         public string AccessToken { get; set; }
-         public string AccountId { get; set; }
-         private EEnvironment Environment { get; set; }
-
-         public static Credentials GetCredentials()
-         {
-            return m_Credentials;
-         }
-
-         public static void SetCredentials(EEnvironment environment, string accessToken, string defaultAccount = "0")
-         {
-            m_Credentials = new Credentials
-            {
-               Environment = environment,
-               AccessToken = accessToken,
-               AccountId = defaultAccount
-            };
          }
       }
    }
