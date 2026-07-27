@@ -63,13 +63,13 @@ namespace OkonkwoOandaV20Tests
                credentials: null,
                valueTransformers: new Dictionary<string, Action<object>>()
                {
-                  {
-                     HttpAction.Request
-                     , input => {
-                        if (input is AccountChangesParameters acp)
-                           --acp.sinceTransactionID;
-                     }
-                  },
+                  //{
+                  //   HttpAction.Request
+                  //   , input => {
+                  //      if (input is AccountChangesParameters acp)
+                  //         --acp.sinceTransactionID;
+                  //   }
+                  //},
                   //{
                   //   HttpAction.Response
                   //   , input => {

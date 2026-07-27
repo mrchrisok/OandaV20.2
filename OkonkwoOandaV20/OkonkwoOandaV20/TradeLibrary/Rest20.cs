@@ -117,22 +117,22 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// JsonSerializerSettings for request to Oanda
       /// </summary>
-      public JsonSerializerSettings JsonSettingsRequest { get; private set; }
+      public JsonSerializerSettings JsonSettingsRequest { get; protected set; }
 
       /// <summary>
       /// JsonSerializerSettings for response from Oanda
       /// </summary>
-      public JsonSerializerSettings JsonSettingsResponse { get; private set; }
+      public JsonSerializerSettings JsonSettingsResponse { get; protected set; }
 
       /// <summary>
       /// JsonConverters for request/response from Oanda
       /// </summary>
-      public IList<JsonConverter> JsonConverters { get; private set; }
+      public IList<JsonConverter> JsonConverters { get; protected set; }
 
       /// <summary>
       /// Value transformers for request/response from Oanda
       /// </summary>
-      public IDictionary<string, Action<object>> ValueTransformers { get; private set; }
+      public IDictionary<string, Action<object>> ValueTransformers { get; protected set; }
 
       /// <summary>
       /// The time of the last request made to an Oanda V20 service
