@@ -60,7 +60,7 @@ namespace OkonkwoOandaV20Tests
          try
          {
             _client = new Rest20(
-               credentials: await GetApiCredentials(),
+               credentials: null,
                valueTransformers: new Dictionary<string, Action<object>>()
                {
                   {
@@ -80,10 +80,10 @@ namespace OkonkwoOandaV20Tests
                }
             );
 
-            //if (!await _client.InitializeAsync())
-            //{
-            //   throw new Exception("Exception: RestV20Test - Rest20 initialization failed.");
-            //}
+            if (!await _client.InitializeAsync(await GetApiCredentials()))
+            {
+               throw new Exception("Exception: RestV20Test - Rest20 initialization failed.");
+            }
 
             // first, get accounts
             // this operation adds the test AccountId to Credentials (if it is null)
