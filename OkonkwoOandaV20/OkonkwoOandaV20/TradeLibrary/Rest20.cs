@@ -41,14 +41,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          _requestClient = requestClient ?? new HttpClient();
          _streamsClient = streamsClient ?? new HttpClient() { Timeout = Timeout.InfiniteTimeSpan };
+         _logger = logger;
 
          JsonConverters = SetJsonConverters(jsonConverters);
          JsonSettingsRequest = SetJsonSerializerSettings("Request", jsonSettingsRequest);
          JsonSettingsResponse = SetJsonSerializerSettings("Response", jsonSettingsResponse);
 
          ValueTransformers = valueTransformers ?? new Dictionary<string, Action<object>>();
-
-         _logger = logger;
 
          if (credentials.HasValue)
          {
