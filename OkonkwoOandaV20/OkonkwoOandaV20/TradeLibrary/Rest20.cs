@@ -44,9 +44,8 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          _logger = logger;
 
          JsonConverters = SetJsonConverters(jsonConverters);
-         JsonSettingsRequest = SetJsonSerializerSettings("Request", jsonSettingsRequest);
-         JsonSettingsResponse = SetJsonSerializerSettings("Response", jsonSettingsResponse);
-
+         JsonSettingsRequest = jsonSettingsRequest;
+         JsonSettingsResponse = jsonSettingsResponse;
          ValueTransformers = valueTransformers ?? new Dictionary<string, Action<object>>();
 
          if (credentials.HasValue)
@@ -66,22 +65,43 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <returns>True, if initialization was successful. False if not successful.</returns>
       public virtual Task<bool> InitializeAsync((EEnvironment environment, string accessToken, string accountId)? credentials)
       {
-         if (!credentials.HasValue)
+         _creds = credentials ?? _creds;
+
+         if (!_creds.HasValue)
             throw new ArgumentNullException("Credentials are null");
 
          _credentials = new Credentials(
-            credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
+            _creds.Value.environment, _creds.Value.accessToken, _creds.Value.accountId);
 
          return Task.FromResult(true);
       }
 
-      protected virtual JsonSerializerSettings SetJsonSerializerSettings(string httpAction
-         , JsonSerializerSettings jsonSettings = null)
+      protected virtual JsonSerializerSettings InitializeJsonSerializerSettings(string httpAction)
       {
-         jsonSettings = jsonSettings ?? new JsonSerializerSettings();
-         var jsonConverters = new List<JsonConverter>(JsonConverters);
-         jsonConverters.AddRange(jsonSettings.Converters);
-         //
+         //jsonSettings = jsonSettings ?? new JsonSerializerSettings();
+         //var jsonConverters = new List<JsonConverter>(JsonConverters);
+         //jsonConverters.AddRange(jsonSettings.Converters);
+         ////
+
+         if (httpAction != HttpAction.Request)
+         {
+            JsonSettingsRequest = JsonSettingsRequest ?? new JsonSerializerSettings();
+            var jsonConvertersRequest = new List<JsonConverter>(JsonConverters);
+            jsonConvertersRequest.AddRange(JsonSettingsRequest.Converters);
+            JsonSettingsRequest = new JsonSerializerSettings()
+            {
+               TypeNameHandling = TypeNameHandling.None,
+               NullValueHandling = NullValueHandling.Ignore,
+               DefaultValueHandling = DefaultValueHandling.Ignore,
+               DateFormatHandling = DateFormatHandling.IsoDateFormat,
+               Converters = JsonConverters
+            };
+         }
+
+         if (httpAction != HttpAction.Response)
+         {
+            JsonSettingsRequest
+         }
 
          return new JsonSerializerSettings()
          {
@@ -108,6 +128,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       #region properties
 
+      protected (EEnvironment environment, string accessToken, string accountId)? _creds;
       protected Credentials _credentials;
       protected readonly HttpClient _requestClient;
       protected readonly HttpClient _streamsClient;

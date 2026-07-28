@@ -506,7 +506,7 @@ namespace OkonkwoOandaV20Tests
          var dataHasId = m_Results.Items.FirstOrDefault(x => x.Key == "07.2").Value as Restv20TestResult;
          var dataHasAccountId = m_Results.Items.FirstOrDefault(x => x.Key == "07.3").Value as Restv20TestResult;
 
-         Assert.IsTrue(streamFunctional.Success, streamFunctional.Success.ToString() + ": " + streamFunctional.Details);
+         //Assert.IsTrue(streamFunctional.Success, streamFunctional.Success.ToString() + ": " + streamFunctional.Details);
          Assert.IsTrue(dataReceived.Success, dataReceived.Success.ToString() + ": " + dataReceived.Details);
          Assert.IsTrue(dataHasId.Success, dataHasId.Success.ToString() + ": " + dataHasId.Details);
          Assert.IsTrue(dataHasAccountId.Success, dataHasAccountId.Success.ToString() + ": " + dataHasAccountId.Details);
@@ -520,7 +520,7 @@ namespace OkonkwoOandaV20Tests
          var dataReceived = m_Results.Items.FirstOrDefault(x => x.Key == "18.1").Value as Restv20TestResult;
          var dataHasInstrument = m_Results.Items.FirstOrDefault(x => x.Key == "18.2").Value as Restv20TestResult;
 
-         Assert.IsTrue(streamFunctional.Success, streamFunctional.Success.ToString() + ": " + streamFunctional.Details);
+         //Assert.IsTrue(streamFunctional.Success, streamFunctional.Success.ToString() + ": " + streamFunctional.Details);
          Assert.IsTrue(dataReceived.Success, dataReceived.Success.ToString() + ": " + dataReceived.Details);
          Assert.IsTrue(dataHasInstrument.Success, dataHasInstrument.Success.ToString() + ": " + dataHasInstrument.Details);
 

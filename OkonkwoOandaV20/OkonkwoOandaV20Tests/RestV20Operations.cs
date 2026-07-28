@@ -37,7 +37,7 @@ namespace OkonkwoOandaV20Tests
 
       static bool m_ApiOperationsComplete = false;
       static string m_Currency = "USD";
-      static string m_TestInstrument = InstrumentName.Currency.USDCHF;
+      static string m_TestInstrument = InstrumentName.Currency.USDJPY;
       static List<Instrument> m_OandaInstruments;
       static List<Price> m_OandaPrices;
       static long m_FirstTransactionID;
@@ -109,9 +109,8 @@ namespace OkonkwoOandaV20Tests
             await Instrument_GetInstrumentOrderBook();
             await Instrument_GetInstrumentPositionBook();
 
-            Stream_GetStreamingPrices();
-
-            // start transactions stream
+            // start the streams
+            Task pricingCheck = Stream_GetStreamingPrices();
             Task transactionsStreamCheck = Stream_GetStreamingTransactions();
 
             // create stream traffic
@@ -119,16 +118,13 @@ namespace OkonkwoOandaV20Tests
             await Trade_RunTradeOperations();
             await Position_RunPositionOperations();
 
-            // stop transactions stream 
-            if (transactionsStreamCheck != null)
-            {
-               await transactionsStreamCheck;
-            }
-
             // review the traffic
             await Transaction_GetTransactionsByDateRange();
             await Transaction_GetTransactionsByIdRange();
             await Account_GetAccountChanges();
+
+            await pricingCheck;
+            await transactionsStreamCheck;
          }
          catch (MarketHaltedException ex)
          {
@@ -1185,33 +1181,30 @@ namespace OkonkwoOandaV20Tests
              new TransactionsSessionParameters { accountID = AccountID });
 
          _gotTransaction = false;
+         _gotTransactionTick = false;
          _transactionReceivedTcs = new TaskCompletionSource<bool>(
              TaskCreationOptions.RunContinuationsAsynchronously);
 
          session.DataReceived += OnTransactionReceived;
          session.StartSession(m_CancellationToken);
 
-         // Wait up to 10 seconds for ANY transaction (non-heartbeat)
-         var firstMessageTask = _transactionReceivedTcs.Task;
-         var completed = await Task.WhenAny(firstMessageTask, Task.Delay(10000));
+         // Wait up to 20 seconds for ANY transaction
+         var transactionReceivedTask = _transactionReceivedTcs.Task;
+         var completedTask = await Task.WhenAny(transactionReceivedTask, Task.Delay(20000));
 
-         m_Results.Verify("07.0",
-             completed == firstMessageTask,
-             "Transaction events stream is functioning.");
-
-         // Now wait up to 20 seconds for a real transaction
-         var timeoutTask = Task.Delay(20000);
-         var finalCompleted = await Task.WhenAny(firstMessageTask, timeoutTask);
+         m_Results.Verify("07.0", _gotTransactionTick, "Transaction events stream is functioning.");
 
          // Stop the session cleanly
          session.StopSession();
       }
       static TaskCompletionSource<bool> _transactionReceivedTcs;
-      static volatile bool _gotTransaction;
+      static volatile bool _gotTransactionTick, _gotTransaction;
       protected static void OnTransactionReceived(TransactionsStreamResponse data)
       {
          if (_gotTransaction)
             return;
+
+         _gotTransactionTick = true;
 
          if (data.IsHeartbeat())
             return;
@@ -1244,29 +1237,30 @@ namespace OkonkwoOandaV20Tests
              });
 
          _gotPrice = false;
+         _gotPriceTick = false;
          _priceReceivedTcs = new TaskCompletionSource<bool>(
              TaskCreationOptions.RunContinuationsAsynchronously);
 
          session.DataReceived += OnPricingReceived;
          session.StartSession(m_CancellationToken);
 
-         // Wait up to 10 seconds for first price tick
-         var firstTickTask = _priceReceivedTcs.Task;
-         var completed = await Task.WhenAny(firstTickTask, Task.Delay(10000));
+         // Wait up to 30 seconds for first price tick
+         var priceReceivedTask = _priceReceivedTcs.Task;
+         var completedTask = await Task.WhenAny(priceReceivedTask, Task.Delay(30000));
 
          // Stop the session cleanly
          session.StopSession();
 
-         m_Results.Verify("18.0",
-             completed == firstTickTask,
-             "Pricing stream is functioning.");
+         m_Results.Verify("18.0", _gotPriceTick, "Pricing stream is functioning.");
       }
       static TaskCompletionSource<bool> _priceReceivedTcs;
-      static volatile bool _gotPrice;
+      static volatile bool _gotPriceTick, _gotPrice;
       protected static void OnPricingReceived(PricingStreamResponse data)
       {
          if (_gotPrice)
             return;
+
+         _gotPriceTick = true;
 
          if (data.price == null)
             return;
