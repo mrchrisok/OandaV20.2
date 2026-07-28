@@ -8,6 +8,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,9 +22,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>the HttpResponseMessage that can be used to retrieve the events as they stream</returns>
-      public static async Task<HttpResponseMessage> GetTransactionsStream(TransactionsStreamParameters parameters, CancellationToken cancellation = default)
+      public virtual async Task<HttpResponseMessage> GetTransactionsStream(TransactionsStreamParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParameters = new HttpParameters(parameters)
+         var requestParameters = new HttpParameters(this, parameters)
          {
             Method = HttpMethod.Get,
             Uri = new Uri(ServerUri(EServer.TransactionsStream) + $"accounts/{parameters.accountID}/transactions/stream"),
@@ -66,15 +67,23 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
    public class TransactionsSession : StreamSession<TransactionsStreamResponse>
    {
-      public TransactionsSession(string accountID) : base(accountID)
+      public TransactionsSession(Rest20 client, TransactionsSessionParameters parameters) 
+         : base(client, parameters.accountID)
       {
+         _parameters = parameters;
       }
+
+      protected readonly TransactionsSessionParameters _parameters;
 
       protected override async Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default)
       {
-         return await Rest20.GetTransactionsStream(new TransactionsStreamParameters() { 
+         return await _client.GetTransactionsStream(new TransactionsStreamParameters() { 
             accountID = _accountID 
          }, cancellation);
       }
+   }
+
+   public class TransactionsSessionParameters : TransactionsStreamParameters
+   {
    }
 }

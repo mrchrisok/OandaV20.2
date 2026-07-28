@@ -33,6 +33,7 @@ namespace OkonkwoOandaV20App
 
       static string AccountID { get; set; }
       const string INSTRUMENT = InstrumentName.Currency.EURUSD;
+      static Rest20 _client;
 
       /// <summary>
       /// Reads the api key from a supplied file name
@@ -50,7 +51,7 @@ namespace OkonkwoOandaV20App
          var accessToken = keyVaultValue.Split('~')[1];
          AccountID = keyVaultValue.Split('~')[2];
 
-         Rest20.InitializeAsync(credentials: (environment, accessToken, AccountID)).Wait();
+         _client = new Rest20(credentials: (environment, accessToken, AccountID));
       }
 
       #region trading
@@ -60,7 +61,7 @@ namespace OkonkwoOandaV20App
 
          // first, check the market status for EUR_USD
          // if it is tradeable, we'll try to make some money :)
-         if (!(await Utilities.IsMarketHalted(INSTRUMENT)))
+         if (!(await _client.IsMarketHalted(INSTRUMENT)))
          {
             WriteNewLine("EUR_USD is open and rockin', so let's start trading!");
 
@@ -80,7 +81,7 @@ namespace OkonkwoOandaV20App
                {
                   var parameters = new TradeCloseParameters() { accountID = AccountID
                      , tradeSpecifier = tradeID.Value, units = "ALL" };
-                  closeResponse = await Rest20.PutTradeCloseAsync(parameters);
+                  closeResponse = await _client.PutTradeCloseAsync(parameters);
                }
                catch
                {
@@ -121,7 +122,7 @@ namespace OkonkwoOandaV20App
 
          var parameters = new AccountInstrumentsParameters() { 
             accountID = AccountID, instruments = new List<string>() { INSTRUMENT } };
-         var oandaInstrument = (await Rest20.GetAccountInstrumentsAsync(parameters))?.instruments.First();
+         var oandaInstrument = (await _client.GetAccountInstrumentsAsync(parameters))?.instruments.First();
          decimal orderUnits = side == "buy" ? 10 : -10;
 
          var request = new MarketOrderRequest(oandaInstrument)
@@ -133,7 +134,7 @@ namespace OkonkwoOandaV20App
          try
          {
             var parameters2 = new PostOrderParameters() { accountID = AccountID, order = request };
-            response = await Rest20.PostOrderAsync(parameters2);
+            response = await _client.PostOrderAsync(parameters2);
             WriteNewLine("Congrats! You've put on a trade! Let it run! :)");
          }
          catch (Exception ex)
@@ -157,7 +158,8 @@ namespace OkonkwoOandaV20App
       {
          WriteNewLine("Starting transactions stream ...");
 
-         _transactionsSession = new TransactionsSession(AccountID);
+         _transactionsSession = new TransactionsSession(_client
+            , new TransactionsSessionParameters() { accountID = AccountID });
          _transactionReceived = new Semaphore(0, 100);
          _transactionsSession.DataReceived += OnTransactionReceived;
 

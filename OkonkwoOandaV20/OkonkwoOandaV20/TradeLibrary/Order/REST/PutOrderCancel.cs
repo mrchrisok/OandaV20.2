@@ -17,9 +17,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <param name="parameters">the parameters for the request</param>
       /// <param name="cancellation">a cancellation token that can cancel the operation</param>
       /// <returns>a PutCancelOrderResponse with details of the cancelled order</returns>
-      public static async Task<OrderCancelResponse> PutOrderCancelAsync(OrderCancelParameters parameters, CancellationToken cancellation = default)
+      public virtual async Task<OrderCancelResponse> PutOrderCancelAsync(OrderCancelParameters parameters, CancellationToken cancellation = default)
       {
-         var requestParams = new HttpParameters(parameters)
+         var requestParams = new HttpParameters(this, parameters)
          {
             Method = HttpMethod.Put,
             Uri = new Uri(ServerUri(EServer.Account) + $"accounts/{parameters.accountID}/orders/{parameters.orderSpecifier}/cancel"),

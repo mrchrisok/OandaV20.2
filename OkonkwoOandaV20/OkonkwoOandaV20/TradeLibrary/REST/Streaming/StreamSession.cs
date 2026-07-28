@@ -11,6 +11,15 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
 {
    public abstract class StreamSession<T> where T : IStreamResponse
    {
+      protected StreamSession(Rest20 client, string accountID)
+      {
+         _client = client;
+         _accountID = accountID;
+      }
+
+      #region properties
+
+      protected readonly Rest20 _client;
       protected readonly string _accountID;
       protected HttpResponseMessage _response;
       protected bool _shutdown;
@@ -29,10 +38,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
          SessionStatusChanged?.Invoke(_accountID, started, e);
       }
 
-      protected StreamSession(string accountID)
-      {
-         _accountID = accountID;
-      }
+      #endregion
 
       protected abstract Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default);
 
@@ -50,11 +56,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
             {
                while (!reader.EndOfStream && !_shutdown && !cancellation.IsCancellationRequested)
                {
-                  string line = reader.ReadLine();
-                  var data = JsonConvert.DeserializeObject<T>(line, Rest20.JsonSettingsResponse);
-                  Rest20.TransformObjectValues(data, HttpAction.Response);
+                  var line = await reader.ReadLineAsync();
+                  var data = JsonConvert.DeserializeObject<T>(line, _client.JsonSettingsResponse);
+                  _client.TransformObjectValues(data, HttpAction.Response);
                   OnSessionStatusChanged(!_shutdown, null);
-
                   OnDataReceived(data);
                }
             }
