@@ -1177,88 +1177,117 @@ namespace OkonkwoOandaV20Tests
       #endregion
 
       #region Stream
-      static Semaphore _transactionReceived;
-      protected static Task Stream_GetStreamingTransactions()
+
+      protected static async Task Stream_GetStreamingTransactions()
       {
-         // 07
-         var session = new TransactionsSession(_client, new TransactionsSessionParameters() { 
-            accountID = AccountID });
-         _transactionReceived = new Semaphore(0, 100);
+         var session = new TransactionsSession(
+             _client,
+             new TransactionsSessionParameters { accountID = AccountID });
+
+         _gotTransaction = false;
+         _transactionReceivedTcs = new TaskCompletionSource<bool>(
+             TaskCreationOptions.RunContinuationsAsynchronously);
+
          session.DataReceived += OnTransactionReceived;
          session.StartSession(m_CancellationToken);
 
-         // wait 10secs or until a message is received
-         bool success = _transactionReceived.WaitOne(10000);
-         m_Results.Verify("07.0", success, "Transaction events stream is functioning.");
+         // Wait up to 10 seconds for ANY transaction (non-heartbeat)
+         var firstMessageTask = _transactionReceivedTcs.Task;
+         var completed = await Task.WhenAny(firstMessageTask, Task.Delay(10000));
 
-         return Task.Run(() =>
-         {
-            // wait until a transaction is received .. max 20secs
-            var autoStopTime = DateTime.UtcNow.AddSeconds(20);
-            while (!_gotTransaction || DateTime.UtcNow < autoStopTime) { }
-            session.StopSession();
-         });
+         m_Results.Verify("07.0",
+             completed == firstMessageTask,
+             "Transaction events stream is functioning.");
+
+         // Now wait up to 20 seconds for a real transaction
+         var timeoutTask = Task.Delay(20000);
+         var finalCompleted = await Task.WhenAny(firstMessageTask, timeoutTask);
+
+         // Stop the session cleanly
+         session.StopSession();
       }
-
-      static bool _gotTransaction = false;
+      static TaskCompletionSource<bool> _transactionReceivedTcs;
+      static volatile bool _gotTransaction;
       protected static void OnTransactionReceived(TransactionsStreamResponse data)
       {
-         if (!_gotTransaction)
-         {
-            if (!data.IsHeartbeat())
-            {
-               m_Results.Verify("07.1", data.transaction != null, "Transaction received");
-               if (data.transaction != null)
-               {
-                  m_Results.Verify("07.2", data.transaction.id != 0, "Transaction has id.");
-                  m_Results.Verify("07.3", data.transaction.accountID == AccountID
-                     , string.Format("Transaction has correct accountID: ({0}).", AccountID));
-               }
+         if (_gotTransaction)
+            return;
 
-               // only testing first data
-               _gotTransaction = true;
-            }
+         if (data.IsHeartbeat())
+            return;
+
+         // Validate transaction
+         m_Results.Verify("07.1", data.transaction != null, "Transaction received");
+
+         if (data.transaction != null)
+         {
+            m_Results.Verify("07.2", data.transaction.id != 0, "Transaction has id.");
+            m_Results.Verify("07.3",
+                data.transaction.accountID == AccountID,
+                $"Transaction has correct accountID: ({AccountID}).");
          }
 
-         _transactionReceived.Release();
+         _gotTransaction = true;
+
+         // Signal the waiting task
+         _transactionReceivedTcs.TrySetResult(true);
       }
 
-      static Semaphore _tickReceived;
-      protected static void Stream_GetStreamingPrices()
+      protected static async Task Stream_GetStreamingPrices()
       {
-         PricingSession session = new PricingSession(_client
-            , new PricingSessionParameters() { 
-               accountID = AccountID, instruments = m_OandaInstruments.Select(i => i.name).ToList() 
-            });
-         _tickReceived = new Semaphore(0, 100);
+         var session = new PricingSession(
+             _client,
+             new PricingSessionParameters
+             {
+                accountID = AccountID,
+                instruments = m_OandaInstruments.Select(i => i.name).ToList()
+             });
+
+         _gotPrice = false;
+         _priceReceivedTcs = new TaskCompletionSource<bool>(
+             TaskCreationOptions.RunContinuationsAsynchronously);
+
          session.DataReceived += OnPricingReceived;
          session.StartSession(m_CancellationToken);
-         bool success = _tickReceived.WaitOne(10000);
-         session.StopSession();
-         m_Results.Verify("18.0", success, "Pricing stream is functioning.");
-      }
 
-      static bool _gotPrice = false;
+         // Wait up to 10 seconds for first price tick
+         var firstTickTask = _priceReceivedTcs.Task;
+         var completed = await Task.WhenAny(firstTickTask, Task.Delay(10000));
+
+         // Stop the session cleanly
+         session.StopSession();
+
+         m_Results.Verify("18.0",
+             completed == firstTickTask,
+             "Pricing stream is functioning.");
+      }
+      static TaskCompletionSource<bool> _priceReceivedTcs;
+      static volatile bool _gotPrice;
       protected static void OnPricingReceived(PricingStreamResponse data)
       {
-         if (!_gotPrice)
+         if (_gotPrice)
+            return;
+
+         if (data.price == null)
+            return;
+
+         // Validate price
+         m_Results.Verify("18.1", data.price != null, "Pricing data received.");
+         m_Results.Verify("18.2", data.price.instrument != null, "Streaming price has instrument");
+
+         if (data.price.tradeable)
          {
-            if (data.price != null)
-            {
-               m_Results.Verify("18.1", data.price != null, "Pricing data received.");
-               m_Results.Verify("18.2", data.price.instrument != null, "Streaming price has instrument");
-
-               if (data.price.tradeable)
-               {
-                  m_Results.Verify("18.3", data.price.bids.Count > 0, "Streaming price has bids");
-                  m_Results.Verify("18.4", data.price.asks.Count > 0, "Streaming price has asks");
-               }
-
-               _gotPrice = true;
-            }
+            m_Results.Verify("18.3", data.price.bids.Count > 0, "Streaming price has bids");
+            m_Results.Verify("18.4", data.price.asks.Count > 0, "Streaming price has asks");
          }
-         _tickReceived.Release();
+
+         _gotPrice = true;
+
+         // Signal the waiting task
+         _priceReceivedTcs.TrySetResult(true);
       }
+
+
       #endregion
 
       #region Utilities

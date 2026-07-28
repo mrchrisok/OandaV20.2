@@ -56,11 +56,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
             {
                while (!reader.EndOfStream && !_shutdown && !cancellation.IsCancellationRequested)
                {
-                  string line = reader.ReadLine();
+                  var line = await reader.ReadLineAsync();
                   var data = JsonConvert.DeserializeObject<T>(line, _client.JsonSettingsResponse);
                   _client.TransformObjectValues(data, HttpAction.Response);
                   OnSessionStatusChanged(!_shutdown, null);
-
                   OnDataReceived(data);
                }
             }

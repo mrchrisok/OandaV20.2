@@ -188,7 +188,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// <summary>
       /// New: Create an HttpRequestMessage from HttpParameters
       /// </summary>
-      protected virtual async Task<HttpRequestMessage> CreateHttpRequestAsync(HttpParameters parameters, CancellationToken cancellation)
+      protected virtual Task<HttpRequestMessage> CreateHttpRequestAsync(HttpParameters parameters, CancellationToken cancellation)
       {
          if (cancellation.IsCancellationRequested) return default;
 
@@ -238,7 +238,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
          request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
 
-         return request;
+         return Task.FromResult(request);
       }
 
       #endregion
