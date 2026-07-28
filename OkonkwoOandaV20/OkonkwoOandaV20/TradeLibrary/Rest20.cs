@@ -20,7 +20,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// <summary>
    /// http://developer.oanda.com/rest-live-v20/introduction/
    /// </summary>
-   public partial class Rest20
+   public partial class Rest20 : IDisposable
    {
       /// <summary>
       /// Initialize the middleware that will make calls to Oanda V3 endpoints.
@@ -43,16 +43,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          _streamsClient = streamsClient ?? new HttpClient() { Timeout = Timeout.InfiniteTimeSpan };
          _logger = logger;
 
-         JsonConverters = SetJsonConverters(jsonConverters);
+         JsonConverters = jsonConverters;
          JsonSettingsRequest = jsonSettingsRequest;
          JsonSettingsResponse = jsonSettingsResponse;
-         ValueTransformers = valueTransformers ?? new Dictionary<string, Action<object>>();
+         ValueTransformers = valueTransformers;
 
-         if (credentials.HasValue)
-         {
-            _credentials = new Credentials(
-               credentials.Value.environment, credentials.Value.accessToken, credentials.Value.accountId);
-         }
+         _creds = credentials;
       }
 
       #region initialization
@@ -63,8 +59,13 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       /// </summary>
       /// <param name="credentials">Used to authenticate to Oanda api</param>
       /// <returns>True, if initialization was successful. False if not successful.</returns>
-      public virtual Task<bool> InitializeAsync((EEnvironment environment, string accessToken, string accountId)? credentials)
+      public virtual async Task<bool> InitializeAsync((EEnvironment environment, string accessToken, string accountId)? credentials)
       {
+         await InitializeJsonConverters();
+         await InitializeJsonSerializerSettings(HttpAction.Request);
+         await InitializeJsonSerializerSettings(HttpAction.Response);
+         await InitializeValueTransformers();
+
          _creds = credentials ?? _creds;
 
          if (!_creds.HasValue)
@@ -73,55 +74,59 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          _credentials = new Credentials(
             _creds.Value.environment, _creds.Value.accessToken, _creds.Value.accountId);
 
-         return Task.FromResult(true);
+         return true;
       }
 
-      protected virtual JsonSerializerSettings InitializeJsonSerializerSettings(string httpAction)
+      protected virtual Task InitializeJsonConverters()
       {
-         //jsonSettings = jsonSettings ?? new JsonSerializerSettings();
-         //var jsonConverters = new List<JsonConverter>(JsonConverters);
-         //jsonConverters.AddRange(jsonSettings.Converters);
-         ////
+         var jsonConverters = JsonConverters ?? new List<JsonConverter>();
 
-         if (httpAction != HttpAction.Request)
+         JsonConverters = new List<JsonConverter>(jsonConverters) {
+
+            new OrderConverter(), new PriceObjectConverter(), new TransactionConverter(),
+            new PricingStreamResponseConverter(), new TransactionsStreamResponseConverter()
+         };
+
+         return Task.CompletedTask;
+      }
+
+      protected virtual Task InitializeJsonSerializerSettings(string httpAction)
+      {
+         JsonSerializerSettings getSettings(IList<JsonConverter> converters) 
          {
-            JsonSettingsRequest = JsonSettingsRequest ?? new JsonSerializerSettings();
-            var jsonConvertersRequest = new List<JsonConverter>(JsonConverters);
-            jsonConvertersRequest.AddRange(JsonSettingsRequest.Converters);
-            JsonSettingsRequest = new JsonSerializerSettings()
+            return new JsonSerializerSettings()
             {
                TypeNameHandling = TypeNameHandling.None,
                NullValueHandling = NullValueHandling.Ignore,
                DefaultValueHandling = DefaultValueHandling.Ignore,
                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-               Converters = JsonConverters
+               Converters = converters
             };
          }
+         var jsonConverters = new List<JsonConverter>(JsonConverters);
+         //
 
-         if (httpAction != HttpAction.Response)
+         if (httpAction != HttpAction.Request)
          {
-            JsonSettingsRequest
+            JsonSettingsRequest = JsonSettingsRequest ?? new JsonSerializerSettings();
+            jsonConverters.AddRange(JsonSettingsRequest.Converters);
+            JsonSettingsRequest = getSettings(jsonConverters);
+         }
+         else if (httpAction != HttpAction.Response)
+         {
+            JsonSettingsResponse = JsonSettingsResponse ?? new JsonSerializerSettings();
+            jsonConverters.AddRange(JsonSettingsResponse.Converters);
+            JsonSettingsResponse = getSettings(jsonConverters);
          }
 
-         return new JsonSerializerSettings()
-         {
-            TypeNameHandling = TypeNameHandling.None,
-            NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            Converters = JsonConverters
-         };
+         return Task.CompletedTask;
       }
 
-      protected virtual IList<JsonConverter> SetJsonConverters(IList<JsonConverter> jsonConverters = null)
+      protected virtual Task InitializeValueTransformers()
       {
-         jsonConverters = jsonConverters ?? new List<JsonConverter>();
+         ValueTransformers = ValueTransformers ?? new Dictionary<string, Action<object>>();
 
-         return new List<JsonConverter>(jsonConverters) {
-
-            new OrderConverter(), new PriceObjectConverter(), new TransactionConverter(),
-            new PricingStreamResponseConverter(), new TransactionsStreamResponseConverter()
-         };
+         return Task.CompletedTask;
       }
 
       #endregion
@@ -133,6 +138,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       protected readonly HttpClient _requestClient;
       protected readonly HttpClient _streamsClient;
       protected readonly ILogger _logger;
+
+      /// <summary>
+      /// Returns true if the client has been successfully initialized and has set credentials
+      /// </summary>
+      public virtual bool Initialized => _credentials != null;
 
       /// <summary>
       /// JsonSerializerSettings for request to Oanda
@@ -474,5 +484,9 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return true;
       }
 
+      public void Dispose()
+      {
+         _credentials = null;
+      }
    }
 }
