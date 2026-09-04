@@ -5,7 +5,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// <summary>
    /// Base class for API parameters, providing a common structure for all parameter classes used in API requests.
    /// </summary>
-   public abstract class ApiParameters
+   public abstract class ClientParameters
    {
       // base class
       // can be used to introduce shared properties and behavior as needed
@@ -30,7 +30,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// <summary>
    /// Class for stream API parameters, providing a common structure for all parameter classes used in API requests.
    /// </summary>
-   public abstract class StreamApiParameters : ApiParameters
+   public abstract class StreamApiParameters : ClientParameters
    {
       /// <summary>
       /// A unique string used to identify the stream in client systems
