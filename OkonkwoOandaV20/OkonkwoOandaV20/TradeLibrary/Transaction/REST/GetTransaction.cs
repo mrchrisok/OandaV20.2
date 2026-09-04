@@ -33,7 +33,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class TransactionParameters : ApiParameters
+   public class TransactionParameters : ClientParameters
    {
       /// <summary>
       /// Account Identifier [required]

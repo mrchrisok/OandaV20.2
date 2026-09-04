@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class OpenTradesParameters : ApiParameters
+   public class OpenTradesParameters : ClientParameters
    {
       /// <summary>
       /// Account Identifier [required]

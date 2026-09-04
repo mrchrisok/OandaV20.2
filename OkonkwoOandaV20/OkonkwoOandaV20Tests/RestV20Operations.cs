@@ -1221,8 +1221,6 @@ namespace OkonkwoOandaV20Tests
          }
 
          _gotTransaction = true;
-
-         // Signal the waiting task
          _transactionReceivedTcs.TrySetResult(true);
       }
 
@@ -1238,17 +1236,15 @@ namespace OkonkwoOandaV20Tests
 
          _gotPrice = false;
          _gotPriceTick = false;
-         _priceReceivedTcs = new TaskCompletionSource<bool>(
-             TaskCreationOptions.RunContinuationsAsynchronously);
+         _priceReceivedTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
          session.DataReceived += OnPricingReceived;
          session.StartSession(m_CancellationToken);
 
-         // Wait up to 30 seconds for first price tick
+         // Wait up to 30 seconds
          var priceReceivedTask = _priceReceivedTcs.Task;
          var completedTask = await Task.WhenAny(priceReceivedTask, Task.Delay(30000));
 
-         // Stop the session cleanly
          session.StopSession();
 
          m_Results.Verify("18.0", _gotPriceTick, "Pricing stream is functioning.");
@@ -1306,13 +1302,13 @@ namespace OkonkwoOandaV20Tests
       /// <summary>
       /// Reads the api key from a supplied file name
       /// </summary>
-      /// <returns></returns>
+      /// <returns>A task representing the asynchronous operation, with a tuple containing the environment, access token, and account ID.</returns>
       private static Task<(EEnvironment environment, string accessToken, string accountId)>
          GetApiCredentials()
       {
          var keyVaultUri = $"https://marketminerkvdev.vault.azure.net/";
          var keyVaultClient = new SecretClient(new Uri(keyVaultUri), Utilities.GetAzureCredential());
-         var keyVaultSecret = keyVaultClient.GetSecret("OandaCredentials");
+         var keyVaultSecret = keyVaultClient.GetSecret("OandaCredentialsPR");
          var keyVaultValue = keyVaultSecret.Value?.Value;
          //
 

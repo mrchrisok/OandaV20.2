@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return await MakeStreamRequestAsync<PricingStreamErrorResponse>(requestParams, cancellation);
       }
 
-      public class PricingStreamParameters : ApiParameters
+      public class PricingStreamParameters : ClientParameters
       {
          public PricingStreamParameters() { snapshot = true; }
 

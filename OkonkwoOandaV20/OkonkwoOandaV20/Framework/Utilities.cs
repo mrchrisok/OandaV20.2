@@ -38,15 +38,6 @@ namespace OkonkwoOandaV20.Framework
          return queryString.ToString().TrimEnd('&');
       }
 
-      public static TokenCredential GetAzureCredential(bool isLocalEnvironment = true)
-      {
-         var credentialOptions = new DefaultAzureCredentialOptions
-         {
-            ExcludeManagedIdentityCredential = isLocalEnvironment
-         };
-         return new DefaultAzureCredential(credentialOptions);
-      }
-
       internal static string ToDistinctCSV(this IEnumerable<string> list)
       {
          return string.Join(",", list.Distinct());
