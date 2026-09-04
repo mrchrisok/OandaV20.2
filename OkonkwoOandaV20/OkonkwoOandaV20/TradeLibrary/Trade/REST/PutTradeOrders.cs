@@ -33,7 +33,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class TradeOrdersParameters : ApiParameters
+      public class TradeOrdersParameters : ClientParameters
       {
          public TradeOrdersParameters()
          {

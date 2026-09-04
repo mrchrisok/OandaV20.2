@@ -29,7 +29,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return await MakeRequestAsync<TradeCloseResponse, TradeCloseErrorResponse>(requestParams, cancellation);
       }
 
-      public class TradeCloseParameters : ApiParameters
+      public class TradeCloseParameters : ClientParameters
       {
          /// <summary>
          /// Account Identifier [required]

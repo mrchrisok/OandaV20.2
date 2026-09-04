@@ -1,7 +1,6 @@
 ﻿using Azure.Core;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.REST;
 using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
@@ -42,7 +41,7 @@ namespace OkonkwoOandaV20App
       private static void SetApiCredentials()
       {
          var keyVaultUri = $"https://marketminerkvdev.vault.azure.net/";
-         var keyVaultClient = new SecretClient(new Uri(keyVaultUri), Utilities.GetAzureCredential());
+         var keyVaultClient = new SecretClient(new Uri(keyVaultUri), GetAzureCredential());
          var keyVaultSecret = keyVaultClient.GetSecret("OandaCredentials");
          var keyVaultValue = keyVaultSecret.Value?.Value;
          //
@@ -186,6 +185,15 @@ namespace OkonkwoOandaV20App
          _transactionsSession.StopSession();
       }
       #endregion
+
+      private static TokenCredential GetAzureCredential(bool isLocalEnvironment = true)
+      {
+         var credentialOptions = new DefaultAzureCredentialOptions
+         {
+            ExcludeManagedIdentityCredential = isLocalEnvironment
+         };
+         return new DefaultAzureCredential(credentialOptions);
+      }
 
       static void WriteNewLine(string message)
       {

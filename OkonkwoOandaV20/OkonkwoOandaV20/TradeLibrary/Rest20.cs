@@ -23,17 +23,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    public partial class Rest20 : IDisposable
    {
       /// <summary>
-      /// Initialize the middleware that will make calls to Oanda V3 endpoints.
-      /// This method is idempotent. Once initialize, any additional calls will have no effect.
+      /// An instance of the Rest20 client for making requests to Oanda's V20 REST API
       /// </summary>
-      /// <param name="settings">The client TSV3 settings.</param>
-      /// <param name="requestClient">An HttpClient configured to support standard connections.</param>
-      /// <param name="streamsClient">An HttpClient configured to support streaming connections.</param>
-      /// <param name="jsonSerializerSettings">Used to json serialization .. nuff said</param>
+      /// <param name="requestClient">A HttpClient configured to support standard connections.</param>
+      /// <param name="streamsClient">A HttpClient configured to support streaming connections.</param>
+      /// <param name="jsonSettingsRequest">Used to json serialization .. nuff said</param>
+      /// <param name="jsonSettingsResponse">Used to json serialization .. nuff said</param>
+      /// <param name="jsonConverters">Used to convert json objects .. nuff said</param>
       /// <param name="valueTransformers">Used to transform request/response property values</param>
-      /// <param name="credentials">Used to authenticate to Oanda api</param>
-      /// <param name="logger">It's a logger.</param>
-      /// <returns>True, if initialization was successful. False if not successful.</returns>
+      /// <param name="credentials">The credentials to use for authorization.</param>
+      /// <param name="logger">An instance of a logger.</param>
       public Rest20(HttpClient requestClient = null, HttpClient streamsClient = null
          , JsonSerializerSettings jsonSettingsRequest = null, JsonSerializerSettings jsonSettingsResponse = null
          , IList<JsonConverter> jsonConverters = null, IDictionary<string, Action<object>> valueTransformers = null
@@ -54,11 +53,11 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       #region initialization
 
       /// <summary>
-      /// Initialize the middleware that will make calls to Oanda V3 endpoints.
-      /// This method is idempotent. Once initialize, any additional calls will have no effect.
+      /// Initializes the Rest20 client by setting up JSON converters, serializer settings, value transformers, and authorizing the application using the provided credentials.
       /// </summary>
-      /// <param name="credentials">Used to authenticate to Oanda api</param>
-      /// <returns>True, if initialization was successful. False if not successful.</returns>
+      /// <param name="credentials">The credentials to use for authorization.</param>
+      /// <returns>A task representing the asynchronous operation, with a boolean result indicating whether initialization was successful.</returns>
+      /// <exception cref="ArgumentNullException">Thrown if the provided credentials are null.</exception>
       public virtual async Task<bool> InitializeAsync((EEnvironment environment, string accessToken, string accountId)? credentials)
       {
          await InitializeJsonConverters();
@@ -77,6 +76,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return true;
       }
 
+      /// <summary>
+      /// Initializes the the json converters for the request and response objects
+      /// </summary>
+      /// <returns>A task representing the asynchronous operation.</returns>
       protected virtual Task InitializeJsonConverters()
       {
          var jsonConverters = JsonConverters ?? new List<JsonConverter>();
@@ -90,9 +93,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return Task.CompletedTask;
       }
 
+      /// <summary>
+      /// Initializes the JsonSerializerSettings
+      /// </summary>
+      /// <param name="httpObject">The HTTP object type (request or response) for which to initialize the settings.</param>
+      /// <returns>A task representing the asynchronous operation.</returns>
       protected virtual Task InitializeJsonSerializerSettings(string httpAction)
       {
-         JsonSerializerSettings getSettings(IList<JsonConverter> converters) 
+         JsonSerializerSettings getSettings(IList<JsonConverter> converters)
          {
             return new JsonSerializerSettings()
             {
@@ -106,13 +114,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          var jsonConverters = new List<JsonConverter>(JsonConverters);
          //
 
-         if (httpAction != HttpAction.Request)
+         if (httpAction == HttpAction.Request)
          {
             JsonSettingsRequest = JsonSettingsRequest ?? new JsonSerializerSettings();
             jsonConverters.AddRange(JsonSettingsRequest.Converters);
             JsonSettingsRequest = getSettings(jsonConverters);
          }
-         else if (httpAction != HttpAction.Response)
+
+         else if (httpAction == HttpAction.Response)
          {
             JsonSettingsResponse = JsonSettingsResponse ?? new JsonSerializerSettings();
             jsonConverters.AddRange(JsonSettingsResponse.Converters);
@@ -122,6 +131,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return Task.CompletedTask;
       }
 
+      /// <summary>
+      /// Initalizes the value transformers
+      /// </summary>
+      /// <returns>A task representing the asynchronous operation.</returns>
       protected virtual Task InitializeValueTransformers()
       {
          ValueTransformers = ValueTransformers ?? new Dictionary<string, Action<object>>();
@@ -204,8 +217,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
 
       /// <summary>
-      /// New: Sends a streaming request using HttpParameters and returns the raw HttpResponseMessage for streaming consumption.
+      /// Creates a web request to a remote service (uri) and returns the response stream.
       /// </summary>
+      /// <typeparam name="E">The error response type</typeparam>
+      /// <param name="parameters">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
+      /// <param name="cancellation">A cancellation token that can terminate the request.</param>
+      /// <returns>An HttpResponseMessage representing the response from the remote service.</returns>
       protected virtual async Task<HttpResponseMessage> MakeStreamRequestAsync<E>(HttpParameters parameters, CancellationToken cancellation = default)
          where E : IErrorResponse
       {
@@ -217,10 +234,16 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
 
       /// <summary>
-      /// New: Create an HttpRequestMessage from HttpParameters
+      /// Creates an Http request to a remote service (uri).
       /// </summary>
+      /// <param name="parameters">optional parameters (if provided, it's assumed the uri doesn't contain any)</param>
+      /// <param name="cancellation">A cancellation token that can terminate the request.</param>
+      /// <returns>An HttpRequestMessage representing the request to be sent.</returns>
       protected virtual Task<HttpRequestMessage> CreateHttpRequestAsync(HttpParameters parameters, CancellationToken cancellation)
       {
+         if (!Initialized)
+            throw new InvalidOperationException($"{GetType().Name} client is not initialized. Call InitializeAsync() first.");
+
          if (cancellation.IsCancellationRequested) return default;
 
          string queryString = string.Empty;
@@ -428,24 +451,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
       #endregion
 
-      public virtual void TransformObjectValues(object inputObject, string httpAction = HttpAction.Response)
-      {
-         if (inputObject == null)
-            return;
-
-         if (httpAction == HttpAction.Request || httpAction == HttpAction.Response)
-         {
-            if (ValueTransformers.TryGetValue(httpAction, out var valueTransformer))
-               valueTransformer.Invoke(inputObject);
-
-            if (httpAction == HttpAction.Request)
-               SimpleObjectValidator.Validate(inputObject);
-
-            return;
-         }
-
-         throw new ArgumentException($"Value transformer type {httpAction} is not supported.");
-      }
+      #region utilities
 
       /// <summary>
       /// Determines if trading is halted for the provided instrument.
@@ -483,6 +489,36 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
 
          return true;
       }
+
+      /// <summary>
+      /// Transforms the values of the properties of the input object based on the specified HTTP action.<br/>
+      /// </summary>
+      /// <param name="inputObject">The object whose property values are to be transformed.</param>
+      /// <param name="httpAction">The HTTP action (request or response) that determines the transformation logic.</param>
+      /// <exception cref="ArgumentException">Thrown when the specified HTTP action is not supported.</exception>
+      public virtual void TransformObjectValues(object inputObject, string httpAction = HttpAction.Response)
+      {
+         if (inputObject == null)
+            return;
+
+         if (httpAction == HttpAction.Request || httpAction == HttpAction.Response)
+         {
+            if (ValueTransformers != null 
+               && ValueTransformers.TryGetValue(httpAction, out var valueTransformer))
+            {
+               valueTransformer.Invoke(inputObject);
+            }
+
+            if (httpAction == HttpAction.Request)
+               SimpleObjectValidator.Validate(inputObject);
+
+            return;
+         }
+
+         throw new ArgumentException($"Value transformer type {httpAction} is not supported.");
+      }
+
+      #endregion
 
       public void Dispose()
       {

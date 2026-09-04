@@ -38,7 +38,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class OrderReplaceParameters : ApiParameters
+   public class OrderReplaceParameters : ClientParameters
    {
       /// <summary>
       /// Account Identifier [required]

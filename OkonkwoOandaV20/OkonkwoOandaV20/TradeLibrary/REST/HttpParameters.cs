@@ -27,10 +27,10 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       {
          if (parameters == null) return;
 
-         if (parameters is ApiParameters apiParameters && !apiParameters.ForInternalRequest)
+         if (parameters is ClientParameters apiParameters && !apiParameters.ForInternalRequest)
             client.TransformObjectValues(parameters, HttpAction.Request);
 
-         jsonSettings = jsonSettings ?? (parameters as ApiParameters)?.JsonSettingsRequest;
+         jsonSettings = jsonSettings ?? (parameters as ClientParameters)?.JsonSettingsRequest;
          jsonSettings = jsonSettings ?? client.JsonSettingsRequest;
          //jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
          var jsonSerializer = JsonSerializer.CreateDefault(jsonSettings);

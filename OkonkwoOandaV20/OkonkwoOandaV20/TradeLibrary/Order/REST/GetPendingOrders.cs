@@ -34,7 +34,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       }
    }
 
-   public class PendingOrdersParameters : ApiParameters
+   public class PendingOrdersParameters : ClientParameters
    {
       /// <summary>
       /// Account Identifier [required]

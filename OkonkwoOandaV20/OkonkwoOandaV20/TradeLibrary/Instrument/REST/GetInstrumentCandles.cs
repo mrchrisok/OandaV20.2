@@ -115,7 +115,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          public string weeklyAlignment { get; set; }
       }
 
-      public class InstrumentParameters : ApiParameters
+      public class InstrumentParameters : ClientParameters
       {
          /// <summary>
          /// Name of the instrument

@@ -31,7 +31,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          return response;
       }
 
-      public class PositionCloseParameters : ApiParameters
+      public class PositionCloseParameters : ClientParameters
       {
          /// <summary>
          /// Account Identifier [required]
