@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using OkonkwoCore.ServiceModel.REST.Streaming;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using OkonkwoOandaV20.TradeLibrary.Transaction;
@@ -42,6 +43,12 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
       [JsonIgnore]
       [Required]
       public string accountID { get; set; }
+
+      /// <summary>
+      /// Gets or sets the maximum number of chunk errors allowed before throwing an exception. Default is 1.
+      /// </summary>
+      [JsonIgnore]
+      public uint? ChunkErrorsMaximumThenThrow { get; set; } = 1;
    }
 
    //[JsonConverter(typeof(TransactionsStreamResponseConverter))]
@@ -68,17 +75,17 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    public class TransactionsSession : StreamSession<TransactionsStreamResponse>
    {
       public TransactionsSession(Rest20 client, TransactionsSessionParameters parameters) 
-         : base(client, parameters.accountID)
+         : base(client, parameters.accountID, parameters.ChunkErrorsMaximumThenThrow)
       {
          _parameters = parameters;
       }
 
       protected readonly TransactionsSessionParameters _parameters;
 
-      protected override async Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default)
+      protected override async Task<HttpResponseMessage> GetSessionAsync(CancellationToken cancellation = default)
       {
-         return await _client.GetTransactionsStream(new TransactionsStreamParameters() { 
-            accountID = _accountID 
+         return await ((Rest20)_client).GetTransactionsStream(new TransactionsStreamParameters() { 
+            accountID = _streamID
          }, cancellation);
       }
    }

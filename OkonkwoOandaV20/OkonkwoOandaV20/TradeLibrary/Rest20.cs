@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OkonkwoCore.Common.Contracts;
 using OkonkwoOandaV20.Framework;
 using OkonkwoOandaV20.Framework.JsonConverters;
 using System;
@@ -20,7 +21,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    /// <summary>
    /// http://developer.oanda.com/rest-live-v20/introduction/
    /// </summary>
-   public partial class Rest20 : IDisposable
+   public partial class Rest20 : IRestClient, IDisposable
    {
       /// <summary>
       /// An instance of the Rest20 client for making requests to Oanda's V20 REST API

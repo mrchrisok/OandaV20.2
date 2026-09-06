@@ -55,7 +55,7 @@ namespace OkonkwoOandaV20Tests
       private static CancellationToken m_CancellationToken = m_CancellationSource.Token;
 
       [ClassInitialize]
-      public static async void RunApiOperations(TestContext context)
+      public static async Task RunApiOperations(TestContext context)
       {
          try
          {
@@ -1186,7 +1186,7 @@ namespace OkonkwoOandaV20Tests
              TaskCreationOptions.RunContinuationsAsynchronously);
 
          session.DataReceived += OnTransactionReceived;
-         session.StartSession(m_CancellationToken);
+         session.StartSessionAsync(m_CancellationToken);
 
          // Wait up to 20 seconds for ANY transaction
          var transactionReceivedTask = _transactionReceivedTcs.Task;
@@ -1239,7 +1239,7 @@ namespace OkonkwoOandaV20Tests
          _priceReceivedTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
          session.DataReceived += OnPricingReceived;
-         session.StartSession(m_CancellationToken);
+         session.StartSessionAsync(m_CancellationToken);
 
          // Wait up to 30 seconds
          var priceReceivedTask = _priceReceivedTcs.Task;

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OkonkwoCore.Common.Contracts;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using OkonkwoOandaV20.TradeLibrary.REST;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
@@ -14,7 +15,7 @@ namespace OkonkwoOandaV20.Framework.JsonConverters
       public override bool CanConvert(Type objectType)
       {
          return objectType == typeof(PricingStreamResponse)
-            && objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IStreamResponse));
+            && objectType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IStreamChunkResponse));
       }
 
       public override object ReadJson(JsonReader reader, Type objectType, object existingValue
