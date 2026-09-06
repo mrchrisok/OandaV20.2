@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using OkonkwoCore.ServiceModel.REST.Streaming;
 using OkonkwoOandaV20.TradeLibrary.Pricing;
 using OkonkwoOandaV20.TradeLibrary.REST.Streaming;
 using System;
@@ -52,19 +53,19 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
          /// initially connecting to the stream. [default=True]
          /// </summary>
          public bool snapshot { get; set; }
+
+         /// <summary>
+         /// Gets or sets the maximum number of chunk errors allowed before throwing an exception. Default is 1.
+         /// </summary>
+         [JsonIgnore]
+         public uint? ChunkErrorsMaximumThenThrow { get; set; } = 1;
       }
    }
 
    //[JsonConverter(typeof(PricingStreamResponseConverter))]
-   public class PricingStreamResponse : IStreamResponse
+   public class PricingStreamResponse : StreamResponse
    {
-      public PricingHeartbeat heartbeat { get; set; }
       public Price price { get; set; }
-
-      public bool IsHeartbeat()
-      {
-         return heartbeat != null;
-      }
    }
 
    public class PricingStreamErrorResponse : ErrorResponse
@@ -79,14 +80,14 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
    public class PricingSession : StreamSession<PricingStreamResponse>
    {
       public PricingSession(Rest20 client, PricingSessionParameters parameters)
-         : base(client, parameters.accountID)
+         : base(client, parameters.accountID, parameters.ChunkErrorsMaximumThenThrow)
       {
          _parameters = parameters;
       }
 
       protected readonly PricingSessionParameters _parameters;
 
-      protected override async Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default)
+      protected override async Task<HttpResponseMessage> GetSessionAsync(CancellationToken cancellation = default)
       {
          //var instruments = new List<string>(_parameters.instruments);
          //_parameters.instruments.ForEach(instrument => instruments.Add(instrument.name));
@@ -98,7 +99,7 @@ namespace OkonkwoOandaV20.TradeLibrary.REST
             snapshot = _parameters.snapshot
          };
 
-         return await _client.GetPricingStream(_parameters, cancellation);
+         return await ((Rest20)_client).GetPricingStream(parameters, cancellation);
       }
    }
 

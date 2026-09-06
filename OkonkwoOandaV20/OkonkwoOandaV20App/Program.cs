@@ -4,11 +4,6 @@ using Azure.Security.KeyVault.Secrets;
 using OkonkwoOandaV20.Framework.Factories;
 using OkonkwoOandaV20.TradeLibrary.REST;
 using OkonkwoOandaV20.TradeLibrary.REST.OrderRequests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static OkonkwoOandaV20.TradeLibrary.REST.Rest20;
 
 namespace OkonkwoOandaV20App
@@ -162,7 +157,7 @@ namespace OkonkwoOandaV20App
          _transactionReceived = new Semaphore(0, 100);
          _transactionsSession.DataReceived += OnTransactionReceived;
 
-         _transactionsSession.StartSession();
+         _transactionsSession.StartSessionAsync();
 
          bool success = _transactionReceived.WaitOne(10000);
 
