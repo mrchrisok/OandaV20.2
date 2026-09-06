@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using OkonkwoCore.Common.Contracts;
 using OkonkwoOandaV20.Framework;
 using System;
 using System.IO;
@@ -9,80 +10,80 @@ using System.Threading.Tasks;
 
 namespace OkonkwoOandaV20.TradeLibrary.REST.Streaming
 {
-   public abstract class StreamSession<T> where T : IStreamResponse
-   {
-      protected StreamSession(Rest20 client, string accountID)
-      {
-         _client = client;
-         _accountID = accountID;
-      }
+   //public abstract class StreamSession<T> where T : IStreamChunkResponse
+   //{
+   //   protected StreamSession(Rest20 client, string accountID)
+   //   {
+   //      _client = client;
+   //      _accountID = accountID;
+   //   }
 
-      #region properties
+   //   #region properties
 
-      protected readonly Rest20 _client;
-      protected readonly string _accountID;
-      protected HttpResponseMessage _response;
-      protected bool _shutdown;
+   //   protected readonly Rest20 _client;
+   //   protected readonly string _accountID;
+   //   protected HttpResponseMessage _response;
+   //   protected bool _shutdown;
 
-      public delegate void DataHandler(T data);
-      public event DataHandler DataReceived;
-      public void OnDataReceived(T data)
-      {
-         DataReceived?.Invoke(data);
-      }
+   //   public delegate void DataHandler(T data);
+   //   public event DataHandler DataReceived;
+   //   public void OnDataReceived(T data)
+   //   {
+   //      DataReceived?.Invoke(data);
+   //   }
 
-      public delegate void SessionStatusHandler(string accountID, bool started, Exception e);
-      public event SessionStatusHandler SessionStatusChanged;
-      public void OnSessionStatusChanged(bool started, Exception e)
-      {
-         SessionStatusChanged?.Invoke(_accountID, started, e);
-      }
+   //   public delegate void SessionStatusHandler(string accountID, bool started, Exception e);
+   //   public event SessionStatusHandler SessionStatusChanged;
+   //   public void OnSessionStatusChanged(bool started, Exception e)
+   //   {
+   //      SessionStatusChanged?.Invoke(_accountID, started, e);
+   //   }
 
-      #endregion
+   //   #endregion
 
-      protected abstract Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default);
+   //   protected abstract Task<HttpResponseMessage> GetSession(CancellationToken cancellation = default);
 
-      public virtual async Task StartSession(CancellationToken cancellation = default)
-      {
-         _shutdown = false;
+   //   public virtual async Task StartSession(CancellationToken cancellation = default)
+   //   {
+   //      _shutdown = false;
 
-         try
-         {
-            _response = await GetSession(cancellation);
+   //      try
+   //      {
+   //         _response = await GetSession(cancellation);
 
-            using (_response)
-            using (var stream = await _response.Content.ReadAsStreamAsync())
-            using (var reader = new StreamReader(stream))
-            {
-               while (!reader.EndOfStream && !_shutdown && !cancellation.IsCancellationRequested)
-               {
-                  var line = await reader.ReadLineAsync();
-                  var data = JsonConvert.DeserializeObject<T>(line, _client.JsonSettingsResponse);
-                  _client.TransformObjectValues(data, HttpAction.Response);
-                  OnSessionStatusChanged(!_shutdown, null);
-                  OnDataReceived(data);
-               }
-            }
-         }
-         catch (Exception e)
-         {
-            _shutdown = true;
-            throw e;
-         }
-         finally
-         {
-            _response = null;
-         }
-      }
+   //         using (_response)
+   //         using (var stream = await _response.Content.ReadAsStreamAsync())
+   //         using (var reader = new StreamReader(stream))
+   //         {
+   //            while (!reader.EndOfStream && !_shutdown && !cancellation.IsCancellationRequested)
+   //            {
+   //               var line = await reader.ReadLineAsync();
+   //               var data = JsonConvert.DeserializeObject<T>(line, _client.JsonSettingsResponse);
+   //               _client.TransformObjectValues(data, HttpAction.Response);
+   //               OnSessionStatusChanged(!_shutdown, null);
+   //               OnDataReceived(data);
+   //            }
+   //         }
+   //      }
+   //      catch (Exception e)
+   //      {
+   //         _shutdown = true;
+   //         throw e;
+   //      }
+   //      finally
+   //      {
+   //         _response = null;
+   //      }
+   //   }
 
-      public void StopSession()
-      {
-         _shutdown = true;
-      }
+   //   public void StopSession()
+   //   {
+   //      _shutdown = true;
+   //   }
 
-      public bool Stopped()
-      {
-         return _shutdown;
-      }
-   }
+   //   public bool Stopped()
+   //   {
+   //      return _shutdown;
+   //   }
+   //}
 }

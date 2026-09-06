@@ -3,8 +3,8 @@
 .NET library that enables Forex trading via OANDA© v20.
 
 Technologies
-- C# 7.0
-- .NET Framework 4.7.2
+- C# 10.0
+- .NET Standard 2.0
 
 Version 2 Improvements
 - Strongly typed parameters for all V20 api operations
