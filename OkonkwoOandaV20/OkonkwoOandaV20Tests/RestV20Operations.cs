@@ -1199,15 +1199,15 @@ namespace OkonkwoOandaV20Tests
       }
       static TaskCompletionSource<bool> _transactionReceivedTcs;
       static volatile bool _gotTransactionTick, _gotTransaction;
-      protected static void OnTransactionReceived(TransactionsStreamResponse data)
+      protected static Task OnTransactionReceived(TransactionsStreamResponse data)
       {
          if (_gotTransaction)
-            return;
+            return Task.CompletedTask;
 
          _gotTransactionTick = true;
 
          if (data.IsHeartbeat())
-            return;
+            return Task.CompletedTask;
 
          // Validate transaction
          m_Results.Verify("07.1", data.transaction != null, "Transaction received");
@@ -1222,6 +1222,7 @@ namespace OkonkwoOandaV20Tests
 
          _gotTransaction = true;
          _transactionReceivedTcs.TrySetResult(true);
+         return Task.CompletedTask;
       }
 
       protected static async Task Stream_GetStreamingPrices()
@@ -1251,15 +1252,15 @@ namespace OkonkwoOandaV20Tests
       }
       static TaskCompletionSource<bool> _priceReceivedTcs;
       static volatile bool _gotPriceTick, _gotPrice;
-      protected static void OnPricingReceived(PricingStreamResponse data)
+      protected static Task OnPricingReceived(PricingStreamResponse data)
       {
          if (_gotPrice)
-            return;
+            return Task.CompletedTask;
 
          _gotPriceTick = true;
 
          if (data.price == null)
-            return;
+            return Task.CompletedTask;
 
          // Validate price
          m_Results.Verify("18.1", data.price != null, "Pricing data received.");
@@ -1275,6 +1276,7 @@ namespace OkonkwoOandaV20Tests
 
          // Signal the waiting task
          _priceReceivedTcs.TrySetResult(true);
+         return Task.CompletedTask;
       }
 
 

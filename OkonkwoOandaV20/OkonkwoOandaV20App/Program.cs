@@ -167,12 +167,13 @@ namespace OkonkwoOandaV20App
             WriteNewLine("Bad news!. Transactions stream is not functioning.");
       }
 
-      protected static void OnTransactionReceived(TransactionsStreamResponse data)
+      protected static Task OnTransactionReceived(TransactionsStreamResponse data)
       {
          if (!data.IsHeartbeat())
             WriteNewLine("V20 notification - New account transaction: " + data.transaction.type);
 
          _transactionReceived.Release();
+         return Task.CompletedTask; 
       }
 
       static void StopTransactionsStream()
