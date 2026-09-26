@@ -26,7 +26,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="OkonkwoCore.ServiceModel" Version="3.2026.919.101" />
+        <PackageReference Include="OkonkwoCore.ServiceModel" Version="3.2026.926.103" />
     </ItemGroup>
 
 </Project>
