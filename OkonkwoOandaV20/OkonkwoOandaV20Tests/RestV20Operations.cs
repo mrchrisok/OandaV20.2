@@ -1199,7 +1199,7 @@ namespace OkonkwoOandaV20Tests
       }
       static TaskCompletionSource<bool> _transactionReceivedTcs;
       static volatile bool _gotTransactionTick, _gotTransaction;
-      protected static Task OnTransactionReceived(TransactionsStreamResponse data)
+      protected static Task OnTransactionReceived(string streamID, TransactionsStreamResponse data)
       {
          if (_gotTransaction)
             return Task.CompletedTask;
@@ -1252,7 +1252,7 @@ namespace OkonkwoOandaV20Tests
       }
       static TaskCompletionSource<bool> _priceReceivedTcs;
       static volatile bool _gotPriceTick, _gotPrice;
-      protected static Task OnPricingReceived(PricingStreamResponse data)
+      protected static Task OnPricingReceived(string streamID, PricingStreamResponse data)
       {
          if (_gotPrice)
             return Task.CompletedTask;
