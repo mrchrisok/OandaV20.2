@@ -31,7 +31,7 @@ jobs:
     env:
       PROJECT_NAME: OkonkwoOandaV20
       PROJECT_FOLDER: ./OkonkwoOandaV20
-      PROJECT_FILE: ./OkonkwoOandaV20/OkonkwoOandaV20/OkonkwoOandaV20.csproj
+      PROJECT_FILE: ./OandaV20.2/OkonkwoOandaV20/OkonkwoOandaV20.csproj
       VERSION: ${{needs.version_01.outputs.version}}
 
     permissions:
